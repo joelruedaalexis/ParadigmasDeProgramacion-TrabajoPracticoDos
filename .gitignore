@@ -1,0 +1,47 @@
+# Archivos compilados de Java
+*.class
+
+# Archivos de paquete de Eclipse
+*.jar
+*.war
+*.ear
+
+# Archivos de log
+*.log
+
+# Archivos de respaldo y temporales
+*~
+*.bak
+*.old
+*.tmp
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Directorios de salida de Eclipse
+bin/
+target/
+build/
+
+# Configuración específica de Eclipse
+.settings/
+.metadata/
+bin/
+
+# Archivos de workspace de Eclipse
+*.launch
+
+# Archivos de proyecto de Eclipse
+.classpath
+.project
+
+# Variables de entorno
+.env
+
+# Archivos de IDE
+*.swp
+*.swo
+
+# Archivos de sistema
+*.orig
