@@ -61,6 +61,16 @@ public class Cancion {
 //		return rolesXCuposDeIntegrantes.values().stream().mapToInt(cupos -> cupos).sum();
 	}
 
+	public Map<String, Integer> getRolesFaltantesXCupos() {
+		Map<String, Integer> rolesFaltantesXCupos = new HashMap<>();
+		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
+			if (nodo.getValue().hayCuposDisponibles())
+				rolesFaltantesXCupos.put(nodo.getKey(), nodo.getValue().getCantDeCuposDisponibles());
+		}
+		return rolesFaltantesXCupos;
+//		return rolesXCuposDeIntegrantes.values().stream().mapToInt(cupos -> cupos).sum();
+	}
+
 	public List<Artista> getListadoDeIntegrantes() {
 		List<Artista> listadoDeIntegrantes = new ArrayList<>();
 		for (IntegranteDeRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
@@ -72,7 +82,8 @@ public class Cancion {
 		return listadoDeIntegrantes;
 	}
 
-	public boolean agregarArtista(String rol, Artista artista) {// chequear si el artista en null o si rol es null maybe ?
+	public boolean agregarArtista(String rol, Artista artista) {// chequear si el artista en null o si rol es null maybe
+																// ?
 		if (!rolesXListaDeIntegrantes.containsKey(rol))
 			return false;// Exception?
 		if (!rolesXListaDeIntegrantes.get(rol).hayCuposDisponibles())

@@ -52,8 +52,21 @@ public class Recital {
 	}
 
 //	rolesFaltantesParaCancion = 1
-	public int cantDeRolesFaltantesParaUnaCancion(int index) {
-		return repertorio.get(index).cantDeCuposDisponibles();
+	public String cantDeRolesFaltantesParaUnaCancion(int index) {
+		// Chequear si el index es válido y blablabla
+		Cancion cancion = repertorio.get(index);
+		Map<String, Integer> rolesFaltantesXCupos = cancion.getRolesFaltantesXCupos();
+		if (rolesFaltantesXCupos.isEmpty())
+			return String.format("Todos los roles de la canción \"%s\"ya han sido asignados.", cancion.getTitulo());
+
+		String str = String.format("A la canción \"%s\" le faltan los siguientes roles a asignar:\n",
+				cancion.getTitulo());
+		for (Map.Entry<String, Integer> nodo : rolesFaltantesXCupos.entrySet()) {
+			String rol = nodo.getKey();
+			Integer cupos = nodo.getValue();
+			str += String.format("\t~%d %s.\n", cupos, rol);
+		}
+		return str;
 	}
 
 //	rolesFaltantesParaTodasLasCanciones = 2,
@@ -101,10 +114,7 @@ public class Recital {
 
 		boolean hayIntegrantesInsuficientes = false;
 //		Map<String,IntegranteDeRol> rolesXIntegrantesCandidatos
-		
-		
-		
-		
+
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
 			IntegranteDeRol integrantesDeRol = nodo.getValue();
@@ -129,12 +139,13 @@ public class Recital {
 			resultadoTransaccion.cancelarTransaccion(rolesXIntegrantesCandidatos, listaDeArtistasDisponibles);
 			return resultadoTransaccion;
 		}
-		
+
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
 			List<Artista> listaDeArtistas = nodo.getValue().getListaDeIntegrantes();
 			listaDeArtistas.forEach(artista -> {
-				System.out.println(cancion.agregarArtista(rol, artista));;
+				System.out.println(cancion.agregarArtista(rol, artista));
+				;
 				artista.asignar(cancion);
 			});
 		}

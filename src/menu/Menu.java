@@ -146,7 +146,8 @@ public class Menu {
 			if (opcion != salir) {
 				pausar();
 			}
-		} while (opcion == salir);
+		} while (opcion == salir);//<------------------------CAMBIAR ESTO PARA LOOPEAR
+//		} while (opcion != salir);
 		System.out.println("Saliendo...");
 	}
 
