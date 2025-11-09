@@ -55,11 +55,12 @@ public class Menu {
 				System.out.println(recital.cantDeRolesFaltantesParaUnaCancion(indexCancion));
 				break;
 			case rolesFaltantesParaTodasLasCanciones:// 2
-				int cantDeRolesFaltantesParaTodasLasCanciones = recital.cantDeRolesFaltantesParaTodasLasCanciones();
-				if (cantDeRolesFaltantesParaTodasLasCanciones == 0)
-					System.out.println("->Todas las canciones tienen asignado a un artista.\n");
-				else
-					System.out.printf("->Hay %d rol(es) sin asignar.\n", cantDeRolesFaltantesParaTodasLasCanciones);
+				System.out.println(recital.cantDeRolesFaltantesParaTodasLasCanciones());
+//				int cantDeRolesFaltantesParaTodasLasCanciones = recital.cantDeRolesFaltantesParaTodasLasCanciones();
+//				if (cantDeRolesFaltantesParaTodasLasCanciones == 0)
+//					System.out.println("->Todas las canciones tienen asignado a un artista.\n");
+//				else
+//					System.out.printf("->Hay %d rol(es) sin asignar.\n", cantDeRolesFaltantesParaTodasLasCanciones);
 				break; 
 			case contratarArtistasParaUnaCancion:// 3
 				indexCancion = elegirCancion();

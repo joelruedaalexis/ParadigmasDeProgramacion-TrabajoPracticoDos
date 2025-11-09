@@ -8,8 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
@@ -70,9 +73,42 @@ public class Recital {
 	}
 
 //	rolesFaltantesParaTodasLasCanciones = 2,
-	public int cantDeRolesFaltantesParaTodasLasCanciones() {
-//		return repertorio.stream().mapToInt(cancion -> cancion.cantDeRolesFaltantes()).sum();
-		return repertorio.stream().mapToInt(cancion -> cancion.cantDeCuposDisponibles()).sum();
+	public String cantDeRolesFaltantesParaTodasLasCanciones() {
+		List<Artista> listaArtistasBase = lineUp.stream().filter(a -> a.perteneceADiscografica()).toList();
+		Map<String, Integer> rolesFaltantesTotalesXCupo = new HashMap<>();
+		Set<Artista> setArtistasYaAsignados = new TreeSet<Artista>(new ComparadorArtistaPorNombre());
+		for (Cancion cancion : repertorio) {
+			System.out.println(cancion.getTitulo());
+			Map<String, Integer> rolesFaltantesXCupoDeCancion = cancion.getRolesFaltantesXCupos();
+			for (Map.Entry<String, Integer> nodo : rolesFaltantesXCupoDeCancion.entrySet()) {
+				String rol = nodo.getKey();
+				Integer cupos = nodo.getValue();
+				for (int i = 0; i < listaArtistasBase.size() && cupos > 0; i++) {
+					Artista artistaBase = listaArtistasBase.get(i);
+					if (!cancion.artistaEstaAsignado(artistaBase) && !setArtistasYaAsignados.contains(artistaBase)
+							&& artistaBase.tieneRol(rol)) {
+						setArtistasYaAsignados.add(artistaBase);
+						cupos--;
+					}
+				}
+				if (cupos > 0)
+					rolesFaltantesTotalesXCupo.put(rol, rolesFaltantesTotalesXCupo.getOrDefault(rol, 0) + cupos);
+			}
+			rolesFaltantesXCupoDeCancion.clear();
+			setArtistasYaAsignados.clear();
+		}
+
+		if (rolesFaltantesTotalesXCupo.isEmpty())
+			return "Todas las canciones ya tienen sus roles asignados a artistas.";
+
+		String str = "Para poder asignar todas las canciones con artistas contratados se necesitan que tengan los siguientes roles:\n";
+		for (Map.Entry<String, Integer> nodo : rolesFaltantesTotalesXCupo.entrySet()) {
+			String rol = nodo.getKey();
+			Integer cupos = nodo.getValue();
+			str += String.format("\t~%d %s.\n", cupos, rol);
+		}
+
+		return str;
 	}
 
 //	public void cargarMapTodosLosRolesXArtista() {
