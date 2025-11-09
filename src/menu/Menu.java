@@ -1,6 +1,7 @@
 package menu;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class Menu {
 //					System.out.println("->Todas las canciones tienen asignado a un artista.\n");
 //				else
 //					System.out.printf("->Hay %d rol(es) sin asignar.\n", cantDeRolesFaltantesParaTodasLasCanciones);
-				break; 
+				break;
 			case contratarArtistasParaUnaCancion:// 3
 				indexCancion = elegirCancion();
 				TransaccionAsignacionDeCancion resultadoTransaccion = recital
@@ -130,7 +131,8 @@ public class Menu {
 				recital.quitarArtistaDelLineUp(xd.get(nombreArtista));
 				break;
 			case guardarEstadoDelRecital:// 12
-				String ruta = this.ingresarRutaParaGuardarRecital();
+				String ruta = this
+						.ingresarRutaParaRecital("-> Ingrese la ruta del archivo donde desea guardar el recital: ");
 				try {
 					recital.guardarEnArchivoJSON(ruta);
 					System.out.println("->El archivo se ha guardado con éxito.");
@@ -142,13 +144,24 @@ public class Menu {
 				}
 				break;
 			case cargarEstadoDelRecital:// 13
+				String ruta2 = this
+						.ingresarRutaParaRecital("-> Ingrese la ruta del archivo donde desea guardar el recital: ");
+				try {
+					recital.cargarEstadoDeArchivoJSON(ruta2);
+					System.out.println("->El archivo se ha cargado con éxito.");
+					recitalesGuardados.add(ruta2);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+//					e.printStackTrace();
+					System.out.println(e.getMessage());
+				}
 				break;
 			}
 			if (opcion != salir) {
 				pausar();
 			}
-		} while (opcion == salir);//<------------------------CAMBIAR ESTO PARA LOOPEAR
-//		} while (opcion != salir);
+//		} while (opcion == salir);//<------------------------CAMBIAR ESTO PARA LOOPEAR
+		} while (opcion != salir);
 		System.out.println("Saliendo...");
 	}
 
@@ -218,10 +231,10 @@ public class Menu {
 
 	}
 
-	private String ingresarRutaParaGuardarRecital() {
+	private String ingresarRutaParaRecital(String str) {
 		String ruta = "";
 		do {
-			System.out.printf("-> Ingrese la ruta del archivo donde desea guardar el recital: ");
+			System.out.printf(str);
 			ruta = this.scanner.nextLine().trim();
 
 			if (!ruta.endsWith(".json") || ruta.length() <= 5) {
@@ -229,6 +242,6 @@ public class Menu {
 			}
 		} while (!ruta.endsWith(".json") || ruta.length() <= 5);
 
-		return ruta;
+		return Paths.get("estadosCreados", ruta).toString();
 	}
 }

@@ -22,6 +22,20 @@ public class Cancion {
 		inicializarRolesXIntegrantes(new LinkedList<String>(roles));
 	}
 
+	public Cancion(String titulo, Map<String, IntegranteDeRol> rolesXListaDeIntegrantes) {
+		this.titulo = titulo;
+		this.rolesXListaDeIntegrantes = rolesXListaDeIntegrantes;
+		this.inicializarRolesXIntegrantes();
+	}
+
+	private void inicializarRolesXIntegrantes() {
+		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
+			String rol = nodo.getKey();
+			List<Artista> artistasDeRol = nodo.getValue().getListaDeIntegrantes();
+			artistasDeRol.forEach(a -> this.agregarArtista(rol, a));
+		}
+	}
+
 	private void inicializarRolesXIntegrantes(List<String> listaRoles) {
 		this.rolesXListaDeIntegrantes = new HashMap<>();
 		while (!listaRoles.isEmpty()) {
