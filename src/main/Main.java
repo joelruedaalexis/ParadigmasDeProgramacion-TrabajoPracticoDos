@@ -104,6 +104,10 @@ public class Main {
 		Menu menu = new Menu(scanner, recital);
 		menu.iniciar();
 		scanner.close();
+		
+		List<String> lista = new ArrayList<>(4);
+		System.out.println("---->" + lista.size());
+		
 //		System.out.println(repertorio);
 		Map<String, Integer> map = new LinkedHashMap<>();
 		map.put("D", 4);

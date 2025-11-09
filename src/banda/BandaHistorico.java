@@ -13,6 +13,10 @@ public class BandaHistorico {
 		this.nombre = nombre;
 		this.integrantes = new ArrayList<>();
 	}
+	public BandaHistorico(String nombre,List<Artista> integrantes) {
+		this.nombre = nombre;
+		this.integrantes = integrantes;
+	}
 
 	public boolean tieneArtistaDeDiscografica() {
 		boolean tieneArtistaDeDiscografica = false;

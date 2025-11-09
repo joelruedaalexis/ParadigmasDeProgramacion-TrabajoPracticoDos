@@ -32,7 +32,6 @@ public class Menu {
 			try {
 				opcion = scanner.nextInt();
 			} catch (NoSuchElementException e) {
-				// TODO: handle exception
 				opcion = -1;
 			} finally {
 				scanner.nextLine();
@@ -61,7 +60,7 @@ public class Menu {
 					System.out.println("->Todas las canciones tienen asignado a un artista.\n");
 				else
 					System.out.printf("->Hay %d rol(es) sin asignar.\n", cantDeRolesFaltantesParaTodasLasCanciones);
-				break;
+				break; 
 			case contratarArtistasParaUnaCancion:// 3
 				indexCancion = elegirCancion();
 				TransaccionAsignacionDeCancion resultadoTransaccion = recital
@@ -147,7 +146,7 @@ public class Menu {
 			if (opcion != salir) {
 				pausar();
 			}
-		} while (opcion != salir);
+		} while (opcion == salir);
 		System.out.println("Saliendo...");
 	}
 

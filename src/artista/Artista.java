@@ -23,6 +23,10 @@ public abstract class Artista {
 		this.costo = 0;
 		cancionesEnLasQueEstaAsignado = new ArrayList<>();
 	}
+	
+	public boolean tieneRol(String rolAConsultar) {
+		return roles.contains(rolAConsultar);
+	}
 
 	public boolean estaAsignadoAUnaCancion() {
 		return cancionesEnLasQueEstaAsignado.size() != 0;

@@ -6,17 +6,18 @@ import java.util.Map;
 
 import artista.Artista;
 import cancion.Cancion;
+import cancion.IntegranteDeRol;
 
 public class TransaccionAsignacionDeCancion {
 	public final static int SI = 0, NO = 1;
 	boolean transaccionCommitted;
-	Map<String, Integer> rolesXCantidadFaltante;
-	Map<String, List<Artista>> rolXArtistaCandidato;
+//	Map<String, Integer> rolesXCantidadFaltante;
+//	Map<String, List<Artista>> rolXArtistaCandidato;
 	List<Artista> listaDeArtistasPosiblesParaEntrenar;
 	Cancion cancion;
+	Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos;
 
 	protected TransaccionAsignacionDeCancion(Cancion cancion) {
-		// TODO Auto-generated constructor stub
 		this.cancion = cancion;
 	}
 
@@ -30,10 +31,14 @@ public class TransaccionAsignacionDeCancion {
 
 	public boolean sePuedenEntrenarArtistasSuficientes() {
 		int cantDeArtistasNecesariosParaEntrenar = 0;
-		for (Integer cant : rolesXCantidadFaltante.values()) {
-			cantDeArtistasNecesariosParaEntrenar += cant;
+		for (IntegranteDeRol integrantesDeRol : rolesXIntegrantesCandidatos.values()) {
+			cantDeArtistasNecesariosParaEntrenar += integrantesDeRol.getCantDeCuposDisponibles();
 		}
-		return cantDeArtistasNecesariosParaEntrenar < listaDeArtistasPosiblesParaEntrenar.size();
+
+//		for (Integer cant : rolesXCantidadFaltante.values()) {
+//			cantDeArtistasNecesariosParaEntrenar += cant;
+//		}
+		return cantDeArtistasNecesariosParaEntrenar <= listaDeArtistasPosiblesParaEntrenar.size();
 	}
 
 	public String getInformeDeAsignacionDeArtistas() {
@@ -48,17 +53,26 @@ public class TransaccionAsignacionDeCancion {
 				+ "\"elegida se necesitan artistas con los siguientes roles:\n";
 
 		int cantDeArtistasNecesariosParaEntrenar = 0;
-		for (Integer cant : rolesXCantidadFaltante.values()) {
-			cantDeArtistasNecesariosParaEntrenar += cant;
+		for (IntegranteDeRol integrantesDeRol : rolesXIntegrantesCandidatos.values()) {
+			cantDeArtistasNecesariosParaEntrenar += integrantesDeRol.getCantDeCuposDisponibles();
 		}
+//		for (Integer cant : rolesXCantidadFaltante.values()) {
+//			cantDeArtistasNecesariosParaEntrenar += cant;
+//		}
 //		System.out.println(rolesXCantidadFaltante);
 
 		String rolesFaltantes = "";
-		for (Map.Entry<String, Integer> nodo : rolesXCantidadFaltante.entrySet()) {
+		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
-			int cantidad = nodo.getValue();
-			rolesFaltantes += String.format("\t->%s: cantidad %d\n", rol, cantidad);
+			int cantidad = nodo.getValue().getCantDeCuposDisponibles();
+			if (nodo.getValue().hayCuposDisponibles())
+				rolesFaltantes += String.format("\t->%s: cantidad %d\n", rol, cantidad);
 		}
+//		for (Map.Entry<String, Integer> nodo : rolesXCantidadFaltante.entrySet()) {
+//			String rol = nodo.getKey();
+//			int cantidad = nodo.getValue();
+//			rolesFaltantes += String.format("\t->%s: cantidad %d\n", rol, cantidad);
+//		}
 		informe += rolesFaltantes + "\n";
 		if (cantDeArtistasNecesariosParaEntrenar > listaDeArtistasPosiblesParaEntrenar.size()) {
 			informe += "No hay artistas suficientes disponibles para entrenar :( \n";
@@ -68,9 +82,9 @@ public class TransaccionAsignacionDeCancion {
 //		String rolesFaltantes = "";
 		String artistasRecomendables = "";
 		Iterator<Artista> iteradorArtistasRecomendables = listaDeArtistasPosiblesParaEntrenar.iterator();
-		for (Map.Entry<String, Integer> nodo : rolesXCantidadFaltante.entrySet()) {
+		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
-			int cantidad = nodo.getValue();
+			int cantidad = nodo.getValue().getCantDeCuposDisponibles();
 //			rolesFaltantes += String.format("\t->%s\n", rol);
 			while (cantidad > 0) {
 				artistasRecomendables += String.format("\t->%s con el rol \"%s\"\n",
@@ -78,6 +92,16 @@ public class TransaccionAsignacionDeCancion {
 				cantidad--;
 			}
 		}
+//		for (Map.Entry<String, Integer> nodo : rolesXCantidadFaltante.entrySet()) {
+//			String rol = nodo.getKey();
+//			int cantidad = nodo.getValue();
+		////			rolesFaltantes += String.format("\t->%s\n", rol);
+//			while (cantidad > 0) {
+//				artistasRecomendables += String.format("\t->%s con el rol \"%s\"\n",
+//						iteradorArtistasRecomendables.next().getNombre(), rol);
+//				cantidad--;
+//			}
+//		}
 		informe += "Se recomiendan entrenar a los siguientes artistas:\n";
 		informe += artistasRecomendables;
 		return informe;
@@ -102,33 +126,57 @@ public class TransaccionAsignacionDeCancion {
 	public String entrenarArtistasRecomendadosYAsignarLosCandidatos(int opcion) {
 		if (opcion == NO)
 			return null;// Exception?
-		for (Map.Entry<String, List<Artista>> nodo : rolXArtistaCandidato.entrySet()) {
+		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
-			List<Artista> lista = nodo.getValue();
+			List<Artista> lista = nodo.getValue().getListaDeIntegrantes();
 			lista.forEach(artista -> {
 				cancion.agregarArtista(rol, artista);
 				artista.asignar(this.cancion);
 			});
-		}
-		for (Map.Entry<String, Integer> nodo : rolesXCantidadFaltante.entrySet()) {
-			String rol = nodo.getKey();
-			int cantidad = nodo.getValue();
-			for (int i = 0; i < cantidad; i++) {
+			for (int i = 0; i < nodo.getValue().getCantDeCuposDisponibles(); i++) {
 				Artista artista = listaDeArtistasPosiblesParaEntrenar.get(i);
 				artista.entrenarNuevoRol(rol);
 				cancion.agregarArtista(rol, artista);
 				artista.asignar(this.cancion);
+
 			}
 		}
+//		for (Map.Entry<String, List<Artista>> nodo : rolXArtistaCandidato.entrySet()) {
+//			String rol = nodo.getKey();
+//			List<Artista> lista = nodo.getValue();
+//			lista.forEach(artista -> {
+//				cancion.agregarArtista(rol, artista);
+//				artista.asignar(this.cancion);
+//			});
+//		}
+
+//		for (Map.Entry<String, Integer> nodo : rolesXCantidadFaltante.entrySet()) {
+//			String rol = nodo.getKey();
+//			int cantidad = nodo.getValue();
+//			for (int i = 0; i < cantidad; i++) {
+//				Artista artista = listaDeArtistasPosiblesParaEntrenar.get(i);
+//				artista.entrenarNuevoRol(rol);
+//				cancion.agregarArtista(rol, artista);
+//				artista.asignar(this.cancion);
+//			}
+//		}
 		return cancion.toString();
 	}
 
-	protected void cancelarTransaccion(Map<String, Integer> rolesXCantidadFaltante,
-			List<Artista> listaDeArtistasCandidatos, Map<String, List<Artista>> rolXArtistaCandidato) {
+//	protected void cancelarTransaccion(Map<String, Integer> rolesXCantidadFaltante,
+//			List<Artista> listaDeArtistasCandidatos, Map<String, List<Artista>> rolXArtistaCandidato) {
+//		transaccionCommitted = false;
+//		this.rolesXCantidadFaltante = rolesXCantidadFaltante;
+//		this.rolXArtistaCandidato = rolXArtistaCandidato;
+//		this.listaDeArtistasPosiblesParaEntrenar = listaDeArtistasCandidatos;
+//		this.listaDeArtistasPosiblesParaEntrenar = listaDeArtistasCandidatos.stream()
+//				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAUnaCancion()).toList();
+//	}
+
+	public void cancelarTransaccion(Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos,
+			List<Artista> listaDeArtistasCandidatos) {
 		transaccionCommitted = false;
-		this.rolesXCantidadFaltante = rolesXCantidadFaltante;
-		this.rolXArtistaCandidato = rolXArtistaCandidato;
-		this.listaDeArtistasPosiblesParaEntrenar = listaDeArtistasCandidatos;
+		this.rolesXIntegrantesCandidatos = rolesXIntegrantesCandidatos;
 		this.listaDeArtistasPosiblesParaEntrenar = listaDeArtistasCandidatos.stream()
 				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAUnaCancion()).toList();
 	}
