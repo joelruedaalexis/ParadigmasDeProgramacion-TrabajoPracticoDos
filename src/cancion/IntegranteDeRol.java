@@ -27,30 +27,43 @@ public class IntegranteDeRol {
 		return costo;
 	}
 
+//
 	public List<Artista> getListaDeIntegrantes() {
 		return integrantes;
 	}
 
+//
 	public boolean artistaEstaAsignado(Artista artista) {
 		return integrantes.contains(artista);
 	}
 
+//
 	public int getCantDeCuposDisponibles() {
 		return cantDeIntegrantesNecesarios - integrantes.size();
 	}
 
+//
 	public boolean hayCuposDisponibles() {
 		return integrantes.size() < cantDeIntegrantesNecesarios;
 	}
 
-	public void agregarIntegrante(Artista artista) {
+//
+	public boolean agregarIntegrante(Artista artista) {
 //		agregar validaciones !!!!!!!!!!
+		if (artista == null)
+			throw new IllegalArgumentException("No se puede agregar artista null.");
+		if (!this.hayCuposDisponibles())
+			return false;
+		if (integrantes.contains(artista))
+			return false;
 		integrantes.addLast(artista);
+		return true;
 	}
 
-	public void quitarIntegrante(Artista artista) {
-//		agregar validaciones!!!!!!!!!!!!!!!!!!!!!!
-		integrantes.remove(artista);
+	public boolean quitarIntegrante(Artista artista) {
+		if (artista == null)
+			throw new IllegalArgumentException("No se puede quitar artista null.");
+		return integrantes.remove(artista);
 	}
 
 	public int getCantDeIntegrantesNecesarios() {
