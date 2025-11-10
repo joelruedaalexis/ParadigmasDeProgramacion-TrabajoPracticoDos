@@ -37,16 +37,36 @@ public class ArtistaContratado extends Artista {
 		return this.maxCanciones > 0;
 	}
 
+//	public boolean asignar(Cancion cancion) {
+//		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
+//			return false;
+//		cancionesEnLasQueEstaAsignado.addLast(cancion);
+//		return true;
+//	}
+//
+//	public boolean designar(Cancion cancion) {
+//		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
+//			return false;
+//		cancionesEnLasQueEstaAsignado.remove(cancion);
+//		return true;
+//	}
+
 	@Override
-	public void asignar(Cancion cancion) {
+	public boolean asignar(Cancion cancion) {
+		if (!this.puedeSerAsignadoACancion() && !cancionesEnLasQueEstaAsignado.contains(cancion))
+			return false;
 		super.asignar(cancion);
 		this.maxCanciones--;
+		return true;
 	}
 
 	@Override
-	public void designar(Cancion cancion) {
+	public boolean designar(Cancion cancion) {
+		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
+			return false;
 		super.designar(cancion);
 		this.maxCanciones++;
+		return true;
 	}
 
 	@Override

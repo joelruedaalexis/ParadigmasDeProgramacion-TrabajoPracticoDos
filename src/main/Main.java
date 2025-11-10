@@ -30,7 +30,6 @@ public class Main {
 //		menu.iniciar();
 //		scanner.close();
 
-//		String recipesPath = Paths.get("src", "assets", "recipes.json").toString();
 
 		String rutaArchivo1 = Paths.get("src", "assets", "artistas-discografica.json").toString();
 		List<String> artistasDeDiscografica = null;

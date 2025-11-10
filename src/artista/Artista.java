@@ -23,7 +23,7 @@ public abstract class Artista {
 		this.costo = 0;
 		cancionesEnLasQueEstaAsignado = new ArrayList<>();
 	}
-	
+
 	public boolean tieneRol(String rolAConsultar) {
 		return roles.contains(rolAConsultar);
 	}
@@ -57,12 +57,18 @@ public abstract class Artista {
 
 	public abstract boolean puedeSerAsignadoACancion();
 
-	public void asignar(Cancion cancion) {
+	public boolean asignar(Cancion cancion) {
+		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
+			return false;
 		cancionesEnLasQueEstaAsignado.addLast(cancion);
+		return true;
 	}
 
-	public void designar(Cancion cancion) {
+	public boolean designar(Cancion cancion) {
+		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
+			return false;
 		cancionesEnLasQueEstaAsignado.remove(cancion);
+		return true;
 	}
 
 	public List<String> getRoles() {

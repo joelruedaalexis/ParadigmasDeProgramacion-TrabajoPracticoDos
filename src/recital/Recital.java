@@ -56,7 +56,7 @@ public class Recital {
 
 //	rolesFaltantesParaCancion = 1
 	public String cantDeRolesFaltantesParaUnaCancion(int index) {
-		// Chequear si el index es válido y blablabla
+//		Chequear si el index es válido y blablabla
 		Cancion cancion = repertorio.get(index);
 		Map<String, Integer> rolesFaltantesXCupos = cancion.getRolesFaltantesXCupos();
 		if (rolesFaltantesXCupos.isEmpty())
@@ -188,8 +188,10 @@ public class Recital {
 
 //	contratarArtistasParaTodasLasCanciones = 4
 	public void contratarArtistasParaTodasLasCanciones() {// plantearlo
-		for (int i = 0; i < repertorio.size(); i++) {// borrar esto
-			this.contratarArtistasParaUnaCancion(i);
+		Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos = new HashMap<>();
+		for (Cancion cancion : repertorio) {
+			Map<String, IntegranteDeRol> rolesXIntegrantes = cancion.getRolesConCuposDeIntegrantes();
+//			if(roles)
 		}
 	}
 
@@ -333,8 +335,6 @@ public class Recital {
 				}
 			}
 		}
-		// De importacion
-
 		for (JsonElement jsonArtistaElement : lineUpJSON) {
 			JsonObject jsonArtistaObject = jsonArtistaElement.getAsJsonObject();
 			String nombreDelArtista = jsonArtistaObject.get("nombre").getAsString();
@@ -363,13 +363,11 @@ public class Recital {
 			}
 			lineUpImportado.addLast(artista);
 		}
-
 //		System.out.println(lineUpImportado);
 		JsonArray repertorioJSON = jsonArch.get("repertorio").getAsJsonArray();
 		List<Cancion> repertorioImportado = new ArrayList<>();
 		for (JsonElement jsonCancionElement : repertorioJSON) {
 			JsonObject jsonCancionObject = jsonCancionElement.getAsJsonObject();
-
 			String titulo = jsonCancionObject.get("titulo").getAsString();
 //			List<String> roles1 = new ArrayList<>();
 			Map<String, IntegranteDeRol> rolesXIntegrantes = new HashMap<>();
@@ -399,46 +397,9 @@ public class Recital {
 			}
 			repertorioImportado.add(new Cancion(titulo, rolesXIntegrantes));
 		}
-
 		this.roles = rolesImportados;
 		this.repertorio = repertorioImportado;
 		this.lineUp = lineUpImportado;
-
-//		List<Artista> lineUp = new ArrayList<>();
-//		JsonArray json = JsonParser.parseReader(fileReader).getAsJsonArray();
-//		Map<String, BandaHistorico> repositorioBanda = new HashMap<>();
-//		Artista artista;
-//
-//		for (JsonElement jsonArtistaElement : json) {
-//			JsonObject jsonArtistaObject = jsonArtistaElement.getAsJsonObject();
-//			String nombreDelArtista = jsonArtistaObject.get("nombre").getAsString();
-//			List<BandaHistorico> historicoDeBanda = new ArrayList<>();
-//			List<String> historicoDeRoles = new ArrayList<>();
-//			for (JsonElement jsonRolElement : jsonArtistaObject.get("roles").getAsJsonArray()) {
-//				String rol = jsonRolElement.getAsString();
-//				historicoDeRoles.add(rol);
-//			}
-//			for (JsonElement jsonRolElement : jsonArtistaObject.get("bandas").getAsJsonArray()) {
-//				String nombreBanda = jsonRolElement.getAsString();
-//				if (!repositorioBanda.containsKey(nombreBanda))
-//					repositorioBanda.put(nombreBanda, new BandaHistorico(nombreBanda));
-//				historicoDeBanda.add(repositorioBanda.get(nombreBanda));
-//			}
-//			if (listaDeArtistasBase.contains(nombreDelArtista))
-//				artista = new ArtistaBase(nombreDelArtista, historicoDeRoles, historicoDeBanda);
-//			else {
-//				double costoXCancion = jsonArtistaObject.get("costo").getAsDouble();
-//				int maxCanciones = jsonArtistaObject.get("maxCanciones").getAsInt();
-//				artista = new ArtistaContratado(nombreDelArtista, historicoDeRoles, historicoDeBanda, costoXCancion,
-//						maxCanciones);
-//			}
-//			for (BandaHistorico banda : historicoDeBanda)
-//				banda.agregarArtista(artista);
-//			lineUp.add(artista);
-//		}
-//		fileReader.close();
-//		repositorioBanda.clear();
-//		return lineUp;
 	}
 
 	public List<String> getListadoDeIntegrantesDeCancion(int nombreDeCancion) {

@@ -45,3 +45,6 @@ bin/
 
 # Archivos de sistema
 *.orig
+
+# Archivos creados JSON
+estadosCreados/

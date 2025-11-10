@@ -10,12 +10,29 @@ public class BandaHistorico {
 	private List<Artista> integrantes;
 
 	public BandaHistorico(String nombre) {
+		if (nombre == null || nombre.isBlank())
+			throw new IllegalArgumentException("El nombre es inválido.");
 		this.nombre = nombre;
 		this.integrantes = new ArrayList<>();
 	}
-	public BandaHistorico(String nombre,List<Artista> integrantes) {
+
+	public BandaHistorico(String nombre, List<Artista> integrantes) {
+		if (nombre == null || nombre.isBlank())
+			throw new IllegalArgumentException("El nombre es inválido.");
+		if (integrantes == null || integrantes.contains(null))
+			throw new IllegalArgumentException("La lista de integrantees es inválida.");
+
 		this.nombre = nombre;
 		this.integrantes = integrantes;
+	}
+
+	public boolean agregarIntegrante(Artista artista) {
+		if(artista == null)
+			throw new IllegalArgumentException("La variable ingresada no puede ser Null.");
+		if (integrantes.contains(artista))
+			return false;
+		integrantes.addLast(artista);
+		return true;
 	}
 
 	public boolean tieneArtistaDeDiscografica() {
@@ -28,13 +45,8 @@ public class BandaHistorico {
 		return tieneArtistaDeDiscografica;
 	}
 
-	public void agregarArtista(Artista artista) {
-		integrantes.add(artista);
-	}
-
 	@Override
 	public String toString() {
-//		return "Banda [nombre=" + nombre + "]";
 		return "Banda [nombre=" + nombre + ", integrantes=" + integrantes + "]";
 	}
 

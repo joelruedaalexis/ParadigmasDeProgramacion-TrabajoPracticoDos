@@ -14,6 +14,11 @@ public class IntegranteDeRol {
 		integrantes = new ArrayList<>(cantIntegrantesDeRol);
 	}
 
+	public IntegranteDeRol(List<Artista> integrantes, int cantDeIntegrantesNecesarios) {
+		this.integrantes = integrantes;
+		this.cantDeIntegrantesNecesarios = cantDeIntegrantesNecesarios;
+	}
+
 	public double getCostoDeIntegrantesAsignados() {
 		double costo = 0;
 		for (Artista artista : integrantes) {
