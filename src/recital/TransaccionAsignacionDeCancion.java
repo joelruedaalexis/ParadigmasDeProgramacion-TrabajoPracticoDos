@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import artista.Artista;
+import artista.ArtistaBase;
 import cancion.Cancion;
 import cancion.IntegranteDeRol;
 
@@ -13,7 +13,7 @@ public class TransaccionAsignacionDeCancion {
 	boolean transaccionCommitted;
 //	Map<String, Integer> rolesXCantidadFaltante;
 //	Map<String, List<Artista>> rolXArtistaCandidato;
-	List<Artista> listaDeArtistasPosiblesParaEntrenar;
+	List<ArtistaBase> listaDeArtistasPosiblesParaEntrenar;
 	Cancion cancion;
 	Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos;
 
@@ -81,7 +81,7 @@ public class TransaccionAsignacionDeCancion {
 
 //		String rolesFaltantes = "";
 		String artistasRecomendables = "";
-		Iterator<Artista> iteradorArtistasRecomendables = listaDeArtistasPosiblesParaEntrenar.iterator();
+		Iterator<ArtistaBase> iteradorArtistasRecomendables = listaDeArtistasPosiblesParaEntrenar.iterator();
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
 			int cantidad = nodo.getValue().getCantDeCuposDisponibles();
@@ -128,13 +128,13 @@ public class TransaccionAsignacionDeCancion {
 			return null;// Exception?
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
-			List<Artista> lista = nodo.getValue().getListaDeIntegrantes();
+			List<ArtistaBase> lista = nodo.getValue().getListaDeIntegrantes();
 			lista.forEach(artista -> {
 				cancion.agregarArtista(rol, artista);
 				artista.asignar(this.cancion);
 			});
 			for (int i = 0; i < nodo.getValue().getCantDeCuposDisponibles(); i++) {
-				Artista artista = listaDeArtistasPosiblesParaEntrenar.get(i);
+				ArtistaBase artista = listaDeArtistasPosiblesParaEntrenar.get(i);
 				artista.entrenarNuevoRol(rol);
 				cancion.agregarArtista(rol, artista);
 				artista.asignar(this.cancion);
@@ -174,7 +174,7 @@ public class TransaccionAsignacionDeCancion {
 //	}
 
 	public void cancelarTransaccion(Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos,
-			List<Artista> listaDeArtistasCandidatos) {
+			List<ArtistaBase> listaDeArtistasCandidatos) {
 		transaccionCommitted = false;
 		this.rolesXIntegrantesCandidatos = rolesXIntegrantesCandidatos;
 		this.listaDeArtistasPosiblesParaEntrenar = listaDeArtistasCandidatos.stream()

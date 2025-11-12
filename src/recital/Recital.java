@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,12 +21,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import artista.Artista;
 import artista.ArtistaBase;
 import artista.ArtistaContratado;
+import artista.BandaHistorico;
 import artista.ComparadorArtistaPorCostoDeCancion;
 import artista.ComparadorArtistaPorNombre;
-import banda.BandaHistorico;
 import cancion.Cancion;
 import cancion.IntegranteDeRol;
 
@@ -41,13 +39,13 @@ public class Recital {
 //		}
 //	}
 	private List<Cancion> repertorio;
-	private List<Artista> lineUp;
+	private List<ArtistaBase> lineUp;
 	private List<String> roles;
 //	private Map<String, List<Artista>> todosLosRolesXArtista;
 //	private ResultadoTransaccionContratacion resTransaccionContratacion;
 //	private Map<String>
 
-	public Recital(List<Cancion> repertorio, List<Artista> lineUp, List<String> roles) {
+	public Recital(List<Cancion> repertorio, List<ArtistaBase> lineUp, List<String> roles) {
 		this.repertorio = repertorio;
 		this.lineUp = lineUp;
 		this.roles = roles;
@@ -74,9 +72,9 @@ public class Recital {
 
 //	rolesFaltantesParaTodasLasCanciones = 2,
 	public String cantDeRolesFaltantesParaTodasLasCanciones() {
-		List<Artista> listaArtistasBase = lineUp.stream().filter(a -> a.perteneceADiscografica()).toList();
+		List<ArtistaBase> listaArtistasBase = lineUp.stream().filter(a -> a.perteneceADiscografica()).toList();
 		Map<String, Integer> rolesFaltantesTotalesXCupo = new HashMap<>();
-		Set<Artista> setArtistasYaAsignados = new TreeSet<Artista>(new ComparadorArtistaPorNombre());
+		Set<ArtistaBase> setArtistasYaAsignados = new TreeSet<ArtistaBase>(new ComparadorArtistaPorNombre());
 		for (Cancion cancion : repertorio) {
 			System.out.println(cancion.getTitulo());
 			Map<String, Integer> rolesFaltantesXCupoDeCancion = cancion.getRolesFaltantesXCupos();
@@ -84,7 +82,7 @@ public class Recital {
 				String rol = nodo.getKey();
 				Integer cupos = nodo.getValue();
 				for (int i = 0; i < listaArtistasBase.size() && cupos > 0; i++) {
-					Artista artistaBase = listaArtistasBase.get(i);
+					ArtistaBase artistaBase = listaArtistasBase.get(i);
 					if (!cancion.artistaEstaAsignado(artistaBase) && !setArtistasYaAsignados.contains(artistaBase)
 							&& artistaBase.tieneRol(rol)) {
 						setArtistasYaAsignados.add(artistaBase);
@@ -112,7 +110,7 @@ public class Recital {
 	}
 
 //	public void cargarMapTodosLosRolesXArtista() {
-//		for (Artista artista : lineUp) {
+//		for (ArtistaBase artista : lineUp) {
 //			List<String> roles = artista.getRoles();
 //			for (String rol : roles) {
 //				if (!todosLosRolesXArtista.containsKey(rol))
@@ -124,7 +122,7 @@ public class Recital {
 //	}
 
 //	public void ordenarMapTodosLosRolesXArtista() {
-//		for (List<Artista> listaArtistas : todosLosRolesXArtista.values())
+//		for (List<ArtistaBase> listaArtistas : todosLosRolesXArtista.values())
 //			listaArtistas.sort(new ComparadorArtistaPorCostoDeCancion());
 //	}
 
@@ -143,7 +141,7 @@ public class Recital {
 //		Map<String, Integer> rolesXCantidadFaltante = new HashMap<>();
 //		Map<String, List<Artista>> rolesXArtistasCandidatos = new HashMap<>();
 
-		List<Artista> listaDeArtistasDisponibles = lineUp.stream()
+		List<ArtistaBase> listaDeArtistasDisponibles = lineUp.stream()
 				.filter(artista -> artista.puedeSerAsignadoACancion() && !cancion.artistaEstaAsignado(artista))
 				.collect(Collectors.toList());
 		listaDeArtistasDisponibles.sort(new ComparadorArtistaPorCostoDeCancion());
@@ -157,7 +155,7 @@ public class Recital {
 
 			int i = 0;
 			while (i < listaDeArtistasDisponibles.size() && integrantesDeRol.hayCuposDisponibles()) {
-				Artista artista = listaDeArtistasDisponibles.get(i);
+				ArtistaBase artista = listaDeArtistasDisponibles.get(i);
 				if (artista.tieneRol(rol)) {
 					integrantesDeRol.agregarIntegrante(artista);
 					listaDeArtistasDisponibles.remove(i);
@@ -175,7 +173,7 @@ public class Recital {
 
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
-			List<Artista> listaDeArtistas = nodo.getValue().getListaDeIntegrantes();
+			List<ArtistaBase> listaDeArtistas = nodo.getValue().getListaDeIntegrantes();
 			listaDeArtistas.forEach(artista -> {
 				System.out.println(cancion.agregarArtista(rol, artista));
 				;
@@ -199,7 +197,7 @@ public class Recital {
 	public boolean entrenarArtista(int index, String nuevoRol) {
 		if (index < 0 || index >= lineUp.size())
 			return false;// Exception fuera del limite?
-		Artista artista = lineUp.get(index);
+		ArtistaBase artista = lineUp.get(index);
 		if (artista.perteneceADiscografica())
 			return false;
 		if (artista.getRoles().contains(nuevoRol))
@@ -215,7 +213,7 @@ public class Recital {
 //	listarArtistasContratados = 6
 	public String getInformacionDeArtistasContratados() {
 		String str = "";
-		for (Artista artista : lineUp)
+		for (ArtistaBase artista : lineUp)
 			if (!artista.perteneceADiscografica())
 				str += artista.toString() + "\n";
 		return str;
@@ -228,7 +226,7 @@ public class Recital {
 		for (int i = 0; i < repertorio.size(); i++) {
 			Cancion cancion = repertorio.get(i);
 			double costoDeCancion = 0;
-			for (Artista artista : cancion.getListadoDeIntegrantes())
+			for (ArtistaBase artista : cancion.getListadoDeIntegrantes())
 				costoDeCancion += artista.getCosto();
 			str += cancion.toString() + String.format("  Y su costo es de $%.02f\n", costoDeCancion);
 		}
@@ -252,13 +250,13 @@ public class Recital {
 			return;// lo mismo
 		}
 		Cancion cancion = repertorio.get(indexCancion);
-		Artista artista = cancion.getListadoDeIntegrantes().get(indexArtista);
+		ArtistaBase artista = cancion.getListadoDeIntegrantes().get(indexArtista);
 		cancion.quitarArtista(artista);
 	}
 
 //	quitarArtistaDeTodasLasCanciones = 10
 	public void quitarArtistaDeTodasLasCanciones(String nombreDeArtista) {
-		Artista artista;
+		ArtistaBase artista;
 		boolean encontro = false;
 		int i;
 		for (i = 0; i < lineUp.size() && !encontro; i++)
@@ -275,7 +273,7 @@ public class Recital {
 //	quitarArtistaDelLineUp = 11
 	public void quitarArtistaDelLineUp(int indexLineUp) {
 //		chequear que el index esté dentro de un rango válido
-		Artista artista = lineUp.get(indexLineUp);
+		ArtistaBase artista = lineUp.get(indexLineUp);
 //		chequear que el artista NO PERTENEZCA a la discografica
 		if (artista.estaAsignadoAUnaCancion())
 			artista.getListaDeCancionesEnLasQueEstaAsignado().forEach(c -> c.quitarArtista(artista));
@@ -319,10 +317,10 @@ public class Recital {
 		}
 
 		// Copy paste de importacion
-		List<Artista> lineUpImportado = new ArrayList<>();
+		List<ArtistaBase> lineUpImportado = new ArrayList<>();
 		Map<String, BandaHistorico> repositorioBanda = new HashMap<>();// Cambiarlo por una lista o SET maybe
-		Map<String, List<Artista>> bandaXIntegrantes = new HashMap<>();
-		Artista artista;
+//		Map<String, List<Artista>> bandaXIntegrantes = new HashMap<>();
+		ArtistaBase artista;
 		JsonArray lineUpJSON = jsonArch.getAsJsonArray("lineUp");
 
 		for (JsonElement jsonArtistaElement : lineUpJSON) {
@@ -330,8 +328,9 @@ public class Recital {
 			for (JsonElement jsonRolElement : jsonArtistaObject.get("bandas").getAsJsonArray()) {
 				String banda = jsonRolElement.getAsString();
 				if (!repositorioBanda.containsKey(banda)) {
-					bandaXIntegrantes.put(banda, new ArrayList<>());
-					repositorioBanda.put(banda, new BandaHistorico(banda, bandaXIntegrantes.get(banda)));
+//					bandaXIntegrantes.put(banda, new ArrayList<>());
+					repositorioBanda.put(banda, new BandaHistorico(banda));
+//					repositorioBanda.put(banda, new BandaHistorico(banda, bandaXIntegrantes.get(banda)));
 				}
 			}
 		}
@@ -358,9 +357,9 @@ public class Recital {
 				artista = new ArtistaContratado(nombreDelArtista, historicoDeRoles, historicoDeBanda, costoXCancion,
 						maxCanciones);
 			}
-			for (BandaHistorico banda : historicoDeBanda) {
-				bandaXIntegrantes.get(banda.getNombre()).add(artista);
-			}
+//			for (BandaHistorico banda : historicoDeBanda) {
+//				bandaXIntegrantes.get(banda.getNombre()).add(artista);
+//			}
 			lineUpImportado.addLast(artista);
 		}
 //		System.out.println(lineUpImportado);
@@ -419,7 +418,7 @@ public class Recital {
 	public List<String> getListaDeNombresDeArtistasQueEstanAsignadosAlMenosACancion() {
 		List<String> artistasAsignadosAUnaCancion = new ArrayList<>();
 		for (Cancion cancion : repertorio) {
-			List<Artista> integrantesDeCancion = cancion.getListadoDeIntegrantes();
+			List<ArtistaBase> integrantesDeCancion = cancion.getListadoDeIntegrantes();
 			for (int i = 0; i < integrantesDeCancion.size() && integrantesDeCancion.get(i) != null; i++) {
 				if (!artistasAsignadosAUnaCancion.contains(integrantesDeCancion.get(i).getNombre())) {
 					artistasAsignadosAUnaCancion.add(integrantesDeCancion.get(i).getNombre());
@@ -439,7 +438,7 @@ public class Recital {
 	public Map<String, Integer> getListadoArtistasContratadosSinSerAsignados() {
 		Map<String, Integer> listado = new LinkedHashMap<>();
 		for (int i = 0; i < lineUp.size(); i++) {
-			Artista artista = lineUp.get(i);
+			ArtistaBase artista = lineUp.get(i);
 			if (!artista.perteneceADiscografica() && !artista.estaAsignadoAUnaCancion())
 				listado.put(artista.getNombre(), i);
 		}
@@ -450,7 +449,7 @@ public class Recital {
 	public Map<String, Integer> getListadoArtistasContratados() {
 		Map<String, Integer> listado = new LinkedHashMap<>();
 		for (int i = 0; i < lineUp.size(); i++) {
-			Artista artista = lineUp.get(i);
+			ArtistaBase artista = lineUp.get(i);
 			if (!artista.perteneceADiscografica())
 				listado.put(artista.getNombre(), i);
 		}

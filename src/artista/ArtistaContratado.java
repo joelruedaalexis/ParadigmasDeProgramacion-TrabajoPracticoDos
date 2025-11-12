@@ -1,13 +1,13 @@
 package artista;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.google.gson.JsonObject;
 
-import banda.BandaHistorico;
 import cancion.Cancion;
 
-public class ArtistaContratado extends Artista {
+public class ArtistaContratado extends ArtistaBase {
 	private int maxCanciones;
 
 	public ArtistaContratado(String nombre, List<String> rol, List<BandaHistorico> banda, double costo,
@@ -58,6 +58,26 @@ public class ArtistaContratado extends Artista {
 		super.asignar(cancion);
 		this.maxCanciones--;
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(maxCanciones);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ArtistaContratado other = (ArtistaContratado) obj;
+		return maxCanciones == other.maxCanciones;
 	}
 
 	@Override

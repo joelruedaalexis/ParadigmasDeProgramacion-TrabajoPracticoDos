@@ -13,15 +13,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import artista.Artista;
 import artista.ArtistaBase;
 import artista.ArtistaContratado;
-import banda.BandaHistorico;
+import artista.BandaHistorico;
 
 class IntegranteDeRolTest {
 	BandaHistorico divididos;
-	Artista artistaBase1, artistaContratado, artistaBase2;
-	List<Artista> integrantes;
+	ArtistaBase artistaBase1, artistaContratado, artistaBase2;
+	List<ArtistaBase> integrantes;
 	IntegranteDeRol integranteDeRol;
 	int cantIntegrantesDeRol;
 

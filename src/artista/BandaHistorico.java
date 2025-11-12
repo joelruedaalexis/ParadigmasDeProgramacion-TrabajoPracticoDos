@@ -1,13 +1,12 @@
-package banda;
+package artista;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import artista.Artista;
+import java.util.Objects;
 
 public class BandaHistorico {
-	private String nombre;
-	private List<Artista> integrantes;
+	protected String nombre;
+	private List<ArtistaBase> integrantes;
 
 	public BandaHistorico(String nombre) {
 		if (nombre == null || nombre.isBlank())
@@ -16,7 +15,7 @@ public class BandaHistorico {
 		this.integrantes = new ArrayList<>();
 	}
 
-	public BandaHistorico(String nombre, List<Artista> integrantes) {
+	public BandaHistorico(String nombre, List<ArtistaBase> integrantes) {
 		if (nombre == null || nombre.isBlank())
 			throw new IllegalArgumentException("El nombre es inválido.");
 		if (integrantes == null || integrantes.contains(null))
@@ -26,9 +25,26 @@ public class BandaHistorico {
 		this.integrantes = integrantes;
 	}
 
-	public boolean agregarIntegrante(Artista artista) {
-		if(artista == null)
-			throw new IllegalArgumentException("La variable ingresada no puede ser Null.");
+	@Override
+	public int hashCode() {
+		return Objects.hash(integrantes, nombre);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BandaHistorico other = (BandaHistorico) obj;
+		return Objects.equals(integrantes, other.integrantes) && Objects.equals(nombre, other.nombre);
+	}
+
+	protected boolean agregarIntegrante(ArtistaBase artista) {
+		if (artista == null)
+			throw new IllegalArgumentException("El objeto ingresado no puede ser Null.");
 		if (integrantes.contains(artista))
 			return false;
 		integrantes.addLast(artista);

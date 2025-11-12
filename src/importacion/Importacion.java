@@ -17,10 +17,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import artista.Artista;
 import artista.ArtistaBase;
 import artista.ArtistaContratado;
-import banda.BandaHistorico;
+import artista.BandaHistorico;
 import cancion.Cancion;
 
 public class Importacion {
@@ -42,21 +41,22 @@ public class Importacion {
 //	    "bandas": ["Queen"],
 //	    "costo": 0,
 //	    "maxCanciones": 100
-	public static List<Artista> importarArtistas(String rutaArch, List<String> listaDeRoles,
+	public static List<ArtistaBase> importarArtistas(String rutaArch, List<String> listaDeRoles,
 			List<String> listaDeArtistasBase) throws FileNotFoundException, JsonSyntaxException, IOException {
 		FileReader fileReader = new FileReader(new File(rutaArch));
-		List<Artista> lineUp = new ArrayList<>();
+		List<ArtistaBase> lineUp = new ArrayList<>();
 		JsonArray json = JsonParser.parseReader(fileReader).getAsJsonArray();
 		Map<String, BandaHistorico> repositorioBanda = new HashMap<>();
-		Map<String, List<Artista>> bandaXIntegrantes = new HashMap<>();
-		Artista artista;
+//		Map<String, List<ArtistaBase>> bandaXIntegrantes = new HashMap<>();
+		ArtistaBase artista;
 		for (JsonElement jsonArtistaElement : json) {
 			JsonObject jsonArtistaObject = jsonArtistaElement.getAsJsonObject();
 			for (JsonElement jsonRolElement : jsonArtistaObject.get("bandas").getAsJsonArray()) {
 				String banda = jsonRolElement.getAsString();
 				if (!repositorioBanda.containsKey(banda)) {
-					bandaXIntegrantes.put(banda, new ArrayList<>());
-					repositorioBanda.put(banda, new BandaHistorico(banda, bandaXIntegrantes.get(banda)));
+//					bandaXIntegrantes.put(banda, new ArrayList<>());
+					repositorioBanda.put(banda, new BandaHistorico(banda));
+//					repositorioBanda.put(banda, new BandaHistorico(banda, bandaXIntegrantes.get(banda)));
 				}
 			}
 		}
@@ -82,13 +82,13 @@ public class Importacion {
 				artista = new ArtistaContratado(nombreDelArtista, historicoDeRoles, historicoDeBanda, costoXCancion,
 						maxCanciones);
 			}
-			for (BandaHistorico banda : historicoDeBanda) {
-				bandaXIntegrantes.get(banda.getNombre()).add(artista);
-			}
+//			for (BandaHistorico banda : historicoDeBanda) {
+//				bandaXIntegrantes.get(banda.getNombre()).add(artista);
+//			}
 			lineUp.add(artista);
 		}
 		fileReader.close();
-		bandaXIntegrantes.clear();
+//		bandaXIntegrantes.clear();
 		repositorioBanda.clear();
 		return lineUp;
 	}

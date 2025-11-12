@@ -1,4 +1,4 @@
-package banda;
+package artista;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,13 +11,9 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import artista.Artista;
-import artista.ArtistaBase;
-import artista.ArtistaContratado;
-
 class BandaHistoricoTest {
 	BandaHistorico divididos;
-	Artista artistaBase;
+	ArtistaBase artistaBase;
 
 	@BeforeEach
 	void setUp() {
@@ -48,30 +44,32 @@ class BandaHistoricoTest {
 
 	@Test
 	void sePuedeAgregarIntegrante() {
+		divididos = new BandaHistorico("Divididos");
+		artistaBase = new ArtistaBase("Ricardo Mollo", Arrays.asList("voz principal"),
+				Arrays.asList(new BandaHistorico("Los redondos")));
 		assertTrue("Es verdadero porque es el primer integrante", divididos.agregarIntegrante(artistaBase));
 	}
 
 	@Test
 	void noSePuedeAgregarIntegranteYaExistente() {
+		divididos = new BandaHistorico("Divididos");
+		artistaBase = new ArtistaBase("Ricardo Mollo", Arrays.asList("voz principal"),
+				Arrays.asList(new BandaHistorico("Los redondos")));
 		assertTrue("Es verdadero porque es el primer integrante.", divididos.agregarIntegrante(artistaBase));
 		assertFalse("Es falso porque es el integrante ya está agregado.", divididos.agregarIntegrante(artistaBase));
 	}
 
 	@Test
 	void bandaNoTieneArtistaDeDiscografica() {
-		Artista artistaContratado = new ArtistaContratado("Catriel Ciavarella", Arrays.asList("batería"),
-				Arrays.asList(divididos), 1610, 3);
-		assertTrue(divididos.agregarIntegrante(artistaContratado));
+		divididos = new BandaHistorico("Divididos");
+		new ArtistaContratado("Catriel Ciavarella", Arrays.asList("batería"), Arrays.asList(divididos), 1610, 3);
 		boolean condicion = divididos.tieneArtistaDeDiscografica();
 		assertFalse("Debería ser falso porque Catriel es un artista contratado.", condicion);
 	}
 
 	@Test
 	void bandaTieneArtistaDeDiscografica() {
-		Artista artistaContratado = new ArtistaContratado("Catriel Ciavarella", Arrays.asList("batería"),
-				Arrays.asList(divididos), 1610, 3);
-		assertTrue(divididos.agregarIntegrante(artistaContratado));
-		assertTrue(divididos.agregarIntegrante(artistaBase));
+		new ArtistaContratado("Catriel Ciavarella", Arrays.asList("batería"), Arrays.asList(divididos), 1610, 3);
 		boolean condicion = divididos.tieneArtistaDeDiscografica();
 		assertTrue("Debería ser verdadero porque tiene a Ricardo Mollo que es un artista base.", condicion);
 	}

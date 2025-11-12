@@ -3,10 +3,10 @@ package cancion;
 import java.util.ArrayList;
 import java.util.List;
 
-import artista.Artista;
+import artista.ArtistaBase;
 
 public class IntegranteDeRol {
-	List<Artista> integrantes;
+	List<ArtistaBase> integrantes;
 	int cantDeIntegrantesNecesarios;
 
 	public IntegranteDeRol(int cantIntegrantesDeRol) {
@@ -14,26 +14,26 @@ public class IntegranteDeRol {
 		integrantes = new ArrayList<>(cantIntegrantesDeRol);
 	}
 
-	public IntegranteDeRol(List<Artista> integrantes, int cantDeIntegrantesNecesarios) {
+	public IntegranteDeRol(List<ArtistaBase> integrantes, int cantDeIntegrantesNecesarios) {
 		this.integrantes = integrantes;
 		this.cantDeIntegrantesNecesarios = cantDeIntegrantesNecesarios;
 	}
 
 	public double getCostoDeIntegrantesAsignados() {
 		double costo = 0;
-		for (Artista artista : integrantes) {
+		for (ArtistaBase artista : integrantes) {
 			costo += artista.getCosto();
 		}
 		return costo;
 	}
 
 //
-	public List<Artista> getListaDeIntegrantes() {
+	public List<ArtistaBase> getListaDeIntegrantes() {
 		return integrantes;
 	}
 
 //
-	public boolean artistaEstaAsignado(Artista artista) {
+	public boolean artistaEstaAsignado(ArtistaBase artista) {
 		return integrantes.contains(artista);
 	}
 
@@ -48,7 +48,7 @@ public class IntegranteDeRol {
 	}
 
 //
-	public boolean agregarIntegrante(Artista artista) {
+	public boolean agregarIntegrante(ArtistaBase artista) {
 //		agregar validaciones !!!!!!!!!!
 		if (artista == null)
 			throw new IllegalArgumentException("No se puede agregar artista null.");
@@ -60,7 +60,7 @@ public class IntegranteDeRol {
 		return true;
 	}
 
-	public boolean quitarIntegrante(Artista artista) {
+	public boolean quitarIntegrante(ArtistaBase artista) {
 		if (artista == null)
 			throw new IllegalArgumentException("No se puede quitar artista null.");
 		return integrantes.remove(artista);
