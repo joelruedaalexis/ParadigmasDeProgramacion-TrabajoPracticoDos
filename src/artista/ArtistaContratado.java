@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 import cancion.Cancion;
 
 public class ArtistaContratado extends ArtistaBase {
-	private int maxCanciones;
+	protected int maxCanciones;
 
 	public ArtistaContratado(String nombre, List<String> rol, List<BandaHistorico> banda, double costo,
 			int maxCanciones) {
@@ -16,46 +16,44 @@ public class ArtistaContratado extends ArtistaBase {
 		this.costo = costo;
 		this.maxCanciones = maxCanciones;
 	}
-
-	public void entrenarNuevoRol(String nuevoRol) {
-		roles.add(nuevoRol);
+//	probado
+	@Override
+	public boolean entrenarNuevoRol(String nuevoRol) {
+		if (nuevoRol == null)
+			throw new IllegalArgumentException("El rol no puede ser null.");
+		if (super.roles.contains(nuevoRol))
+			return false;
+		super.roles.addLast(nuevoRol);
 		this.costo *= 1.5;
+		return true;
 	}
 
+//	probado
 	@Override
 	public boolean perteneceADiscografica() {
 		return false;
 	}
 
+//	probado
 	@Override
 	public double getCosto() {
 		return tieneDescuento() ? super.getCosto() * 0.5 : super.getCosto();
 	}
 
+//	probado
 	@Override
 	public boolean puedeSerAsignadoACancion() {
 		return this.maxCanciones > 0;
 	}
 
-//	public boolean asignar(Cancion cancion) {
-//		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
-//			return false;
-//		cancionesEnLasQueEstaAsignado.addLast(cancion);
-//		return true;
-//	}
-//
-//	public boolean designar(Cancion cancion) {
-//		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
-//			return false;
-//		cancionesEnLasQueEstaAsignado.remove(cancion);
-//		return true;
-//	}
-
+//	probado
 	@Override
 	public boolean asignar(Cancion cancion) {
-		if (!this.puedeSerAsignadoACancion() && !cancionesEnLasQueEstaAsignado.contains(cancion))
+		if (cancion == null)
+			throw new IllegalArgumentException("No se puede asignar una cancion en null.");
+		if (!this.puedeSerAsignadoACancion() || cancionesEnLasQueEstaAsignado.contains(cancion))
 			return false;
-		super.asignar(cancion);
+		cancionesEnLasQueEstaAsignado.addLast(cancion);
 		this.maxCanciones--;
 		return true;
 	}
@@ -80,11 +78,14 @@ public class ArtistaContratado extends ArtistaBase {
 		return maxCanciones == other.maxCanciones;
 	}
 
+//	probado
 	@Override
 	public boolean designar(Cancion cancion) {
+		if (cancion == null)
+			throw new IllegalArgumentException("No se puede designar una cancion en null.");
 		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
 			return false;
-		super.designar(cancion);
+		cancionesEnLasQueEstaAsignado.remove(cancion);
 		this.maxCanciones++;
 		return true;
 	}
@@ -101,6 +102,7 @@ public class ArtistaContratado extends ArtistaBase {
 		return str;
 	}
 
+//	probado
 	@Override
 	public boolean tieneDescuento() {
 		for (int i = 0; i < getListaDeBandas().size(); i++)
@@ -109,6 +111,7 @@ public class ArtistaContratado extends ArtistaBase {
 		return false;
 	}
 
+//	probado
 	@Override
 	public JsonObject toJson() {
 		JsonObject artistaJSON = super.toJson();

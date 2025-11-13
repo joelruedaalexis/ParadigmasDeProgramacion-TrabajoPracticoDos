@@ -45,6 +45,7 @@ public class ArtistaBase {
 				&& Objects.equals(nombre, other.nombre) && Objects.equals(roles, other.roles);
 	}
 
+//	probado
 	public boolean tieneRol(String rolAConsultar) {
 		return roles.contains(rolAConsultar);
 	}
@@ -53,48 +54,52 @@ public class ArtistaBase {
 		return cancionesEnLasQueEstaAsignado.size() != 0;
 	}
 
+//	probado
 	public List<Cancion> getListaDeCancionesEnLasQueEstaAsignado() {
 		return cancionesEnLasQueEstaAsignado;
 	}
 
+//	probado
 	public List<BandaHistorico> getListaDeBandas() {
 		return bandaHistorico;
 	}
 
+//	probado
 	public double getCosto() {
 		return costo;
 	}
 
+//	probado
 	public String getNombre() {
 		return nombre;
 	}
 
-	public void entrenarNuevoRol(String nuevoRol) {
+//	sin probar!!!
+	public boolean entrenarNuevoRol(String nuevoRol) {// ¿Exception?
+		return false;
 	}
 
-//
-//	public abstract boolean tieneDescuento();
-//
-//	public boolean perteneceADiscografica() {
-//		return true;
-//	}
-//
-//	public abstract boolean puedeSerAsignadoACancion();
-
+//  probado
 	public boolean asignar(Cancion cancion) {
-		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
+		if (cancion == null)
+			throw new IllegalArgumentException("La canción no puede ser null.");
+		if (cancionesEnLasQueEstaAsignado.contains(cancion))
 			return false;
 		cancionesEnLasQueEstaAsignado.addLast(cancion);
 		return true;
 	}
 
+//	probado
 	public boolean designar(Cancion cancion) {
+		if (cancion == null)
+			throw new IllegalArgumentException("La canción no puede ser null.");
 		if (!cancionesEnLasQueEstaAsignado.contains(cancion))
 			return false;
 		cancionesEnLasQueEstaAsignado.remove(cancion);
 		return true;
 	}
 
+//	probado
 	public List<String> getRoles() {
 		return roles;
 	}
@@ -108,42 +113,31 @@ public class ArtistaBase {
 		return str;
 	}
 
+//	probado
 	public JsonObject toJson() {
 		JsonObject artistaJSON = new JsonObject();
 		JsonArray rolesJSON = new JsonArray(roles.size());
 		JsonArray bandasJSON = new JsonArray(bandaHistorico.size());
 		roles.forEach(rol -> rolesJSON.add(rol));
 		bandaHistorico.forEach(banda -> bandasJSON.add(banda.getNombre()));
-		;
 		artistaJSON.addProperty("nombre", this.nombre);
 		artistaJSON.add("roles", rolesJSON);
 		artistaJSON.add("bandas", bandasJSON);
 		return artistaJSON;
 	}
 
-//	public ArtistaBase(String nombre, List<String> rol, List<BandaHistorico> banda) {
-//		super(nombre, rol, banda);
-//	}
-//
+//	probado
 	public boolean perteneceADiscografica() {
 		return true;
 	}
 
+//	probado
 	public boolean puedeSerAsignadoACancion() {
 		return true;
 	}
 
+//	probado
 	public boolean tieneDescuento() {
 		return false;
 	}
-//
-//	@Override
-//	public JsonObject toJson() {
-//		System.out.println("XDDDD");
-//		JsonObject artistaJSON = super.toJson();
-//		artistaJSON.addProperty("costo", 0);
-//		artistaJSON.addProperty("maxCanciones", 100);
-//		return artistaJSON;
-//	}
-
 }

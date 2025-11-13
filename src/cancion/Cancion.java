@@ -73,9 +73,10 @@ public class Cancion {
 		}
 	}
 
+//	probado
 	public boolean artistaEstaAsignado(ArtistaBase artista) {
 		if (artista == null)
-			return false;// Exception?
+			throw new IllegalArgumentException("No se puede asignar un artista en null");// Exception?
 		for (IntegranteDeRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
 			if (integrantesDeRol.artistaEstaAsignado(artista))
 				return true;
@@ -83,9 +84,8 @@ public class Cancion {
 		return false;
 	}
 
-	// Rol 3 cantantes
-	// List<> = [null,null,pepe] ó [pepe,null,null]
-	public int cantDeCuposDisponibles() {
+//	probado
+	public int getCantDeCuposDisponibles() {
 		int cant = 0;
 		for (IntegranteDeRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
 			cant += integrantesDeRol.getCantDeCuposDisponibles();
@@ -94,6 +94,7 @@ public class Cancion {
 //		return rolesXCuposDeIntegrantes.values().stream().mapToInt(cupos -> cupos).sum();
 	}
 
+//	
 	public Map<String, Integer> getRolesFaltantesXCupos() {
 		Map<String, Integer> rolesFaltantesXCupos = new HashMap<>();
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
@@ -104,6 +105,7 @@ public class Cancion {
 //		return rolesXCuposDeIntegrantes.values().stream().mapToInt(cupos -> cupos).sum();
 	}
 
+//	probado
 	public List<ArtistaBase> getListadoDeIntegrantes() {
 		List<ArtistaBase> listadoDeIntegrantes = new ArrayList<>();
 		for (IntegranteDeRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
@@ -115,28 +117,40 @@ public class Cancion {
 		return listadoDeIntegrantes;
 	}
 
-	public boolean agregarArtista(String rol, ArtistaBase artista) {// chequear si el artista en null o si rol es null maybe
-																// ?
+//	probado
+	public boolean agregarArtista(String rol, ArtistaBase artista) {// chequear si el artista en null o si rol es null
+		if (rol == null)
+			throw new IllegalArgumentException("No se puede agregar un artista con rol en null.");
+		if (artista == null)
+			throw new IllegalArgumentException("No se puede agregar un artista en null.");
 		if (!rolesXListaDeIntegrantes.containsKey(rol))
 			return false;// Exception?
 		if (!rolesXListaDeIntegrantes.get(rol).hayCuposDisponibles())
 			return false;// ya estan asignados todos los artistas a ese rol!!!!
 		// chequear q el artista pueda ser asignado por su limite en participaciones en
 		// canciones
+		if (!artista.puedeSerAsignadoACancion())
+			return false;
 		rolesXListaDeIntegrantes.get(rol).agregarIntegrante(artista);
 		artista.asignar(this);
 		return true;
 	}
 
-	public void quitarArtista(ArtistaBase artista) {
-		for (IntegranteDeRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
+//	probado
+	public boolean quitarArtista(ArtistaBase artista) {
+		if (artista == null)
+			throw new IllegalArgumentException("No se puede quitar un artista null.");
+		for (IntegranteDeRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {// cambiar al for tradicional!!!
 			if (integrantesDeRol.artistaEstaAsignado(artista)) {
 				integrantesDeRol.quitarIntegrante(artista);
 				artista.designar(this);
+				return true;
 			}
 		}
+		return false;
 	}
 
+//	probado
 	public List<String> getRoles() {
 		List<String> roles = new ArrayList<>();
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
@@ -148,7 +162,7 @@ public class Cancion {
 		return roles;
 	}
 
-	public Map<String, IntegranteDeRol> getRolesConCuposDeIntegrantes() {
+	public Map<String, IntegranteDeRol> getRolesFaltantesConCuposDeIntegrantes() {
 //		return new HashMap<>(rolesXCuposDeIntegrantes);
 		Map<String, IntegranteDeRol> rolesXCuposDeIntegrantes = new HashMap<>();
 		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
@@ -160,10 +174,12 @@ public class Cancion {
 		return rolesXCuposDeIntegrantes;
 	}
 
+//	probado
 	public String getTitulo() {
 		return this.titulo;
 	}
 
+//	probado
 	public double getCostoDeCancion() {
 		double costo = 0;
 		for (IntegranteDeRol integrantesDeRol : rolesXListaDeIntegrantes.values())
@@ -173,7 +189,6 @@ public class Cancion {
 
 	private String integrantesToString(int cuposDisponibles, List<ArtistaBase> lista) {
 		String str = "";
-
 		str += lista.isEmpty() ? "disponible" : lista.getFirst().getNombre();
 		for (int i = 1; i < lista.size(); i++)
 			str += ", " + lista.get(i).getNombre();

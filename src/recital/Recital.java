@@ -129,12 +129,13 @@ public class Recital {
 //	contratarArtistasParaUnaCancion = 3, 
 	public TransaccionAsignacionDeCancion contratarArtistasParaUnaCancion(int index) {
 		if (index < 0 || index >= repertorio.size())
-			return null;// exception? el indice está por afuera de los limites del array
+			throw new ArrayIndexOutOfBoundsException(
+					"El index ingresado es inválido porque está fuera de los limites.");
 		Cancion cancion = repertorio.get(index);
 
 		TransaccionAsignacionDeCancion resultadoTransaccion = new TransaccionAsignacionDeCancion(cancion);
 
-		Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos = cancion.getRolesConCuposDeIntegrantes();
+		Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos = cancion.getRolesFaltantesConCuposDeIntegrantes();
 
 //		Map<String, Integer> rolesXCantidadNecesaria = cancion.getRolesConCuposDeIntegrantes();
 //		Map<String, Integer> rolesXCantidadNecesaria = new HashMap<>();
@@ -188,7 +189,7 @@ public class Recital {
 	public void contratarArtistasParaTodasLasCanciones() {// plantearlo
 		Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos = new HashMap<>();
 		for (Cancion cancion : repertorio) {
-			Map<String, IntegranteDeRol> rolesXIntegrantes = cancion.getRolesConCuposDeIntegrantes();
+			Map<String, IntegranteDeRol> rolesXIntegrantes = cancion.getRolesFaltantesConCuposDeIntegrantes();
 //			if(roles)
 		}
 	}
