@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -18,6 +20,30 @@ import menu.Menu;
 import recital.Recital;
 
 public class Main {
+	static class Producto implements Comparable<Producto> {
+		String nombre;
+		int cantidad;
+
+		public Producto(String nombre, int cantidad) {
+			this.nombre = nombre;
+			this.cantidad = cantidad;
+		}
+
+		@Override
+		public int compareTo(Producto o) {
+			int comp = this.cantidad - o.cantidad;
+			if (comp == 0)
+				return this.nombre.compareTo(o.nombre);
+			return comp > 0 ? 1 : -1;
+		}
+
+		@Override
+		public String toString() {
+			return "Producto [nombre=" + nombre + ", cantidad=" + cantidad + "]";
+		}
+
+	}
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 //		System.out.println("XD");
@@ -100,8 +126,16 @@ public class Main {
 //		List<String> roles = Importacion.importarRoles(null);
 		Recital recital = new Recital(repertorio, artistas, roles);
 		Menu menu = new Menu(scanner, recital);
-//		menu.iniciar();
+		menu.iniciar();
 		scanner.close();
+
+		Set<Producto> wasd = new TreeSet<>();
+		wasd.add(new Producto("A", 1));
+		wasd.add(new Producto("B", 3));
+		wasd.add(new Producto("C", 2));
+		wasd.add(new Producto("D", 1));
+		System.out.println(">>>>" + wasd);
+
 		int[] vec = { 1, 2, 3, 4 };
 		List<Integer> l1 = new ArrayList<>();
 		l1.add(1);

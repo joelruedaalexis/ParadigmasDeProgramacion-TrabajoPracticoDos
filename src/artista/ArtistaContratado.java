@@ -16,6 +16,7 @@ public class ArtistaContratado extends ArtistaBase {
 		this.costo = costo;
 		this.maxCanciones = maxCanciones;
 	}
+
 //	probado
 	@Override
 	public boolean entrenarNuevoRol(String nuevoRol) {
@@ -59,14 +60,6 @@ public class ArtistaContratado extends ArtistaBase {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(maxCanciones);
-		return result;
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -75,10 +68,10 @@ public class ArtistaContratado extends ArtistaBase {
 		if (getClass() != obj.getClass())
 			return false;
 		ArtistaContratado other = (ArtistaContratado) obj;
-		return maxCanciones == other.maxCanciones;
+		return Objects.equals(nombre, other.nombre);
 	}
 
-//	probado
+	// probado
 	@Override
 	public boolean designar(Cancion cancion) {
 		if (cancion == null)

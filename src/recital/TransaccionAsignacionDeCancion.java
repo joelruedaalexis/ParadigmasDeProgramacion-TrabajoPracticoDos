@@ -6,7 +6,7 @@ import java.util.Map;
 
 import artista.ArtistaBase;
 import cancion.Cancion;
-import cancion.IntegranteDeRol;
+import cancion.IntegranteDeUnRol;
 
 public class TransaccionAsignacionDeCancion {
 	public final static int SI = 0, NO = 1;
@@ -15,7 +15,7 @@ public class TransaccionAsignacionDeCancion {
 //	Map<String, List<Artista>> rolXArtistaCandidato;
 	List<ArtistaBase> listaDeArtistasPosiblesParaEntrenar;
 	Cancion cancion;
-	Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos;
+	Map<String, IntegranteDeUnRol> rolesXIntegrantesCandidatos;
 
 	protected TransaccionAsignacionDeCancion(Cancion cancion) {
 		this.cancion = cancion;
@@ -31,7 +31,7 @@ public class TransaccionAsignacionDeCancion {
 
 	public boolean sePuedenEntrenarArtistasSuficientes() {
 		int cantDeArtistasNecesariosParaEntrenar = 0;
-		for (IntegranteDeRol integrantesDeRol : rolesXIntegrantesCandidatos.values()) {
+		for (IntegranteDeUnRol integrantesDeRol : rolesXIntegrantesCandidatos.values()) {
 			cantDeArtistasNecesariosParaEntrenar += integrantesDeRol.getCantDeCuposDisponibles();
 		}
 
@@ -53,7 +53,7 @@ public class TransaccionAsignacionDeCancion {
 				+ "\"elegida se necesitan artistas con los siguientes roles:\n";
 
 		int cantDeArtistasNecesariosParaEntrenar = 0;
-		for (IntegranteDeRol integrantesDeRol : rolesXIntegrantesCandidatos.values()) {
+		for (IntegranteDeUnRol integrantesDeRol : rolesXIntegrantesCandidatos.values()) {
 			cantDeArtistasNecesariosParaEntrenar += integrantesDeRol.getCantDeCuposDisponibles();
 		}
 //		for (Integer cant : rolesXCantidadFaltante.values()) {
@@ -62,7 +62,7 @@ public class TransaccionAsignacionDeCancion {
 //		System.out.println(rolesXCantidadFaltante);
 
 		String rolesFaltantes = "";
-		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
+		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
 			int cantidad = nodo.getValue().getCantDeCuposDisponibles();
 			if (nodo.getValue().hayCuposDisponibles())
@@ -82,7 +82,7 @@ public class TransaccionAsignacionDeCancion {
 //		String rolesFaltantes = "";
 		String artistasRecomendables = "";
 		Iterator<ArtistaBase> iteradorArtistasRecomendables = listaDeArtistasPosiblesParaEntrenar.iterator();
-		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
+		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
 			int cantidad = nodo.getValue().getCantDeCuposDisponibles();
 //			rolesFaltantes += String.format("\t->%s\n", rol);
@@ -124,9 +124,11 @@ public class TransaccionAsignacionDeCancion {
 //	}
 
 	public String entrenarArtistasRecomendadosYAsignarLosCandidatos(int opcion) {
-		if (opcion == NO)
+		if (opcion == NO) {
+			transaccionCommitted = false;
 			return null;// Exception?
-		for (Map.Entry<String, IntegranteDeRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
+		}
+		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
 			String rol = nodo.getKey();
 			List<ArtistaBase> lista = nodo.getValue().getListaDeIntegrantes();
 			lista.forEach(artista -> {
@@ -160,6 +162,7 @@ public class TransaccionAsignacionDeCancion {
 //				artista.asignar(this.cancion);
 //			}
 //		}
+		transaccionCommitted = true;
 		return cancion.toString();
 	}
 
@@ -173,7 +176,7 @@ public class TransaccionAsignacionDeCancion {
 //				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAUnaCancion()).toList();
 //	}
 
-	public void cancelarTransaccion(Map<String, IntegranteDeRol> rolesXIntegrantesCandidatos,
+	public void cancelarTransaccion(Map<String, IntegranteDeUnRol> rolesXIntegrantesCandidatos,
 			List<ArtistaBase> listaDeArtistasCandidatos) {
 		transaccionCommitted = false;
 		this.rolesXIntegrantesCandidatos = rolesXIntegrantesCandidatos;

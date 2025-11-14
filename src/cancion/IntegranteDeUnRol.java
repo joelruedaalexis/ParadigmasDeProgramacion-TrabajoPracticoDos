@@ -5,16 +5,23 @@ import java.util.List;
 
 import artista.ArtistaBase;
 
-public class IntegranteDeRol {
+public class IntegranteDeUnRol {
+	String rol;
 	List<ArtistaBase> integrantes;
 	int cantDeIntegrantesNecesarios;
 
-	public IntegranteDeRol(int cantIntegrantesDeRol) {
+	public IntegranteDeUnRol(String rol, List<ArtistaBase> integrantes) {
+		this.rol = rol;
+		this.integrantes = integrantes;
+		cantDeIntegrantesNecesarios = integrantes.size();
+	}
+
+	public IntegranteDeUnRol(int cantIntegrantesDeRol) {
 		this.cantDeIntegrantesNecesarios = cantIntegrantesDeRol;
 		integrantes = new ArrayList<>(cantIntegrantesDeRol);
 	}
 
-	public IntegranteDeRol(List<ArtistaBase> integrantes, int cantDeIntegrantesNecesarios) {
+	public IntegranteDeUnRol(List<ArtistaBase> integrantes, int cantDeIntegrantesNecesarios) {
 		this.integrantes = integrantes;
 		this.cantDeIntegrantesNecesarios = cantDeIntegrantesNecesarios;
 	}
@@ -74,6 +81,11 @@ public class IntegranteDeRol {
 	public String toString() {
 		return "IntegranteDeRol [integrantes=" + integrantes.stream().map(a -> a.getNombre()).toList()
 				+ ", cantDeIntegrantesNecesarios=" + cantDeIntegrantesNecesarios + "]";
+	}
+
+	public String getRol() {
+		// TODO Auto-generated method stub
+		return rol;
 	}
 
 }

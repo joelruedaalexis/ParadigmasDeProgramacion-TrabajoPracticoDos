@@ -21,13 +21,13 @@ class IntegranteDeRolTest {
 	BandaHistorico divididos;
 	ArtistaBase artistaBase1, artistaContratado, artistaBase2;
 	List<ArtistaBase> integrantes;
-	IntegranteDeRol integranteDeRol;
+	IntegranteDeUnRol integranteDeRol;
 	int cantIntegrantesDeRol;
 
 	@BeforeEach
 	void setUp() throws Exception {
 		cantIntegrantesDeRol = 3;
-		integranteDeRol = new IntegranteDeRol(cantIntegrantesDeRol);
+		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
 		integrantes = new ArrayList<>();
 		divididos = new BandaHistorico("Divididos");
 		artistaBase1 = new ArtistaBase("Ricardo Mollo", Arrays.asList("voz principal"), Arrays.asList(divididos));
@@ -39,13 +39,13 @@ class IntegranteDeRolTest {
 	@Test
 	void sepuedeInstanciar() {
 		cantIntegrantesDeRol = 1;
-		integranteDeRol = new IntegranteDeRol(cantIntegrantesDeRol);
+		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
 		assertNotNull(integranteDeRol);
 		assertEquals(cantIntegrantesDeRol, integranteDeRol.getCantDeIntegrantesNecesarios());
 		assertEquals(new ArrayList<>(), integranteDeRol.getListaDeIntegrantes());
 
 		integrantes.add(artistaBase1);
-		IntegranteDeRol integranteDeRol2 = new IntegranteDeRol(integrantes, 1);
+		IntegranteDeUnRol integranteDeRol2 = new IntegranteDeUnRol(integrantes, 1);
 		assertNotNull(integranteDeRol2);
 		assertEquals(integrantes, integranteDeRol2.getListaDeIntegrantes());
 		assertEquals(cantIntegrantesDeRol, integranteDeRol2.getCantDeIntegrantesNecesarios());
@@ -75,7 +75,7 @@ class IntegranteDeRolTest {
 	@Test
 	void noSepuedeAgregarIntegranteEnRolYaOcupado() {
 		cantIntegrantesDeRol = 2;
-		integranteDeRol = new IntegranteDeRol(cantIntegrantesDeRol);
+		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
 		integranteDeRol.agregarIntegrante(artistaBase1);
 		assertTrue(integranteDeRol.hayCuposDisponibles(), "Es verdadero porque queda un cupo disponible");
 		integranteDeRol.agregarIntegrante(artistaBase2);
@@ -86,14 +86,14 @@ class IntegranteDeRolTest {
 
 	@Test
 	void noSepuedeAgregarIntegranteNull() {
-		integranteDeRol = new IntegranteDeRol(3);
+		integranteDeRol = new IntegranteDeUnRol(3);
 		assertThrows(IllegalArgumentException.class, () -> integranteDeRol.agregarIntegrante(null),
 				"No se puede agregar artista cuya referencia es null");
 	}
 
 	@Test
 	void sepuedeQuitarIntegrante() {
-		integranteDeRol = new IntegranteDeRol(cantIntegrantesDeRol);
+		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
 		integranteDeRol.agregarIntegrante(artistaBase1);
 		assertTrue(integranteDeRol.quitarIntegrante(artistaBase1));
 		assertEquals(cantIntegrantesDeRol, integranteDeRol.getCantDeCuposDisponibles(),

@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 import cancion.Cancion;
 
 public class ArtistaBase {
-	private String nombre;
+	protected String nombre;
 	protected List<String> roles;
 	private List<BandaHistorico> bandaHistorico;
 	protected List<Cancion> cancionesEnLasQueEstaAsignado;
@@ -27,7 +27,7 @@ public class ArtistaBase {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(bandaHistorico, cancionesEnLasQueEstaAsignado, costo, nombre, roles);
+		return Objects.hash(nombre);
 	}
 
 	@Override
@@ -39,13 +39,10 @@ public class ArtistaBase {
 		if (getClass() != obj.getClass())
 			return false;
 		ArtistaBase other = (ArtistaBase) obj;
-		return Objects.equals(bandaHistorico, other.bandaHistorico)
-				&& Objects.equals(cancionesEnLasQueEstaAsignado, other.cancionesEnLasQueEstaAsignado)
-				&& Double.doubleToLongBits(costo) == Double.doubleToLongBits(other.costo)
-				&& Objects.equals(nombre, other.nombre) && Objects.equals(roles, other.roles);
+		return Objects.equals(nombre, other.nombre);
 	}
 
-//	probado
+	// probado
 	public boolean tieneRol(String rolAConsultar) {
 		return roles.contains(rolAConsultar);
 	}
