@@ -53,10 +53,36 @@ public class Menu {
 			switch (opcion) {
 			case rolesFaltantesParaCancion:// 1
 				indexCancion = elegirCancion();
-				System.out.println(recital.cantDeRolesFaltantesParaUnaCancion(indexCancion));
+				Map<String, Integer> rolesFaltantesXCupos = recital.cantDeRolesFaltantesParaUnaCancion(indexCancion);
+				String titulo = recital.getListadoDeTitulosDeCanciones().get(indexCancion);
+				if (rolesFaltantesXCupos.isEmpty())
+					System.out.printf("Todos los roles de la canción \"%s\"ya han sido asignados.\n", titulo);
+				else {
+					String str = String.format("A la canción \"%s\" le faltan los siguientes roles a asignar:\n",
+							titulo);
+					for (Map.Entry<String, Integer> nodo : rolesFaltantesXCupos.entrySet()) {
+						String rol = nodo.getKey();
+						Integer cupos = nodo.getValue();
+						str += String.format("\t~%d %s.\n", cupos, rol);
+					}
+					System.out.println(str);
+				}
 				break;
 			case rolesFaltantesParaTodasLasCanciones:// 2
-				System.out.println(recital.cantDeRolesFaltantesParaTodasLasCanciones());
+				Map<String, Integer> rolesFaltantesTotalesXCupo = recital.cantDeRolesFaltantesParaTodasLasCanciones();
+
+				if (rolesFaltantesTotalesXCupo.isEmpty())
+					System.out.println("Todas las canciones ya tienen sus roles asignados a artistas.");
+				else {
+					String str = "Para poder asignar todas las canciones con artistas contratados se necesitan que tengan los siguientes roles:\n";
+					for (Map.Entry<String, Integer> nodo : rolesFaltantesTotalesXCupo.entrySet()) {
+						String rol = nodo.getKey();
+						Integer cupos = nodo.getValue();
+						str += String.format("\t~%d %s.\n", cupos, rol);
+					}
+					System.out.println(str);
+				}
+
 //				int cantDeRolesFaltantesParaTodasLasCanciones = recital.cantDeRolesFaltantesParaTodasLasCanciones();
 //				if (cantDeRolesFaltantesParaTodasLasCanciones == 0)
 //					System.out.println("->Todas las canciones tienen asignado a un artista.\n");

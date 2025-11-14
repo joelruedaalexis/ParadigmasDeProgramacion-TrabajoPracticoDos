@@ -55,25 +55,14 @@ public class Recital {
 	}
 
 //	rolesFaltantesParaCancion = 1
-	public String cantDeRolesFaltantesParaUnaCancion(int index) {
+	public Map<String, Integer> cantDeRolesFaltantesParaUnaCancion(int index) {
 //		Chequear si el index es válido y blablabla
 		Cancion cancion = repertorio.get(index);
-		Map<String, Integer> rolesFaltantesXCupos = cancion.getRolesFaltantesXCupos();
-		if (rolesFaltantesXCupos.isEmpty())
-			return String.format("Todos los roles de la canción \"%s\"ya han sido asignados.", cancion.getTitulo());
-
-		String str = String.format("A la canción \"%s\" le faltan los siguientes roles a asignar:\n",
-				cancion.getTitulo());
-		for (Map.Entry<String, Integer> nodo : rolesFaltantesXCupos.entrySet()) {
-			String rol = nodo.getKey();
-			Integer cupos = nodo.getValue();
-			str += String.format("\t~%d %s.\n", cupos, rol);
-		}
-		return str;
+		return cancion.getRolesFaltantesXCupos();
 	}
 
 //	rolesFaltantesParaTodasLasCanciones = 2,
-	public String cantDeRolesFaltantesParaTodasLasCanciones() {
+	public Map<String, Integer> cantDeRolesFaltantesParaTodasLasCanciones() {
 		List<ArtistaBase> listaArtistasBase = lineUp.stream().filter(a -> a.perteneceADiscografica()).toList();
 		Map<String, Integer> rolesFaltantesTotalesXCupo = new HashMap<>();
 		Set<ArtistaBase> setArtistasYaAsignados = new TreeSet<ArtistaBase>(new ComparadorArtistaPorNombre());
@@ -98,17 +87,7 @@ public class Recital {
 			setArtistasYaAsignados.clear();
 		}
 
-		if (rolesFaltantesTotalesXCupo.isEmpty())
-			return "Todas las canciones ya tienen sus roles asignados a artistas.";
-
-		String str = "Para poder asignar todas las canciones con artistas contratados se necesitan que tengan los siguientes roles:\n";
-		for (Map.Entry<String, Integer> nodo : rolesFaltantesTotalesXCupo.entrySet()) {
-			String rol = nodo.getKey();
-			Integer cupos = nodo.getValue();
-			str += String.format("\t~%d %s.\n", cupos, rol);
-		}
-
-		return str;
+		return rolesFaltantesTotalesXCupo;
 	}
 
 //	public void cargarMapTodosLosRolesXArtista() {
@@ -208,6 +187,7 @@ public class Recital {
 			Map<String, IntegranteDeUnRol> rolesXIntegrantes = cancion.getRolesFaltantesConCuposDeIntegrantes();
 //			if(roles)
 		}
+
 	}
 
 //	entrenarArtista = 5
