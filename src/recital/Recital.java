@@ -29,6 +29,7 @@ import artista.ComparadorArtistaPorCostoDeCancion;
 import artista.ComparadorArtistaPorNombre;
 import cancion.Cancion;
 import cancion.IntegranteDeUnRol;
+import prolog.IntegracionProlog;
 
 public class Recital {
 //	private class ResultadoTransaccionContratacion{
@@ -232,7 +233,7 @@ public class Recital {
 
 //	prolog = 8
 	public void prolog() {
-
+		IntegracionProlog.prueba();
 	}
 
 //	quitarArtistaDeCancion = 9
