@@ -28,7 +28,6 @@ import artista.BandaHistorico;
 import artista.ComparadorArtistaPorCostoDeCancion;
 import artista.ComparadorArtistaPorNombre;
 import cancion.Cancion;
-import cancion.ComparadoraPorCantidadDeIntegrantesYRol;
 import cancion.IntegranteDeUnRol;
 
 public class Recital {
@@ -199,7 +198,7 @@ public class Recital {
 			return false;
 		if (artista.getRoles().contains(nuevoRol))
 			return false;// Exception?
-		if (artista.estaAsignadoAUnaCancion())
+		if (artista.estaAsignadoAlmenosAUnaCancion())
 			return false;
 //		System.out.println(artista);
 		artista.entrenarNuevoRol(nuevoRol);
@@ -238,43 +237,51 @@ public class Recital {
 
 //	quitarArtistaDeCancion = 9
 	public void quitarArtistaDeCancion(int indexArtista, int indexCancion) {
-		if (indexArtista < 0 || indexArtista >= lineUp.size()) {
-			System.out.println("indexArtista");
-			return;// exception out of bonds o algo así
-		}
-		if (indexCancion < 0 || indexCancion >= repertorio.size()) {
-			System.out.println("indexCancion");
-			return;// lo mismo
-		}
+		if (indexCancion < 0 || indexCancion >= repertorio.size())
+			throw new IllegalArgumentException("El índice de canción está fuera de los limites permitidos.");
 		Cancion cancion = repertorio.get(indexCancion);
+		if (indexArtista < 0 || indexArtista >= cancion.getListadoDeIntegrantes().size())
+			throw new IllegalArgumentException("El índice de artista está fuera de los limites permitidos.");
 		ArtistaBase artista = cancion.getListadoDeIntegrantes().get(indexArtista);
 		cancion.quitarArtista(artista);
 	}
 
 //	quitarArtistaDeTodasLasCanciones = 10
-	public void quitarArtistaDeTodasLasCanciones(String nombreDeArtista) {
+	public boolean quitarArtistaDeTodasLasCanciones(String nombreDeArtista) {
+		if (nombreDeArtista == null)
+			throw new IllegalArgumentException("El nombre de artista no puede ser null.");
 		ArtistaBase artista;
 		boolean encontro = false;
-		int i;
-		for (i = 0; i < lineUp.size() && !encontro; i++)
+		int i = 0;
+
+		while (i < lineUp.size() && !encontro)
 			if (lineUp.get(i).getNombre().compareTo(nombreDeArtista) == 0)
 				encontro = true;
+			else
+				i++;
 		if (!encontro/* && i == lineUp.size() */)// borrar la 2da condicion!!!!
-			return; // el artista con ese nombre no existe
+			throw new RuntimeException("No hay ningun artista que tenga ese nombre"); // CREAR EXCEPTION -> el artista
+																						// con ese nombre no existe
 		artista = lineUp.get(i);
+		if (!artista.estaAsignadoAlmenosAUnaCancion())
+			return false;
 		repertorio.stream().filter(cancion -> cancion.artistaEstaAsignado(artista)).forEach(cancion -> {
 			cancion.quitarArtista(artista);
 		});
+		return true;
 	}
 
 //	quitarArtistaDelLineUp = 11
-	public void quitarArtistaDelLineUp(int indexLineUp) {
-//		chequear que el index esté dentro de un rango válido
+	public boolean quitarArtistaDelLineUp(int indexLineUp) {
+		if (indexLineUp < 0 || indexLineUp >= lineUp.size())
+			throw new IllegalArgumentException("El índice ingresado está fuera de los límites  permitidos.");
 		ArtistaBase artista = lineUp.get(indexLineUp);
-//		chequear que el artista NO PERTENEZCA a la discografica
-		if (artista.estaAsignadoAUnaCancion())
+		if (artista.perteneceADiscografica())
+			return false;
+		if (artista.estaAsignadoAlmenosAUnaCancion())
 			artista.getListaDeCancionesEnLasQueEstaAsignado().forEach(c -> c.quitarArtista(artista));
 		lineUp.remove(indexLineUp);
+		return true;
 	}
 
 //	guardarEstadoDelRecital = 12
@@ -436,7 +443,7 @@ public class Recital {
 		Map<String, Integer> listado = new LinkedHashMap<>();
 		for (int i = 0; i < lineUp.size(); i++) {
 			ArtistaBase artista = lineUp.get(i);
-			if (!artista.perteneceADiscografica() && !artista.estaAsignadoAUnaCancion())
+			if (!artista.perteneceADiscografica() && !artista.estaAsignadoAlmenosAUnaCancion())
 				listado.put(artista.getNombre(), i);
 		}
 //		System.out.println(listado.size());s

@@ -1,6 +1,7 @@
 package artista;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,13 +48,13 @@ public class ArtistaBase {
 		return roles.contains(rolAConsultar);
 	}
 
-	public boolean estaAsignadoAUnaCancion() {
+	public boolean estaAsignadoAlmenosAUnaCancion() {
 		return cancionesEnLasQueEstaAsignado.size() != 0;
 	}
 
 //	probado
 	public List<Cancion> getListaDeCancionesEnLasQueEstaAsignado() {
-		return cancionesEnLasQueEstaAsignado;
+		return new ArrayList<>(cancionesEnLasQueEstaAsignado);
 	}
 
 //	probado

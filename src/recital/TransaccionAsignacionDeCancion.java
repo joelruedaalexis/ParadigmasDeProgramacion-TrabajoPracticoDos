@@ -181,6 +181,6 @@ public class TransaccionAsignacionDeCancion {
 		transaccionCommitted = false;
 		this.rolesXIntegrantesCandidatos = rolesXIntegrantesCandidatos;
 		this.listaDeArtistasPosiblesParaEntrenar = listaDeArtistasCandidatos.stream()
-				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAUnaCancion()).toList();
+				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAlmenosAUnaCancion()).toList();
 	}
 }

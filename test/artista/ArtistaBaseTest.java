@@ -44,7 +44,7 @@ class ArtistaBaseTest {
 		assertEquals(expectedBanda, artistaBase.getListaDeBandas());
 		assertEquals(expectedCosto, artistaBase.getCosto());
 		assertEquals(expectedCancion, artistaBase.getListaDeCancionesEnLasQueEstaAsignado());
-		assertFalse(artistaBase.estaAsignadoAUnaCancion());
+		assertFalse(artistaBase.estaAsignadoAlmenosAUnaCancion());
 		assertTrue(artistaBase.perteneceADiscografica());
 	}
 
@@ -80,7 +80,7 @@ class ArtistaBaseTest {
 		List<Cancion> expectedCanciones = List.of(cancion);
 		assertTrue(cantante.asignar(cancion));
 		assertEquals(expectedCanciones, cantante.getListaDeCancionesEnLasQueEstaAsignado());
-		assertTrue(cantante.estaAsignadoAUnaCancion());
+		assertTrue(cantante.estaAsignadoAlmenosAUnaCancion());
 	}
 
 	@Test
@@ -100,7 +100,7 @@ class ArtistaBaseTest {
 		Cancion cancion = new Cancion("Todo un palo", List.of("voz principal"));
 		cantante.asignar(cancion);
 		assertTrue(cantante.designar(cancion));
-		assertFalse(cantante.estaAsignadoAUnaCancion());
+		assertFalse(cantante.estaAsignadoAlmenosAUnaCancion());
 	}
 
 	@Test

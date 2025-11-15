@@ -50,7 +50,7 @@ class ArtistaContratadoTest {
 		assertEquals(expectedBanda, artistaContratado.getListaDeBandas());
 		assertEquals(expectedCosto, artistaContratado.getCosto());
 		assertEquals(expectedCancion, artistaContratado.getListaDeCancionesEnLasQueEstaAsignado());
-		assertFalse(artistaContratado.estaAsignadoAUnaCancion());
+		assertFalse(artistaContratado.estaAsignadoAlmenosAUnaCancion());
 		assertFalse(artistaContratado.perteneceADiscografica());
 		assertFalse(artistaContratado.tieneDescuento());
 	}
@@ -85,7 +85,7 @@ class ArtistaContratadoTest {
 		assertTrue(guitarrista.puedeSerAsignadoACancion());
 		assertTrue(guitarrista.asignar(cancion));
 		assertEquals(expectedCanciones, guitarrista.getListaDeCancionesEnLasQueEstaAsignado());
-		assertTrue(guitarrista.estaAsignadoAUnaCancion());
+		assertTrue(guitarrista.estaAsignadoAlmenosAUnaCancion());
 		assertEquals(expectedMaxCanciones, guitarrista.maxCanciones);
 	}
 
@@ -125,7 +125,7 @@ class ArtistaContratadoTest {
 
 		guitarrista.asignar(cancion);
 		assertTrue(guitarrista.designar(cancion));
-		assertFalse(guitarrista.estaAsignadoAUnaCancion());
+		assertFalse(guitarrista.estaAsignadoAlmenosAUnaCancion());
 		assertEquals(expectedMaxCanciones, guitarrista.maxCanciones);
 	}
 
