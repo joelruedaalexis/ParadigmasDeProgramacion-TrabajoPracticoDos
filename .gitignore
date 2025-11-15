@@ -2,7 +2,6 @@
 *.class
 
 # Archivos de paquete de Eclipse
-*.jar
 *.war
 *.ear
 
