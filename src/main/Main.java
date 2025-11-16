@@ -17,32 +17,10 @@ import artista.ArtistaBase;
 import cancion.Cancion;
 import importacion.Importacion;
 import menu.Menu;
+import prolog.IntegracionProlog;
 import recital.Recital;
 
 public class Main {
-	static class Producto implements Comparable<Producto> {
-		String nombre;
-		int cantidad;
-
-		public Producto(String nombre, int cantidad) {
-			this.nombre = nombre;
-			this.cantidad = cantidad;
-		}
-
-		@Override
-		public int compareTo(Producto o) {
-			int comp = this.cantidad - o.cantidad;
-			if (comp == 0)
-				return this.nombre.compareTo(o.nombre);
-			return comp > 0 ? 1 : -1;
-		}
-
-		@Override
-		public String toString() {
-			return "Producto [nombre=" + nombre + ", cantidad=" + cantidad + "]";
-		}
-
-	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -71,7 +49,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+	
 		String rutaArchivo2 = Paths.get("src", "assets", "recital.json").toString();
 		List<Cancion> repertorio = null;
 		try {
@@ -88,8 +66,8 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		List<String> roles = null;
 		String rutaArchivo3 = Paths.get("src", "assets", "roles-necesarios.json").toString();
+		List<String> roles = null;
 		try {
 			roles = Importacion.importarRoles(rutaArchivo3);
 //			System.out.println(roles);
@@ -119,6 +97,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 
 		Scanner scanner = new Scanner(System.in);
 //		List<Artista> lineUp = Importacion.importarArtistas(null);
@@ -126,71 +105,11 @@ public class Main {
 //		List<String> roles = Importacion.importarRoles(null);
 		Recital recital = new Recital(repertorio, artistas, roles);
 		Menu menu = new Menu(scanner, recital);
-		menu.iniciar();
+		//menu.iniciar();
+		IntegracionProlog.generarBaseDeConocimiento();
 		scanner.close();
-
-		Set<Producto> wasd = new TreeSet<>();
-		wasd.add(new Producto("A", 1));
-		wasd.add(new Producto("B", 3));
-		wasd.add(new Producto("C", 2));
-		wasd.add(new Producto("D", 1));
-		System.out.println(">>>>" + wasd);
-
-		int[] vec = { 1, 2, 3, 4 };
-		List<Integer> l1 = new ArrayList<>();
-		l1.add(1);
-		List<Integer> l2 = new ArrayList<>();
-		l2.add(1);
-		l2.add(1);
-		l2.add(1);
-		l2.add(1);
-		l2.removeAll(l1);
-		System.out.println(l2);
-
-		int[] a = { 1, 2, 3, 4 };
-		int[] b = { 1, 2, 3, 1, 1 };
-		int[] c = parcial(a, b);
-
-		for (int i = 0; i < c.length; i++) {
-			System.out.print(" " + c[i]);
-		}
-		System.out.println("");
-
-		List<String> lista = new ArrayList<>(4);
-		System.out.println("---->" + lista.size());
-
-//		System.out.println(repertorio);
-		Map<String, Integer> map = new LinkedHashMap<>();
-		map.put("D", 4);
-		map.put("B", 2);
-		map.put("A", 1);
-		map.put("C", 3);
-		System.out.println(map);
-
-		List<Integer> xd = new ArrayList<>();
-		xd.add(null);
-		xd.add(null);
-		xd.add(2);
-		System.out.println(xd);
-	}
-
-	public static int[] parcial(int[] a, int[] b) {
-		List<Integer> lA = new ArrayList<>();
-		List<Integer> lB = new ArrayList<>();
-
-		for (int i = 0; i < a.length; i++) {
-			lA.add(a[i]);
-		}
-		for (int j = 0; j < b.length; j++) {
-			lB.add(b[j]);
-		}
-
-		List<Integer> lAuxA = new ArrayList<>(lA);
-		List<Integer> lAuxB = new ArrayList<>(lB);
-
-		lAuxA.removeAll(lB);
-		lAuxB.removeAll(lA);
-
-		return lAuxA.size() > lAuxB.size() ? a : b;
 	}
 }
+
+
+	
