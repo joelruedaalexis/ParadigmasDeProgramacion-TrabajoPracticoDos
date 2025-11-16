@@ -1,6 +1,4 @@
-% --- GENERADO AUTOMATICAMENTE DESDE JAVA ---
-
-% --- HECHOS DE ARTISTAS Y HABILIDADES ---
+% --- HECHOS DE ARTISTAS ---
 artista(agustin_cruz, contratado).
 artista(annie_lennox, contratado).
 artista(brian_may, base).
@@ -13,18 +11,8 @@ artista(lucy_patane, contratado).
 artista(rita_lee, contratado).
 artista(roberto_musso, contratado).
 artista(roger_taylor, base).
-costo_base(agustin_cruz, 500).
-costo_base(annie_lennox, 900).
-costo_base(brian_may, 0).
-costo_base(david_bowie, 1500).
-costo_base(elton_john, 1200).
-costo_base(george_michael, 1000).
-costo_base(john_deacon, 0).
-costo_base(lisa_stansfield, 800).
-costo_base(lucy_patane, 800).
-costo_base(rita_lee, 800).
-costo_base(roberto_musso, 300).
-costo_base(roger_taylor, 0).
+
+% --- HECHOS DE HABILIDADES ---
 habilidad(agustin_cruz, armonica).
 habilidad(agustin_cruz, saxofon).
 habilidad(agustin_cruz, voz_principal).
@@ -50,26 +38,14 @@ habilidad(roberto_musso, saxofon).
 habilidad(roberto_musso, voz_principal).
 habilidad(roger_taylor, bateria).
 habilidad(roger_taylor, voz_secundaria).
-max_canciones(agustin_cruz, 2).
-max_canciones(annie_lennox, 2).
-max_canciones(brian_may, 100).
-max_canciones(david_bowie, 2).
-max_canciones(elton_john, 2).
-max_canciones(george_michael, 3).
-max_canciones(john_deacon, 100).
-max_canciones(lisa_stansfield, 2).
-max_canciones(lucy_patane, 2).
-max_canciones(rita_lee, 2).
-max_canciones(roberto_musso, 2).
-max_canciones(roger_taylor, 100).
 
-% --- MIEMBROS DE DISCOGRAFICA (ARTISTAS BASE) ---
+% --- ARTISTAS BASE ---
 miembro_discografica(brian_may).
 miembro_discografica(john_deacon).
 miembro_discografica(lucy_patane).
 miembro_discografica(roger_taylor).
 
-% --- HECHOS DE ROLES REQUERIDOS (POR CADA CANCION) ---
+% --- ROLES REQUERIDOS ---
 rol_instancia(i1, voz_principal).
 rol_instancia(i10, voz_principal).
 rol_instancia(i11, guitarra_electrica).
@@ -110,12 +86,9 @@ rol_instancia(i8, bajo).
 rol_instancia(i9, bateria).
 total_instancias_rol(38).
 
-% --- REGLAS ESTÁTICAS DE COSTE ---
-coste_entrenamiento(A, R, 0) :- habilidad(A, R).
-coste_entrenamiento(A, R, 1) :- artista(A, _), \+ habilidad(A, R).
-
-% --- REGLAS PARA CALCULAR ENTRENAMIENTOS MINIMOS ---
-requeridas(Rol, Cant) :- findall(1, rol_instancia(_, Rol), L), length(L, Cant).
+% --- REGLAS ---
 base_saben(Rol, Cant) :- findall(A, (habilidad(A, Rol), artista(A, base)), L), length(L, Cant).
-entrenamientos_necesarios(Rol, Ent) :- requeridas(Rol, Req), base_saben(Rol, Base), Temp is Req - Base, (Temp > 0 -> Ent = Temp ; Ent = 0).
-entrenamientos_minimos(Total) :- setof(R, I^rol_instancia(I, R), Roles), findall(E, (member(R, Roles), entrenamientos_necesarios(R, E)), Lista), sumlist(Lista, Total).
+entrenamientos_minimos(Total) :- setof(R, I^rol_instancia(I, R), Roles), findall(E, (member(R, Roles), entrenamientos_necesarios(R, E)), L), sumlist(L, Total).
+entrenamientos_necesarios(R, E) :- requeridas(R, Req), base_saben(R, Base), Temp is Req - Base, (Temp > 0 -> E = Temp ; E = 0).
+requeridas(Rol, Cant) :- findall(1, rol_instancia(_, Rol), L), length(L, Cant).
+

@@ -106,7 +106,13 @@ public class Main {
 		Recital recital = new Recital(repertorio, artistas, roles);
 		Menu menu = new Menu(scanner, recital);
 		//menu.iniciar();
+		
+		
 		IntegracionProlog.generarBaseDeConocimiento();
+	    int entrenamientos = IntegracionProlog.consultarEntrenamientosMinimos();
+	    System.out.println("Entrenamientos mínimos requeridos: " + entrenamientos);
+
+		
 		scanner.close();
 	}
 }

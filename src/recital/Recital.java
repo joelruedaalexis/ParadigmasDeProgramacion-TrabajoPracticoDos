@@ -233,7 +233,7 @@ public class Recital {
 
 //	prolog = 8
 	public void prolog() {
-		IntegracionProlog.generarHechosDeArtistas();
+		IntegracionProlog.generarBaseDeConocimiento();
 	}
 
 //	quitarArtistaDeCancion = 9
