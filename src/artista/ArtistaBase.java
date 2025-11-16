@@ -49,12 +49,16 @@ public class ArtistaBase {
 	}
 
 	public boolean estaAsignadoAlmenosAUnaCancion() {
-		return cancionesEnLasQueEstaAsignado.size() != 0;
+		return !cancionesEnLasQueEstaAsignado.isEmpty();
 	}
 
 //	probado
 	public List<Cancion> getListaDeCancionesEnLasQueEstaAsignado() {
 		return new ArrayList<>(cancionesEnLasQueEstaAsignado);
+	}
+
+	public boolean estaAsignadoACancion(Cancion cancion) {
+		return this.cancionesEnLasQueEstaAsignado.contains(cancion);
 	}
 
 //	probado
