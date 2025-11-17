@@ -216,6 +216,8 @@ public class Recital {
 //	prolog = 8
 	public void prolog() {
 		IntegracionProlog.generarBaseDeConocimiento();
+		System.out.println("El número mínimo de entrenamientos para cubrir el recital es: " +
+		IntegracionProlog.consultarEntrenamientosMinimos());
 	}
 
 //	quitarArtistaDeCancion = 9
