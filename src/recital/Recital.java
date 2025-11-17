@@ -27,6 +27,7 @@ import artista.ArtistaContratado;
 import artista.BandaHistorico;
 import artista.ComparadorArtistaPorCostoDeCancion;
 import artista.ComparadorArtistaPorNombre;
+import artista.ComparadoraArtistaPorCantidadDeRoles;
 import cancion.Cancion;
 import cancion.IntegranteDeUnRol;
 import prolog.IntegracionProlog;
@@ -56,6 +57,8 @@ public class Recital {
 
 //	rolesFaltantesParaCancion = 1
 	public Map<String, Integer> cantDeRolesFaltantesParaUnaCancion(int index) {
+		if (index < 0 || index >= repertorio.size())
+			throw new IllegalArgumentException("Los indices están fuera del limite permitido");
 //		Chequear si el index es válido y blablabla
 		Cancion cancion = repertorio.get(index);
 		return cancion.getRolesFaltantesXCupos();
@@ -64,29 +67,65 @@ public class Recital {
 //	rolesFaltantesParaTodasLasCanciones = 2,
 	public Map<String, Integer> cantDeRolesFaltantesParaTodasLasCanciones() {
 		List<ArtistaBase> listaArtistasBase = lineUp.stream().filter(a -> a.perteneceADiscografica()).toList();
+
 		Map<String, Integer> rolesFaltantesTotalesXCupo = new HashMap<>();
-		Set<ArtistaBase> setArtistasYaAsignados = new TreeSet<ArtistaBase>(new ComparadorArtistaPorNombre());
-		for (Cancion cancion : repertorio) {
-			System.out.println(cancion.getTitulo());
-			Map<String, Integer> rolesFaltantesXCupoDeCancion = cancion.getRolesFaltantesXCupos();
-			for (Map.Entry<String, Integer> nodo : rolesFaltantesXCupoDeCancion.entrySet()) {
-				String rol = nodo.getKey();
-				Integer cupos = nodo.getValue();
-				for (int i = 0; i < listaArtistasBase.size() && cupos > 0; i++) {
-					ArtistaBase artistaBase = listaArtistasBase.get(i);
-					if (!cancion.artistaEstaAsignado(artistaBase) && !setArtistasYaAsignados.contains(artistaBase)
-							&& artistaBase.tieneRol(rol)) {
-						setArtistasYaAsignados.add(artistaBase);
-						cupos--;
-					}
-				}
-				if (cupos > 0)
-					rolesFaltantesTotalesXCupo.put(rol, rolesFaltantesTotalesXCupo.getOrDefault(rol, 0) + cupos);
-			}
-			rolesFaltantesXCupoDeCancion.clear();
-			setArtistasYaAsignados.clear();
+
+//		Map<String, IntegranteDeUnRol> rolesXIntegrantesCandidatos = cancion.getRolesFaltantesConCuposDeIntegrantes();
+
+		List<ArtistaBase> artistasUsados = new ArrayList<>();
+
+		Map<Integer, List<String>> cantidadesDeIntegrantesXListaDeRoles = new TreeMap<>();
+		Map<String, List<ArtistaBase>> rolesXListaDeArtistas = new HashMap<>();
+//		Map<>
+//		Cargo los el map con los roles
+		for (ArtistaBase artista : listaArtistasBase) {
+			for (String rol : artista.getRoles())
+				if (rolesXListaDeArtistas.containsKey(rol))
+					rolesXListaDeArtistas.get(rol).add(artista);
+				else
+					rolesXListaDeArtistas.put(rol, new ArrayList<>(List.of(artista)));
+		}
+//		Ahora cargo el segundo map
+		for (Map.Entry<String, List<ArtistaBase>> rolXListaDeArtistas : rolesXListaDeArtistas.entrySet()) {
+			String rol = rolXListaDeArtistas.getKey();
+			Integer cantDeArtistasQueTienenRol = rolXListaDeArtistas.getValue().size();
+			if (cantidadesDeIntegrantesXListaDeRoles.containsKey(cantDeArtistasQueTienenRol))
+				cantidadesDeIntegrantesXListaDeRoles.get(cantDeArtistasQueTienenRol).addLast(rol);
+			else
+				cantidadesDeIntegrantesXListaDeRoles.put(cantDeArtistasQueTienenRol,
+						new ArrayList<String>(List.of(rol)));
 		}
 
+		for (Cancion cancion : repertorio) {
+			Map<String, Integer> rolesFaltantesXCupos = cancion.getRolesFaltantesXCupos();
+			for (Map.Entry<Integer, List<String>> cantDeIntegrantesXRoles : cantidadesDeIntegrantesXListaDeRoles
+					.entrySet()) {
+				List<String> rolesConEsaCantidadDeIntegrantes = cantDeIntegrantesXRoles.getValue();
+				for (int i = 0; i < rolesConEsaCantidadDeIntegrantes.size(); i++) {
+					String rolCursor = rolesConEsaCantidadDeIntegrantes.get(i);
+					if (rolesFaltantesXCupos.containsKey(rolCursor)) {
+						Integer cupos = rolesFaltantesXCupos.get(rolCursor);
+						List<ArtistaBase> artistasQueTieneRol = rolesXListaDeArtistas.get(rolCursor);
+						for (int j = 0; j < artistasQueTieneRol.size() && cupos > 0; j++) {
+							ArtistaBase artista = artistasQueTieneRol.get(j);
+							if (!artistasUsados.contains(artista) && !artista.estaAsignadoACancion(cancion)) {
+								artistasUsados.add(artista);
+								cupos--;
+							}
+						}
+						if (cupos == 0)
+							rolesFaltantesXCupos.remove(rolCursor);
+						else
+							rolesFaltantesXCupos.put(rolCursor, cupos);
+					}
+				}
+			}
+			if (!rolesFaltantesXCupos.isEmpty()) {
+				rolesFaltantesXCupos.forEach((rolFaltante, cupos) -> rolesFaltantesTotalesXCupo.put(rolFaltante,
+						rolesFaltantesTotalesXCupo.getOrDefault(rolFaltante, 0) + cupos));
+			}
+			artistasUsados.clear();
+		}
 		return rolesFaltantesTotalesXCupo;
 	}
 
