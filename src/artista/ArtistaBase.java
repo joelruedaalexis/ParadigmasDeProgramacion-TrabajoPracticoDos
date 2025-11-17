@@ -1,9 +1,10 @@
 package artista;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,7 +15,7 @@ public class ArtistaBase {
 	protected String nombre;
 	protected List<String> roles;
 	private List<BandaHistorico> bandaHistorico;
-	protected List<Cancion> cancionesEnLasQueEstaAsignado;
+	protected Set<Cancion> cancionesEnLasQueEstaAsignado;
 	protected double costo;
 
 	public ArtistaBase(String nombre, List<String> rol, List<BandaHistorico> banda) {
@@ -22,7 +23,7 @@ public class ArtistaBase {
 		this.roles = rol;
 		this.bandaHistorico = banda;
 		this.costo = 0;
-		cancionesEnLasQueEstaAsignado = new ArrayList<>();
+		cancionesEnLasQueEstaAsignado = new HashSet<>();
 		banda.forEach(b -> b.agregarIntegrante(this));
 	}
 
@@ -87,7 +88,7 @@ public class ArtistaBase {
 			throw new IllegalArgumentException("La canción no puede ser null.");
 		if (cancionesEnLasQueEstaAsignado.contains(cancion))
 			return false;
-		cancionesEnLasQueEstaAsignado.addLast(cancion);
+		cancionesEnLasQueEstaAsignado.add(cancion);
 		return true;
 	}
 

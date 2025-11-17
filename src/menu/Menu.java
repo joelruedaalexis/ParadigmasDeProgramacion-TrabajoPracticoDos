@@ -94,7 +94,7 @@ public class Menu {
 				TransaccionAsignacionDeCancion resultadoTransaccion = recital
 						.contratarArtistasParaUnaCancion(indexCancion);
 				System.out.println(resultadoTransaccion.getInformeDeAsignacionDeArtistas());
-				if (!resultadoTransaccion.esTransaccionCommitted()) {
+				if (resultadoTransaccion.esTransaccionEnCurso()) {
 					if (resultadoTransaccion.sePuedenEntrenarArtistasSuficientes()) {
 						System.out.printf(
 								"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"

@@ -54,7 +54,7 @@ public class ArtistaContratado extends ArtistaBase {
 			throw new IllegalArgumentException("No se puede asignar una cancion en null.");
 		if (!this.puedeSerAsignadoACancion() || cancionesEnLasQueEstaAsignado.contains(cancion))
 			return false;
-		cancionesEnLasQueEstaAsignado.addLast(cancion);
+		cancionesEnLasQueEstaAsignado.add(cancion);
 		this.maxCanciones--;
 		return true;
 	}
