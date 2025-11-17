@@ -7,12 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
@@ -27,7 +26,6 @@ import artista.ArtistaContratado;
 import artista.BandaHistorico;
 import artista.ComparadorArtistaPorCostoDeCancion;
 import artista.ComparadorArtistaPorNombre;
-import artista.ComparadoraArtistaPorCantidadDeRoles;
 import cancion.Cancion;
 import cancion.IntegranteDeUnRol;
 
@@ -65,85 +63,40 @@ public class Recital {
 
 //	rolesFaltantesParaTodasLasCanciones = 2,
 	public Map<String, Integer> cantDeRolesFaltantesParaTodasLasCanciones() {
-		List<ArtistaBase> listaArtistasBase = lineUp.stream().filter(a -> a.perteneceADiscografica()).toList();
-
-		Map<String, Integer> rolesFaltantesTotalesXCupo = new HashMap<>();
-
-//		Map<String, IntegranteDeUnRol> rolesXIntegrantesCandidatos = cancion.getRolesFaltantesConCuposDeIntegrantes();
-
-		List<ArtistaBase> artistasUsados = new ArrayList<>();
-
-		Map<Integer, List<String>> cantidadesDeIntegrantesXListaDeRoles = new TreeMap<>();
-		Map<String, List<ArtistaBase>> rolesXListaDeArtistas = new HashMap<>();
-//		Map<>
-//		Cargo los el map con los roles
-		for (ArtistaBase artista : listaArtistasBase) {
-			for (String rol : artista.getRoles())
-				if (rolesXListaDeArtistas.containsKey(rol))
-					rolesXListaDeArtistas.get(rol).add(artista);
+		List<ArtistaBase> artistasBase = lineUp.stream().filter(ArtistaBase::perteneceADiscografica).toList();
+		Map<String, List<ArtistaBase>> artistasXRol = new HashMap<>();
+		for (ArtistaBase artista : artistasBase) {
+			for (String rol : artista.getRoles()) {
+				if (artistasXRol.containsKey(rol))
+					artistasXRol.get(rol).add(artista);
 				else
-					rolesXListaDeArtistas.put(rol, new ArrayList<>(List.of(artista)));
+					artistasXRol.put(rol, new ArrayList<>(List.of(artista)));
+			}
 		}
-//		Ahora cargo el segundo map
-		for (Map.Entry<String, List<ArtistaBase>> rolXListaDeArtistas : rolesXListaDeArtistas.entrySet()) {
-			String rol = rolXListaDeArtistas.getKey();
-			Integer cantDeArtistasQueTienenRol = rolXListaDeArtistas.getValue().size();
-			if (cantidadesDeIntegrantesXListaDeRoles.containsKey(cantDeArtistasQueTienenRol))
-				cantidadesDeIntegrantesXListaDeRoles.get(cantDeArtistasQueTienenRol).addLast(rol);
-			else
-				cantidadesDeIntegrantesXListaDeRoles.put(cantDeArtistasQueTienenRol,
-						new ArrayList<String>(List.of(rol)));
-		}
-
+		Map<String, Integer> rolesFaltantesTotales = new HashMap<>();
+		ComparadoraDeArtistasXRoles comparadoraDeArtistasXRoles = new ComparadoraDeArtistasXRoles(artistasXRol);
+		Set<ArtistaBase> artistasUsadosEnCancion = new HashSet<>();
 		for (Cancion cancion : repertorio) {
-			Map<String, Integer> rolesFaltantesXCupos = cancion.getRolesFaltantesXCupos();
-			for (Map.Entry<Integer, List<String>> cantDeIntegrantesXRoles : cantidadesDeIntegrantesXListaDeRoles
-					.entrySet()) {
-				List<String> rolesConEsaCantidadDeIntegrantes = cantDeIntegrantesXRoles.getValue();
-				for (int i = 0; i < rolesConEsaCantidadDeIntegrantes.size(); i++) {
-					String rolCursor = rolesConEsaCantidadDeIntegrantes.get(i);
-					if (rolesFaltantesXCupos.containsKey(rolCursor)) {
-						Integer cupos = rolesFaltantesXCupos.get(rolCursor);
-						List<ArtistaBase> artistasQueTieneRol = rolesXListaDeArtistas.get(rolCursor);
-						for (int j = 0; j < artistasQueTieneRol.size() && cupos > 0; j++) {
-							ArtistaBase artista = artistasQueTieneRol.get(j);
-							if (!artistasUsados.contains(artista) && !artista.estaAsignadoACancion(cancion)) {
-								artistasUsados.add(artista);
-								cupos--;
-							}
-						}
-						if (cupos == 0)
-							rolesFaltantesXCupos.remove(rolCursor);
-						else
-							rolesFaltantesXCupos.put(rolCursor, cupos);
+			Map<String, Integer> rolesFaltantes = cancion.getRolesFaltantesXCupos();
+			List<String> rolesDeCancion = new ArrayList<>(rolesFaltantes.keySet());
+			rolesDeCancion.sort(comparadoraDeArtistasXRoles);
+			for (String rol : rolesDeCancion) {
+				int cupos = rolesFaltantes.get(rol);
+				List<ArtistaBase> artistasQueTieneRol = artistasXRol.getOrDefault(rol, new ArrayList<>(0));
+				for (int i = 0; i < artistasQueTieneRol.size() && cupos > 0; i++) {
+					ArtistaBase artista = artistasQueTieneRol.get(i);
+					if (!artistasUsadosEnCancion.contains(artista) && !artista.estaAsignadoACancion(cancion)) {
+						artistasUsadosEnCancion.add(artista);
+						cupos--;
 					}
 				}
+				if (cupos > 0)// https://medium.com/@AlexanderObregon/javas-map-merge-method-explained-a2f0b5de9c8a
+					rolesFaltantesTotales.merge(rol, cupos, Integer::sum);
 			}
-			if (!rolesFaltantesXCupos.isEmpty()) {
-				rolesFaltantesXCupos.forEach((rolFaltante, cupos) -> rolesFaltantesTotalesXCupo.put(rolFaltante,
-						rolesFaltantesTotalesXCupo.getOrDefault(rolFaltante, 0) + cupos));
-			}
-			artistasUsados.clear();
+			artistasUsadosEnCancion.clear();
 		}
-		return rolesFaltantesTotalesXCupo;
+		return rolesFaltantesTotales;
 	}
-
-//	public void cargarMapTodosLosRolesXArtista() {
-//		for (ArtistaBase artista : lineUp) {
-//			List<String> roles = artista.getRoles();
-//			for (String rol : roles) {
-//				if (!todosLosRolesXArtista.containsKey(rol))
-//					todosLosRolesXArtista.put(rol, new ArrayList<>());
-//				todosLosRolesXArtista.get(rol).add(artista);
-//			}
-//		}
-//		this.ordenarMapTodosLosRolesXArtista();
-//	}
-
-//	public void ordenarMapTodosLosRolesXArtista() {
-//		for (List<ArtistaBase> listaArtistas : todosLosRolesXArtista.values())
-//			listaArtistas.sort(new ComparadorArtistaPorCostoDeCancion());
-//	}
 
 //	contratarArtistasParaUnaCancion = 3, 
 	public TransaccionAsignacionDeCancion contratarArtistasParaUnaCancion(int index) {
@@ -153,65 +106,55 @@ public class Recital {
 		Cancion cancion = repertorio.get(index);
 
 		TransaccionAsignacionDeCancion resultadoTransaccion = new TransaccionAsignacionDeCancion(cancion);
-		Map<String, IntegranteDeUnRol> rolesXIntegrantesCandidatos = cancion.getRolesFaltantesConCuposDeIntegrantes();
+		Map<String, IntegranteDeUnRol> candidatosXRol = cancion.getRolesFaltantes();
 		List<ArtistaBase> listaDeArtistasDisponibles = lineUp.stream()
 				.filter(artista -> artista.puedeSerAsignadoACancion() && !cancion.artistaEstaAsignado(artista))
 				.collect(Collectors.toList());
+//		Lo ordenamos por costo, asi ya no tenemos q preocuparnos por asignar primero a los contratados
 		listaDeArtistasDisponibles.sort(new ComparadorArtistaPorCostoDeCancion());
 		List<ArtistaBase> artistasUsados = new ArrayList<>();
-		Map<String, List<ArtistaBase>> mapa = new HashMap<>(rolesXIntegrantesCandidatos.size());
-
-		Map<Integer, List<String>> mapaInt = new TreeMap<>();
-
-//		inicializo mapa
-		rolesXIntegrantesCandidatos.keySet().forEach(rol -> mapa.put(rol, new ArrayList<>()));
-//		Cargo TODOS los roles por artista q necesito en mi cancion de modo q me quede <String,List<Artista>> asi ya sé cuál es el rol que menos tiene artistas para asignar.
+		Map<String, List<ArtistaBase>> artistasQueTieneRol = new HashMap<>(candidatosXRol.size());
+//		cargo los artistas y los voy encasillando en los roles
 		for (ArtistaBase artista : listaDeArtistasDisponibles) {
-			List<String> rolesDelArtista = artista.getRoles();
-			for (int i = 0; i < rolesDelArtista.size(); i++)
-				if (mapa.containsKey(rolesDelArtista.get(i)))
-					mapa.get(rolesDelArtista.get(i)).addLast(artista);
-		}
-//		Ahora cargo mapint para saber cuáles son los roles que menos tienen artistas. Como es un TreeMap se ordena solo por INTEGER
-		for (Map.Entry<String, List<ArtistaBase>> nodo : mapa.entrySet()) {
-			String rol = nodo.getKey();
-			Integer cantArtistasDeRol = nodo.getValue().size();
-			if (mapaInt.containsKey(cantArtistasDeRol))
-				mapaInt.get(cantArtistasDeRol).add(rol);
-			else
-				mapaInt.put(cantArtistasDeRol, new ArrayList<>(List.of(rol)));
-		}
-
-//		Ahora q ya tengo cargado cuales son los roles que menos tienen artistas, arranco leyendo <Integer,List<String>> y voy comparando con la cantidad de roles que necesita mi canción
-		boolean hayIntegrantesSuficientes = true;
-		for (Map.Entry<Integer, List<String>> nodo : mapaInt.entrySet()) {
-			for (String rol : nodo.getValue()) {
-				List<ArtistaBase> integrantes = mapa.get(rol);
-				for (int i = 0; i < integrantes.size()
-						&& rolesXIntegrantesCandidatos.get(rol).hayCuposDisponibles(); i++) {
-					ArtistaBase artista = integrantes.get(i);
-					if (!artistasUsados.contains(integrantes.get(i))) {
-						artistasUsados.addLast(integrantes.get(i));
-						rolesXIntegrantesCandidatos.get(rol).agregarIntegrante(integrantes.get(i));
-					}
+			for (String rolDelArtista : artista.getRoles()) {
+				if (candidatosXRol.containsKey(rolDelArtista)) {
+					if (artistasQueTieneRol.containsKey(rolDelArtista))
+						artistasQueTieneRol.get(rolDelArtista).add(artista);
+					else
+						artistasQueTieneRol.put(rolDelArtista, new ArrayList<>(List.of(artista)));
 				}
-				if (hayIntegrantesSuficientes && rolesXIntegrantesCandidatos.get(rol).hayCuposDisponibles())
-					hayIntegrantesSuficientes = false;
 			}
 		}
+		ComparadoraDeArtistasXRoles comparadoraDeArtistasXRoles = new ComparadoraDeArtistasXRoles(artistasQueTieneRol);
+		List<String> rolesDisponiblesDeArtistas = new ArrayList<>(candidatosXRol.keySet());
+		rolesDisponiblesDeArtistas.sort(comparadoraDeArtistasXRoles);
+		boolean hayIntegrantesSuficientes = true;
+		for (String rol : rolesDisponiblesDeArtistas) {
+			int cupos = candidatosXRol.get(rol).getCantDeIntegrantesNecesarios();
+			List<ArtistaBase> artistasDeEseRol = artistasQueTieneRol.getOrDefault(rol, new ArrayList<>(0));
+			for (int i = 0; i < artistasDeEseRol.size() && cupos > 0; i++) {
+				ArtistaBase artista = artistasDeEseRol.get(i);
+				if (!artistasUsados.contains(artista)) {
+					candidatosXRol.get(rol).agregarIntegrante(artista);
+					artistasUsados.add(artista);
+					cupos--;
+				}
+			}
+			if (hayIntegrantesSuficientes && candidatosXRol.get(rol).hayCuposDisponibles())
+				hayIntegrantesSuficientes = false;
+		}
+
 		if (!hayIntegrantesSuficientes) {// hay roles q no estan cubiertos !!!!!
 			listaDeArtistasDisponibles.removeAll(artistasUsados);
-			resultadoTransaccion.cancelarTransaccion(rolesXIntegrantesCandidatos, listaDeArtistasDisponibles);
+			resultadoTransaccion.registrarFallaEnAsignacion(candidatosXRol, listaDeArtistasDisponibles);
 			return resultadoTransaccion;
 		}
 
-		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXIntegrantesCandidatos.entrySet()) {
+		for (Map.Entry<String, IntegranteDeUnRol> nodo : candidatosXRol.entrySet()) {
 			String rol = nodo.getKey();
 			List<ArtistaBase> listaDeArtistas = nodo.getValue().getListaDeIntegrantes();
 			listaDeArtistas.forEach(artista -> {
-//				System.out.println(cancion.agregarArtista(rol, artista));
 				cancion.agregarArtista(rol, artista);
-//				artista.asignar(cancion);
 			});
 		}
 		resultadoTransaccion.confirmarTransaccion();
@@ -222,7 +165,7 @@ public class Recital {
 	public void contratarArtistasParaTodasLasCanciones() {// plantearlo
 		Map<String, IntegranteDeUnRol> rolesXIntegrantesCandidatos = new HashMap<>();
 		for (Cancion cancion : repertorio) {
-			Map<String, IntegranteDeUnRol> rolesXIntegrantes = cancion.getRolesFaltantesConCuposDeIntegrantes();
+			Map<String, IntegranteDeUnRol> rolesXIntegrantes = cancion.getRolesFaltantes();
 //			if(roles)
 		}
 

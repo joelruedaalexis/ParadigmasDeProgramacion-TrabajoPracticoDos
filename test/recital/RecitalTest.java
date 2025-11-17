@@ -94,6 +94,7 @@ class RecitalTest {
 		int indexCancion2 = repertorio.indexOf(cancion2);
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
 		assertFalse(transaccion.esTransaccionCommitted());
+		assertEquals(EstadoDeTransaccion.EN_CURSO, transaccion.getEstadoDeTransaccion());
 		assertFalse(transaccion.sePuedenEntrenarArtistasSuficientes());
 	}
 
@@ -160,9 +161,7 @@ class RecitalTest {
 	void contratacionFallidaDeArtistasParaUnaCancionPorqueNoSeDeseaAEntrenarArtistas() {
 		int expectedCuposDisponibles = 5;
 		cancion2 = new Cancion("Román", new ArrayList<>(List.of(vozPrincipal, piano, piano, armonica, vozSecundaria)));
-//		cancion5 = new Cancion("Crow", new ArrayList<>(List.of(vozPrincipal, bateria, bajo)));
 		repertorio.addLast(cancion2);
-//		cancionero.addLast(cancion5);
 		int indexCancion2 = 0;
 		lineUp = new ArrayList<>(List.of(bateristaContratado1, bajistaContratado1, cantanteContratado1, cantanteBase1,
 				bajistaContratado1));
@@ -174,22 +173,19 @@ class RecitalTest {
 		transaccion.entrenarArtistasRecomendadosYAsignarLosCandidatos(TransaccionAsignacionDeCancion.NO);
 		assertEquals(expectedCuposDisponibles, cancion2.getCantDeCuposDisponibles());
 		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
+		assertThrows(IllegalStateException.class,
+				() -> transaccion.entrenarArtistasRecomendadosYAsignarLosCandidatos(TransaccionAsignacionDeCancion.SI));
 	}
 
 	@Test
 	void contratacionExitosaDeArtistasMezcladosParaUnaCancion() {
 		int expectedCuposDisponibles = 0;
 		cancion2 = new Cancion("Román", new ArrayList<>(List.of(vozPrincipal, vozPrincipal, bajo, bateria, piano)));
-		////		cancion5 = new Cancion("Crow", new ArrayList<>(List.of(vozPrincipal, bateria, bajo)));
 		repertorio.addLast(cancion2);
-		////		cancionero.addLast(cancion5);
 		int indexCancion2 = 0;
 		ArtistaBase bajistaYPianistaContratado = new ArtistaBase("Kamasi Washington",
 				new ArrayList<>(List.of(bajo, piano)),
 				new ArrayList<>(List.of(new BandaHistorico("Kamasi Washington"))));
-//		ArtistaContratado bajistaYPianistaContratado = new ArtistaContratado("Kamasi Washington",
-		////				new ArrayList<>(List.of(bajo, piano)),
-////				new ArrayList<>(List.of(new BandaHistorico("Kamasi Washington"))), 5000, maxCanciones);
 		lineUp = new ArrayList<>(List.of(bateristaContratado1, bajistaContratado1, cantanteContratado1, cantanteBase1,
 				cantantePrincSecunBase2, bajistaYPianistaContratado));
 		recital = new Recital(repertorio, lineUp, roles);
@@ -204,6 +200,38 @@ class RecitalTest {
 	}
 
 	@Test
+	void contratacionExitosaDeManeraEficienteDeArtistasMezcladosParaUnaCancion() {
+		int expectedCuposDisponibles = 0;
+		cancion2 = new Cancion("Román",
+				new ArrayList<>(List.of(vozPrincipal, vozPrincipal, bajo, bateria, piano, saxofon)));
+		repertorio.addLast(cancion2);
+		int indexCancion2 = 0;
+		ArtistaBase bajistaYPianistaContratado = new ArtistaBase("Kamasi Washington",
+				new ArrayList<>(List.of(bajo, piano)),
+				new ArrayList<>(List.of(new BandaHistorico("Kamasi Washington"))));
+		ArtistaContratado saxofonistaBarato = new ArtistaContratado("Lisa Simpsons",
+				new ArrayList<>(List.of(saxofon, armonica)),
+				new ArrayList<>(List.of(new BandaHistorico("Lisa Simpsons"))), 5000, maxCanciones);
+		ArtistaContratado saxofonistaCaro = new ArtistaContratado("Bleeding Gums Murphy",
+				new ArrayList<>(List.of(saxofon, armonica)),
+				new ArrayList<>(List.of(new BandaHistorico("Bleeding Gums Murphy"))), 99999999, maxCanciones);
+
+		lineUp = new ArrayList<>(List.of(bateristaContratado1, bajistaContratado1, cantanteContratado1, cantanteBase1,
+				cantantePrincSecunBase2, bajistaYPianistaContratado, saxofonistaCaro, saxofonistaBarato));
+		recital = new Recital(repertorio, lineUp, roles);
+		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
+		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
+		assertTrue(transaccion.esTransaccionCommitted());
+		assertEquals(expectedCuposDisponibles, cancion2.getCantDeCuposDisponibles());
+		assertFalse(cancion2.artistaEstaAsignado(cantanteContratado1));
+		assertFalse(cancion2.artistaEstaAsignado(saxofonistaCaro));
+		assertTrue(cancion2.artistaEstaAsignado(saxofonistaBarato));
+		double expectedCosto = bateristaContratado1.getCosto() + bajistaContratado1.getCosto()
+				+ bajistaYPianistaContratado.getCosto() + saxofonistaBarato.getCosto();
+		assertEquals(expectedCosto, cancion2.getCostoDeCancion());
+	}
+
+	@Test
 	void sePuedeQuitarArtistaBaseDeUnaCancion() {
 		int expectedCuposDisponibles = 1;
 		cancion2 = new Cancion("Crawling", new ArrayList<>(List.of(vozPrincipal, vozPrincipal, bajo, bateria)));
@@ -211,7 +239,6 @@ class RecitalTest {
 		int indexCancion = 0, indexArtista = 0;
 		lineUp = new ArrayList<>(List.of(cantanteBase1, cantanteContratado1, bajistaContratado1, bateristaContratado1));
 		recital = new Recital(repertorio, lineUp, roles);
-//		double expectedCosto = 
 		assertTrue(recital.contratarArtistasParaUnaCancion(indexCancion).esTransaccionCommitted());
 		ArtistaBase expectedArtistaQuitado = cancion2.getListadoDeIntegrantes().getFirst();
 		assertTrue(cancion2.artistaEstaAsignado(expectedArtistaQuitado));
@@ -306,11 +333,12 @@ class RecitalTest {
 		repertorio.addLast(cancion2);
 		lineUp = new ArrayList<>(List.of(cantanteBase1, cantanteContratado1, bajistaContratado1, bateristaContratado1));
 		recital = new Recital(repertorio, lineUp, roles);
-
 		int indexCancion1 = 0, indexCancion2 = 1;
 		assertTrue(recital.contratarArtistasParaUnaCancion(indexCancion1).esTransaccionCommitted());
 		assertTrue(recital.contratarArtistasParaUnaCancion(indexCancion2).esTransaccionCommitted());
-		assertEquals(repertorio, cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado());
+		assertEquals(repertorio.size(), cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado().size());
+		assertTrue(cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado().containsAll(repertorio));
+		assertTrue(repertorio.containsAll(cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado()));
 		assertTrue(cantanteBase1.estaAsignadoAlmenosAUnaCancion());
 		assertTrue(recital.quitarArtistaDeTodasLasCanciones(cantanteBase1.getNombre()));
 		assertFalse(cantanteBase1.estaAsignadoAlmenosAUnaCancion());
@@ -329,7 +357,9 @@ class RecitalTest {
 		assertTrue(recital.contratarArtistasParaUnaCancion(indexCancion1).esTransaccionCommitted());
 		assertTrue(recital.contratarArtistasParaUnaCancion(indexCancion2).esTransaccionCommitted());
 
-		assertEquals(repertorio, cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado());
+		assertEquals(repertorio.size(), cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado().size());
+		assertTrue(repertorio.containsAll(cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado()));
+		assertTrue(cantanteBase1.getListaDeCancionesEnLasQueEstaAsignado().containsAll(repertorio));
 		assertTrue(bajistaContratado1.estaAsignadoAlmenosAUnaCancion());
 		assertTrue(recital.quitarArtistaDelLineUp(index));
 		assertFalse(bajistaContratado1.estaAsignadoAlmenosAUnaCancion());
@@ -484,5 +514,29 @@ class RecitalTest {
 		expectedRolesFaltantes.put(saxofon, 2);
 		assertEquals(expectedRolesFaltantes, recital.cantDeRolesFaltantesParaTodasLasCanciones(),
 				"Todos los roles deberian estár cubiertos pos los 3 artistas bases.");
+	}
+
+	@Test
+	void estanTodosLosRolesCubiertosEnTodasLasCancionesQueSeLesQuitóArtistas() {
+		cancion1 = new Cancion("Crawling", new ArrayList<>(List.of(vozPrincipal, guitarraElectrica, vozSecundaria)));
+		cancion2 = new Cancion("Heavy is the Crown",
+				new ArrayList<>(List.of(vozPrincipal, guitarraElectrica, vozPrincipal)));
+		cancion3 = new Cancion("Signo Marte", new ArrayList<>(List.of(vozPrincipal, guitarraElectrica, vozSecundaria)));
+		cancion4 = new Cancion("Broken Relief",
+				new ArrayList<>(List.of(vozPrincipal, guitarraElectrica, vozPrincipal)));
+		repertorio.addLast(cancion1);
+		repertorio.addLast(cancion2);
+		repertorio.addLast(cancion3);
+		repertorio.addLast(cancion4);
+		lineUp = new ArrayList<>(List.of(cantantePrincSecunBase2, cantanteContratado1, cantanteBase1,
+				bajistaContratado1, guitarristaBase1));
+		recital = new Recital(repertorio, lineUp, roles);
+
+		recital.quitarArtistaDeTodasLasCanciones(guitarristaBase1.getNombre());
+		recital.quitarArtistaDeTodasLasCanciones(cantantePrincSecunBase2.getNombre());
+
+		Map<String, Integer> expectedRolesFaltantes = new HashMap<>();
+		assertEquals(expectedRolesFaltantes, recital.cantDeRolesFaltantesParaTodasLasCanciones());
+		assertTrue(recital.cantDeRolesFaltantesParaTodasLasCanciones().isEmpty());
 	}
 }

@@ -2,7 +2,6 @@
 *.class
 
 # Archivos de paquete de Eclipse
-*.jar
 *.war
 *.ear
 
@@ -45,6 +44,3 @@ bin/
 
 # Archivos de sistema
 *.orig
-
-# Archivos creados JSON
-estadosCreados/

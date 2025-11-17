@@ -162,7 +162,7 @@ public class Cancion {
 		return roles;
 	}
 
-	public Map<String, IntegranteDeUnRol> getRolesFaltantesConCuposDeIntegrantes() {
+	public Map<String, IntegranteDeUnRol> getRolesFaltantes() {
 //		return new HashMap<>(rolesXCuposDeIntegrantes);
 		Map<String, IntegranteDeUnRol> rolesXCuposDeIntegrantes = new HashMap<>();
 		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
