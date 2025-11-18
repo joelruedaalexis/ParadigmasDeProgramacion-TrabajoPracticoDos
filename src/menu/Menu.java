@@ -19,6 +19,7 @@ public class Menu {
 			listarArtistasContratados = 6, listarCanciones = 7, prolog = 8, quitarArtistaDeCancion = 9,
 			quitarArtistaDeTodasLasCanciones = 10, quitarArtistaContratadoDelLineUp = 11, guardarEstadoDelRecital = 12,
 			cargarEstadoDelRecital = 13;
+	private static final String rutaCarpetaRecitales = "estadosCreados";
 	private Scanner scanner;
 	private Recital recital;
 	private List<String> recitalesGuardados;
@@ -164,7 +165,7 @@ public class Menu {
 
 			    try {
 			        // Crea la carpeta si no existe (lógico para guardar)
-			        Files.createDirectories(Paths.get("estadosCreados"));
+			        Files.createDirectories(Paths.get(Menu.rutaCarpetaRecitales));
 			        
 			        recital.guardarEnArchivoJSON(rutaGuardar);
 			        System.out.println("-> El archivo se ha guardado con éxito.");
@@ -291,6 +292,6 @@ public class Menu {
 			}
 		} while (!ruta.endsWith(".json") || ruta.length() <= 5);
 
-		return Paths.get("estadosCreados", ruta).toString();
+		return Paths.get(Menu.rutaCarpetaRecitales, ruta).toString();
 	}
 }
