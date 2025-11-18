@@ -41,7 +41,7 @@ public class Menu {
 				scanner.nextLine();
 			}
 			if (opcion < limInf || opcion > limSup)
-				System.out.println("XD");
+				System.out.println("Opción inválida. Ingrese Nuevamente: ");
 		} while (opcion < limInf || opcion > limSup);
 		return opcion;
 	}
@@ -118,7 +118,7 @@ public class Menu {
 			case entrenarArtista:// 5
 				Map<String, Integer> mapArtistaAEntrenar = recital.getListadoArtistasContratadosSinSerAsignados();
 				System.out.println("Elija un artista contratado para entrenarle un nuevo rol:");
-				String nombreArtistaAEntrenar = elegirArtistaAEntrenar(new ArrayList<>(mapArtistaAEntrenar.keySet()));
+				String nombreArtistaAEntrenar = elegirArtista(new ArrayList<>(mapArtistaAEntrenar.keySet()));
 				indexArtista = mapArtistaAEntrenar.get(nombreArtistaAEntrenar);
 				System.out.printf("Elija qué rol desea que %s entrene.\n", nombreArtistaAEntrenar);
 				String nuevoRol = this.elegirRolDelArtistaAEntrenar(indexArtista);
@@ -154,11 +154,19 @@ public class Menu {
 					recital.quitarArtistaDeTodasLasCanciones(listaArtistasAsignados.get(indexArtista));
 				break;
 			case quitarArtistaContratadoDelLineUp:// 11
-				Map<String, Integer> xd = recital.getListadoArtistasContratados();
-				System.out.println("->Elija un artista contratado para quitarlo del lineUp.");
-				String nombreArtista = this.elegirArtistaAEntrenar(new ArrayList<>(xd.keySet()));
-				recital.quitarArtistaDelLineUp(xd.get(nombreArtista));
-				break;
+			    Map<String, Integer> artistas = recital.getListadoArtistasContratados();
+
+			    if (artistas.isEmpty()) {
+			        System.out.println("-> No hay artistas contratados para quitar.");
+			        break;
+			    }
+
+			    System.out.println("->Elija un artista contratado para quitarlo del lineUp.");
+			    String nombreArtista = this.elegirArtista(new ArrayList<>(artistas.keySet()));
+
+			    recital.quitarArtistaDelLineUp(artistas.get(nombreArtista));
+			    break;
+
 			case guardarEstadoDelRecital:// 12
 			    String rutaGuardar = this
 			            .ingresarRutaParaRecital("-> Ingrese el nombre del archivo para guardar el recital: ");
@@ -243,7 +251,7 @@ public class Menu {
 		return ingresarOpcionVal(1, lista.size()) - 1;
 	}
 
-	public String elegirArtistaAEntrenar(List<String> lista) {
+	public String elegirArtista(List<String> lista) {
 		for (int i = 0; i < lista.size(); i++)
 			System.out.printf("%02d) %s\n", i + 1, lista.get(i));
 		int index = ingresarOpcionVal(1, lista.size());
