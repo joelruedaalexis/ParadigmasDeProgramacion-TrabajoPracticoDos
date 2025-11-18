@@ -274,10 +274,10 @@ public class Menu {
 
 	public void mostrarOpciones() {
 		System.out.println("Elija una de las siguientes opciones:");
-		System.out.printf("00) Salir \n01) rolesFaltantesParaCancion \n02) rolesFaltantesParaTodasLasCanciones\n"
-				+ "03) contratarArtistasParaUnaCancion \n04) contratarArtistasParaTodasLasCanciones \n05) entrenarArtista \n"
-				+ "06) listarArtistasContratados \n07) listarCanciones \n08) prolog\n09) quitarArtistaDeCancion \n"
-				+ "10) quitarArtistaDeTodasLasCanciones \n11)quitarArtistaDelLineUp \n12) Guardar estado del recital actual \n13) Cargar estado de un recital\n");
+		System.out.printf("00) Salir \n01) Roles faltantes para una canción \n02) Roles faltantes para todas las canciones\n"
+				+ "03) Contratar artistas para una canción \n04) Contratar artistas para todas las canciones \n05) Entrenar artista \n"
+				+ "06) Listar artistas contratados \n07) Listar Canciones \n08) [PROLOG] - Consulta de entrenamientos mínimos\n09) Quitar artista de una canción \n"
+				+ "10) Quitar artista de todas las canciones \n11) Quitar artista del LineUp \n12) Guardar estado del recital actual \n13) Cargar estado de un recital\n");
 
 	}
 
