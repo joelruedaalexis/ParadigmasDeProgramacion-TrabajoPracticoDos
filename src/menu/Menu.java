@@ -1,6 +1,8 @@
 package menu;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,31 +159,52 @@ public class Menu {
 				recital.quitarArtistaDelLineUp(xd.get(nombreArtista));
 				break;
 			case guardarEstadoDelRecital:// 12
-				String ruta = this
-						.ingresarRutaParaRecital("-> Ingrese la ruta del archivo donde desea guardar el recital: ");
-				try {
-					recital.guardarEnArchivoJSON(ruta);
-					System.out.println("->El archivo se ha guardado con éxito.");
-					recitalesGuardados.add(ruta);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-//					e.printStackTrace();
-					System.out.println(e.getMessage());
-				}
-				break;
+			    String rutaGuardar = this
+			            .ingresarRutaParaRecital("-> Ingrese el nombre del archivo para guardar el recital: ");
+
+			    try {
+			        // Crea la carpeta si no existe (lógico para guardar)
+			        Files.createDirectories(Paths.get("estadosCreados"));
+			        
+			        recital.guardarEnArchivoJSON(rutaGuardar);
+			        System.out.println("-> El archivo se ha guardado con éxito.");
+			        recitalesGuardados.add(rutaGuardar);
+
+			    } catch (IOException e) {
+			        System.out.println("-> Error al guardar el archivo: " + e.getMessage());
+			    }
+			    break;
+
+
 			case cargarEstadoDelRecital:// 13
-				String ruta2 = this
-						.ingresarRutaParaRecital("-> Ingrese la ruta del archivo donde desea guardar el recital: ");
-				try {
-					recital.cargarEstadoDeArchivoJSON(ruta2);
-					System.out.println("->El archivo se ha cargado con éxito.");
-					recitalesGuardados.add(ruta2);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-//					e.printStackTrace();
-					System.out.println(e.getMessage());
-				}
-				break;
+			    String rutaCargar = this
+			            .ingresarRutaParaRecital("-> Ingrese el nombre del archivo a cargar: ");
+
+			    File archivoCargar = new File(rutaCargar);
+			    File carpetaCargar = archivoCargar.getParentFile();
+
+			    // Verificar existencia de carpeta (pero NO crearla)
+			    if (carpetaCargar != null && !carpetaCargar.exists()) {
+			        System.out.println("-> La carpeta '" + carpetaCargar.getPath() + "' no existe.");
+			        break;
+			    }
+
+			    // Verificar existencia del archivo
+			    if (!archivoCargar.exists()) {
+			        System.out.println("-> El archivo '" + archivoCargar.getPath() + "' no existe.");
+			        break;
+			    }
+
+			    try {
+			        recital.cargarEstadoDeArchivoJSON(rutaCargar);
+			        System.out.println("-> El archivo se ha cargado con éxito.");
+			        recitalesGuardados.add(rutaCargar);
+
+			    } catch (IOException e) {
+			        System.out.println("-> Error al cargar el archivo: " + e.getMessage());
+			    }
+			    break;
+
 			}
 			if (opcion != salir) {
 				pausar();
@@ -253,7 +276,7 @@ public class Menu {
 		System.out.printf("00) Salir \n01) rolesFaltantesParaCancion \n02) rolesFaltantesParaTodasLasCanciones\n"
 				+ "03) contratarArtistasParaUnaCancion \n04) contratarArtistasParaTodasLasCanciones \n05) entrenarArtista \n"
 				+ "06) listarArtistasContratados \n07) listarCanciones \n08) prolog\n09) quitarArtistaDeCancion \n"
-				+ "10) quitarArtistaDeTodasLasCanciones \n11)quitarArtistaDelLineUp \n12)guardarEstadoDelRecital \n13) cargarEstadoDelRecital\n");
+				+ "10) quitarArtistaDeTodasLasCanciones \n11)quitarArtistaDelLineUp \n12) Guardar estado del recital actual \n13) Cargar estado de un recital\n");
 
 	}
 
