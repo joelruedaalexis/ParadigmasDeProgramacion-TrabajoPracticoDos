@@ -21,13 +21,13 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 	private List<ArtistaBase> artistasDisponiblesParaSerEntrenados;
 	private Map<String, List<ArtistaBase>> artistasEntrenadosEnRol;
 
-	public TransaccionAsignacionDeTodasLasCanciones(
+	protected TransaccionAsignacionDeTodasLasCanciones(
 			Map<Cancion, Map<String, IntegranteDeUnRol>> artistasCandidatosAsignadosACancion) {
 		this.artistasCandidatosAsignadosACancion = artistasCandidatosAsignadosACancion;
 		estado = EstadoDeTransaccion.EN_CURSO;
 	}
 
-	public void confirmarTransaccion() {
+	protected void confirmarTransaccion() {
 		estado = EstadoDeTransaccion.CONFIRMADA;
 	}
 
@@ -49,7 +49,7 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 			for (Map.Entry<String, IntegranteDeUnRol> integrantesDeRolDeCancion : nodo.getValue().entrySet()) {
 				IntegranteDeUnRol integranteDeUnRol = integrantesDeRolDeCancion.getValue();
 				cuposDeCancion += integranteDeUnRol.getCantDeCuposDisponibles();
-			} // 2 5 3 8
+			}
 			Set<ArtistaBase> candidatosUsadosEnCancion = getCandidatosDeCancion(cancion);
 			for (int i = 0; i < artistasDisponiblesParaSerEntrenados.size() && cuposDeCancion > 0; i++) {
 				ArtistaBase artista = artistasDisponiblesParaSerEntrenados.get(i);
@@ -164,10 +164,6 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 			estado = EstadoDeTransaccion.CANCELADA;
 	}
 
-	public void mostrar() {
-//		for(artistasCandidatosAsignadosACancion)
-	}
-
 	public String getInformeDeAsignacionesDeArtistas() {
 		if (estado == EstadoDeTransaccion.CONFIRMADA)
 			return getInformeParaAsignacionExitosa();
@@ -177,7 +173,65 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 	}
 
 	private String getInformeParaFallaEnAsignacion() {
-		return "terminar";
+		String str = "Para completar todos los roles del repertorio se necesitan entrenar a artistas. "
+				+ "Las canciones y roles con espacios disponibles son :\n";
+		artistasEntrenadosEnRol = new HashMap<>();
+
+		Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones = new HashMap<>(
+				this.artistasXCantDisponiblesDeCanciones);
+		Iterator<Cancion> iterador = cancionesConRolesFaltantes.iterator();
+		Set<ArtistaBase> artistasUsadosEnCancion = new HashSet<>();
+//		Map<String, List<ArtistaBase>>
+		while (iterador.hasNext()) {
+			Cancion cancion = iterador.next();
+			artistasUsadosEnCancion = getCandidatosDeCancion(cancion);
+			str += "-> " + cancion.getTitulo() + "\n";
+			for (Map.Entry<String, IntegranteDeUnRol> integrantesXRol : artistasCandidatosAsignadosACancion.get(cancion)
+					.entrySet()) {
+				if (!integrantesXRol.getValue().hayCuposDisponibles())
+					continue;
+				String rol = integrantesXRol.getKey();
+				IntegranteDeUnRol integrantesDeUnRol = integrantesXRol.getValue();
+				int cupos = integrantesDeUnRol.getCantDeCuposDisponibles();
+				List<ArtistaBase> listaArtistasEntrenadosEnRol;
+				if (!artistasEntrenadosEnRol.containsKey(rol)) {
+					listaArtistasEntrenadosEnRol = new ArrayList<ArtistaBase>();
+					artistasEntrenadosEnRol.put(rol, listaArtistasEntrenadosEnRol);
+				} else
+					listaArtistasEntrenadosEnRol = artistasEntrenadosEnRol.get(rol);
+//				Si entra a este for es xq ya entrené a artistas con este rol. Ahora asigno al artista SI Y SOLO SI tiene su cantMaxCanciones > 0
+
+				str += "\t~" + rol + ": ";
+
+				for (int i = 0; i < listaArtistasEntrenadosEnRol.size() && cupos > 0; i++) {
+					ArtistaBase artista = listaArtistasEntrenadosEnRol.get(i);
+					if (!artistasUsadosEnCancion.contains(artista)
+							&& artistasXCantDisponiblesDeCanciones.get(artista) > 0) {
+						artistasXCantDisponiblesDeCanciones.put(artista,
+								artistasXCantDisponiblesDeCanciones.get(artista) - 1);
+						artistasUsadosEnCancion.add(artista);
+						str += artista.getNombre() + ", ";
+						cupos--;
+					}
+				}
+
+//				Si entra a este for es xq NO tengo artistas entrenados (o no estan disponibles) en este rol
+				for (int i = 0; i < artistasDisponiblesParaSerEntrenados.size() && cupos > 0; i++) {
+					ArtistaBase artista = artistasDisponiblesParaSerEntrenados.get(i);
+					if (!artistasUsadosEnCancion.contains(artista)
+							&& artistasXCantDisponiblesDeCanciones.get(artista) > 0) {
+						artistasXCantDisponiblesDeCanciones.put(artista,
+								artistasXCantDisponiblesDeCanciones.get(artista) - 1);
+						integrantesDeUnRol.agregarIntegrante(artista);
+						artistasUsadosEnCancion.add(artista);
+						str += artista.getNombre() + ", ";
+						cupos--;
+					}
+				}
+				str += "\n";
+			}
+		}
+		return str;
 	}
 
 	private String getInformeParaAsignacionExitosa() {
@@ -188,5 +242,4 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 
 		return str;
 	}
-
 }

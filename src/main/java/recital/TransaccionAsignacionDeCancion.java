@@ -27,7 +27,7 @@ public class TransaccionAsignacionDeCancion {
 		return estado == EstadoDeTransaccion.EN_CURSO;
 	}
 
-	public boolean esTransaccionCommitted() {
+	protected boolean esTransaccionCommitted() {
 		return estado == EstadoDeTransaccion.CONFIRMADA;
 	}
 
@@ -55,10 +55,6 @@ public class TransaccionAsignacionDeCancion {
 		informe += "Para completar los integrantes para la canción \"" + cancion.getTitulo()
 				+ "\"elegida se necesitan artistas con los siguientes roles:\n";
 
-		int cantDeArtistasNecesariosParaEntrenar = 0;
-		for (IntegranteDeUnRol integrantesDeRol : candidatosXRol.values()) {
-			cantDeArtistasNecesariosParaEntrenar += integrantesDeRol.getCantDeCuposDisponibles();
-		}
 		String rolesFaltantes = "";
 		for (Map.Entry<String, IntegranteDeUnRol> nodo : candidatosXRol.entrySet()) {
 			String rol = nodo.getKey();
@@ -67,10 +63,6 @@ public class TransaccionAsignacionDeCancion {
 				rolesFaltantes += String.format("\t->%s: cantidad %d\n", rol, cantidad);
 		}
 		informe += rolesFaltantes + "\n";
-		if (cantDeArtistasNecesariosParaEntrenar > artistasDisponiblesParaSerEntrenados.size()) {
-			informe += "No hay artistas suficientes disponibles para entrenar :( \n";
-			return informe;
-		}
 		String artistasRecomendables = "";
 		Iterator<ArtistaBase> iteradorArtistasRecomendables = artistasDisponiblesParaSerEntrenados.iterator();
 		for (Map.Entry<String, IntegranteDeUnRol> nodo : candidatosXRol.entrySet()) {
@@ -100,10 +92,6 @@ public class TransaccionAsignacionDeCancion {
 		if (estado != EstadoDeTransaccion.EN_CURSO) {
 			throw new IllegalStateException(
 					"La transaccion no se peude realizar porque se encuentra " + estado.toString());
-		}
-		if (!this.sePuedenEntrenarArtistasSuficientes()) {
-			estado = EstadoDeTransaccion.CANCELADA;
-			return null;
 		}
 		for (Map.Entry<String, IntegranteDeUnRol> nodo : candidatosXRol.entrySet()) {
 			String rol = nodo.getKey();
