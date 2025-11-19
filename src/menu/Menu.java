@@ -8,8 +8,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import recital.EstadoDeTransaccion;
+import recital.OpcionDeTransaccion;
 import recital.Recital;
 import recital.TransaccionAsignacionDeCancion;
+import recital.TransaccionAsignacionDeTodasLasCanciones;
 
 public class Menu {
 	private static final int salir = 0, rolesFaltantesParaCancion = 1, rolesFaltantesParaTodasLasCanciones = 2,
@@ -87,30 +90,41 @@ public class Menu {
 //				if (cantDeRolesFaltantesParaTodasLasCanciones == 0)
 //					System.out.println("->Todas las canciones tienen asignado a un artista.\n");
 //				else
-//					System.out.printf("->Hay %d rol(es) sin asignar.\n", cantDeRolesFaltantesParaTodasLasCanciones);
+//					 System.out.printf("->Hay %d rol(es) sin asignar.\n", cantDeRolesFaltantesParaTodasLasCanciones);
 				break;
 			case contratarArtistasParaUnaCancion:// 3
 				indexCancion = elegirCancion();
-				TransaccionAsignacionDeCancion resultadoTransaccion = recital
-						.contratarArtistasParaUnaCancion(indexCancion);
-				System.out.println(resultadoTransaccion.getInformeDeAsignacionDeArtistas());
-				if (resultadoTransaccion.esTransaccionEnCurso()) {
-					if (resultadoTransaccion.sePuedenEntrenarArtistasSuficientes()) {
+				TransaccionAsignacionDeCancion transaccion1 = recital.contratarArtistasParaUnaCancion(indexCancion);
+				System.out.println(transaccion1.getInformeDeAsignacionDeArtistas());
+				if (transaccion1.esTransaccionEnCurso()) {
+					if (transaccion1.sePuedenEntrenarArtistasSuficientes()) {
 						System.out.printf(
 								"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"
 										+ "%02d)SI\n%02d)NO\n",
-								TransaccionAsignacionDeCancion.SI, TransaccionAsignacionDeCancion.NO);
-						int opcionEntrenar = ingresarOpcionVal(TransaccionAsignacionDeCancion.SI,
-								TransaccionAsignacionDeCancion.NO);
-						String informe = resultadoTransaccion
-								.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
+								OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+						int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+						String informe = transaccion1.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
 						System.out.println(informe);
 					}
 				}
 //				System.out.println(recital.getInformacionSobreCancion(indexCancion));
 				break;
 			case contratarArtistasParaTodasLasCanciones:// 4
-				recital.contratarArtistasParaTodasLasCanciones();
+				TransaccionAsignacionDeTodasLasCanciones transaccion2 = recital
+						.contratarArtistasParaTodasLasCanciones();
+				System.out.println();
+				if (transaccion2.getEstadoDeTransaccion() == EstadoDeTransaccion.EN_CURSO) {
+					if (transaccion2.sePuedenEntrenarParaTodosLosRoles()) {
+						System.out.printf(
+								"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"
+										+ "%02d)SI\n%02d)NO\n",
+								OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+						int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+						String informe = transaccion2.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
+						System.out.println(informe);
+					} else
+						System.out.println("No hay artistas suficientes para entrenar en los roles faltantes.");
+				}
 				break;
 			case entrenarArtista:// 5
 				Map<String, Integer> mapArtistaAEntrenar = recital.getListadoArtistasContratadosSinSerAsignados();

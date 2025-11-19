@@ -9,7 +9,6 @@ import cancion.Cancion;
 import cancion.IntegranteDeUnRol;
 
 public class TransaccionAsignacionDeCancion {
-	public final static int SI = 0, NO = 1;
 	private EstadoDeTransaccion estado;
 	private List<ArtistaBase> artistasDisponiblesParaSerEntrenados;
 	private Cancion cancion;
@@ -92,9 +91,9 @@ public class TransaccionAsignacionDeCancion {
 	}
 
 	public String entrenarArtistasRecomendadosYAsignarLosCandidatos(int opcion) {
-		if (opcion == NO) {
+		if (opcion == OpcionDeTransaccion.NO) {
 			estado = EstadoDeTransaccion.CANCELADA;
-			return null;
+			return "No se decidió entrenar artistas para la canción.\n" + cancion.toString();
 		}
 		if (estado != EstadoDeTransaccion.EN_CURSO) {
 			throw new IllegalStateException(

@@ -63,26 +63,30 @@ public class Recital {
 
 //	rolesFaltantesParaTodasLasCanciones = 2,
 	public Map<String, Integer> cantDeRolesFaltantesParaTodasLasCanciones() {
+//		Uso un filter para quedarme con los artistas bases del Line Up
 		List<ArtistaBase> artistasBase = lineUp.stream().filter(ArtistaBase::perteneceADiscografica).toList();
-		Map<String, List<ArtistaBase>> artistasXRol = new HashMap<>();
+		Map<String, List<ArtistaBase>> artistasQueTienenRol = new HashMap<>();
+//		Voy asignando a los artistas según los roles que tienen
 		for (ArtistaBase artista : artistasBase) {
 			for (String rol : artista.getRoles()) {
-				if (artistasXRol.containsKey(rol))
-					artistasXRol.get(rol).add(artista);
+				if (artistasQueTienenRol.containsKey(rol))
+					artistasQueTienenRol.get(rol).add(artista);
 				else
-					artistasXRol.put(rol, new ArrayList<>(List.of(artista)));
+					artistasQueTienenRol.put(rol, new ArrayList<>(List.of(artista)));
 			}
 		}
 		Map<String, Integer> rolesFaltantesTotales = new HashMap<>();
-		ComparadoraDeArtistasXRoles comparadoraDeArtistasXRoles = new ComparadoraDeArtistasXRoles(artistasXRol);
+//		Le mando el map "artistasQueTienenRol" para usarlo para un futuro ordenamiento por los roles q' tienen menos artistas
+		ComparadoraDeArtistasXRoles comparadoraDeArtistasXRoles = new ComparadoraDeArtistasXRoles(artistasQueTienenRol);
 		Set<ArtistaBase> artistasUsadosEnCancion = new HashSet<>();
 		for (Cancion cancion : repertorio) {
 			Map<String, Integer> rolesFaltantes = cancion.getRolesFaltantesXCupos();
 			List<String> rolesDeCancion = new ArrayList<>(rolesFaltantes.keySet());
+//			Ordeno x los roles que menos tienen artistas. Si no hay ningún artista con ese rol va a quedar primero en la lista
 			rolesDeCancion.sort(comparadoraDeArtistasXRoles);
 			for (String rol : rolesDeCancion) {
 				int cupos = rolesFaltantes.get(rol);
-				List<ArtistaBase> artistasQueTieneRol = artistasXRol.getOrDefault(rol, new ArrayList<>(0));
+				List<ArtistaBase> artistasQueTieneRol = artistasQueTienenRol.getOrDefault(rol, new ArrayList<>(0));
 				for (int i = 0; i < artistasQueTieneRol.size() && cupos > 0; i++) {
 					ArtistaBase artista = artistasQueTieneRol.get(i);
 					if (!artistasUsadosEnCancion.contains(artista) && !artista.estaAsignadoACancion(cancion)) {
@@ -104,11 +108,10 @@ public class Recital {
 			throw new ArrayIndexOutOfBoundsException(
 					"El index ingresado es inválido porque está fuera de los limites.");
 		Cancion cancion = repertorio.get(index);
-
-		TransaccionAsignacionDeCancion resultadoTransaccion = new TransaccionAsignacionDeCancion(cancion);
+		TransaccionAsignacionDeCancion transaccion = new TransaccionAsignacionDeCancion(cancion);
 		Map<String, IntegranteDeUnRol> candidatosXRol = cancion.getRolesFaltantes();
 		List<ArtistaBase> listaDeArtistasDisponibles = lineUp.stream()
-				.filter(artista -> artista.puedeSerAsignadoACancion() && !cancion.artistaEstaAsignado(artista))
+				.filter(artista -> artista.puedeSerAsignadoACancion() && !artista.estaAsignadoACancion(cancion))
 				.collect(Collectors.toList());
 //		Lo ordenamos por costo, asi ya no tenemos q preocuparnos por asignar primero a los contratados
 		listaDeArtistasDisponibles.sort(new ComparadorArtistaPorCostoDeCancion());
@@ -146,8 +149,8 @@ public class Recital {
 
 		if (!hayIntegrantesSuficientes) {// hay roles q no estan cubiertos !!!!!
 			listaDeArtistasDisponibles.removeAll(artistasUsados);
-			resultadoTransaccion.registrarFallaEnAsignacion(candidatosXRol, listaDeArtistasDisponibles);
-			return resultadoTransaccion;
+			transaccion.registrarFallaEnAsignacion(candidatosXRol, listaDeArtistasDisponibles);
+			return transaccion;
 		}
 
 		for (Map.Entry<String, IntegranteDeUnRol> nodo : candidatosXRol.entrySet()) {
@@ -157,18 +160,91 @@ public class Recital {
 				cancion.agregarArtista(rol, artista);
 			});
 		}
-		resultadoTransaccion.confirmarTransaccion();
-		return resultadoTransaccion;
+		transaccion.confirmarTransaccion();
+		return transaccion;
 	}
 
 //	contratarArtistasParaTodasLasCanciones = 4
-	public void contratarArtistasParaTodasLasCanciones() {// plantearlo
-		Map<String, IntegranteDeUnRol> rolesXIntegrantesCandidatos = new HashMap<>();
+	public TransaccionAsignacionDeTodasLasCanciones contratarArtistasParaTodasLasCanciones() {
+		List<ArtistaBase> artistasDisponibles = lineUp.stream().filter(a -> a.puedeSerAsignadoACancion())
+				.collect(Collectors.toList());
+//		Al ordenarlo por costo, me van a quedar los artistas bases adelante de la lista.
+		artistasDisponibles.sort(new ComparadorArtistaPorCostoDeCancion());
+		Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones = new HashMap<>();
+		Map<String, List<ArtistaBase>> artistasQueTienenRol = new HashMap<>();
+//		Encasillo todos los artistas en todos los roles que tienen. De esta manera ya sé cuáles son los roles que menos artistas tiene
+		for (ArtistaBase artista : artistasDisponibles) {
+			for (String rol : artista.getRoles()) {
+				if (artistasQueTienenRol.containsKey(rol))
+					artistasQueTienenRol.get(rol).addLast(artista);
+				else
+					artistasQueTienenRol.put(rol, new ArrayList<>(List.of(artista)));
+			}
+			if (!artista.perteneceADiscografica()) {
+				ArtistaContratado artistaContratado = (ArtistaContratado) artista;
+				artistasXCantDisponiblesDeCanciones.put(artistaContratado,
+						artistaContratado.getCantCancionesDisponiblesParaSerAsignado());
+			}
+		}
+		Set<ArtistaBase> artistasUsadosEnCancion = new HashSet<>();
+		Set<Cancion> cancionesConRolesFaltantes = new HashSet<>();
+		Map<Cancion, Map<String, IntegranteDeUnRol>> artistasCandidatosAsignadosACancion = new HashMap<>();
 		for (Cancion cancion : repertorio) {
-			Map<String, IntegranteDeUnRol> rolesXIntegrantes = cancion.getRolesFaltantes();
-//			if(roles)
+			boolean hayArtistasSuficientes = true;
+			Map<String, IntegranteDeUnRol> candidatosXRol = cancion.getRolesFaltantes();
+			List<String> rolesDeCancion = new ArrayList<>(candidatosXRol.keySet());
+			ComparadoraDeArtistasXRoles comparadoraDeArtistasXRoles = new ComparadoraDeArtistasXRoles(
+					artistasQueTienenRol);
+//			List<String> rolesQueTienenArtistas = new ArrayList<>(
+//					artistasQueTienenRol.keySet().stream().filter(rol -> candidatosXRol.containsKey(rol)).toList());
+			rolesDeCancion.sort(comparadoraDeArtistasXRoles);
+			for (String rol : rolesDeCancion) {
+				int cupos = candidatosXRol.get(rol).getCantDeIntegrantesNecesarios();
+				List<ArtistaBase> artistasDeEseRol = artistasQueTienenRol.getOrDefault(rol, new ArrayList<>(0));
+				for (int i = 0; i < artistasDeEseRol.size() && cupos > 0; i++) {
+					ArtistaBase artista = artistasDeEseRol.get(i);
+					if (!artista.estaAsignadoACancion(cancion) && !artistasUsadosEnCancion.contains(artista)
+							&& artistasXCantDisponiblesDeCanciones.getOrDefault(artista, Integer.MAX_VALUE) > 0) {
+//						Si no está en "artistasXCantDisponiblesDeCanciones" es porque es una artista BASE!!!!
+						candidatosXRol.get(rol).agregarIntegrante(artista);
+						artistasUsadosEnCancion.add(artista);
+						cupos--;
+						if (!artista.perteneceADiscografica())
+							artistasXCantDisponiblesDeCanciones.put(artista,
+									artistasXCantDisponiblesDeCanciones.get(artista) - 1);
+					}
+				}
+				if (hayArtistasSuficientes && cupos > 0) {
+					hayArtistasSuficientes = false;
+					cancionesConRolesFaltantes.add(cancion);
+				}
+			}
+			artistasCandidatosAsignadosACancion.put(cancion, candidatosXRol);
+			artistasUsadosEnCancion.clear();
+		}
+		TransaccionAsignacionDeTodasLasCanciones transaccion = new TransaccionAsignacionDeTodasLasCanciones(
+				artistasCandidatosAsignadosACancion);
+		if (!cancionesConRolesFaltantes.isEmpty()) {
+			transaccion.registrarFallaEnAsignacion(cancionesConRolesFaltantes, artistasXCantDisponiblesDeCanciones,
+					artistasDisponibles);
+			return transaccion;
 		}
 
+		for (Map.Entry<Cancion, Map<String, IntegranteDeUnRol>> nodo : artistasCandidatosAsignadosACancion.entrySet()) {
+			Cancion cancion = nodo.getKey();
+			Map<String, IntegranteDeUnRol> integrantesXRol = nodo.getValue();
+			for (Map.Entry<String, IntegranteDeUnRol> integranteXRol : integrantesXRol.entrySet()) {
+				String rol = integranteXRol.getKey();
+				List<ArtistaBase> artistasAAsignar = integranteXRol.getValue().getListaDeIntegrantes();
+				artistasAAsignar.forEach(artista -> cancion.agregarArtista(rol, artista));
+			}
+		}
+
+//		for (Cancion cancion : repertorio) {
+//			System.out.println(cancion);
+//		}
+		transaccion.confirmarTransaccion();
+		return transaccion;
 	}
 
 //	entrenarArtista = 5

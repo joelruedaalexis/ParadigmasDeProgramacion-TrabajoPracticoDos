@@ -16,6 +16,10 @@ public class ArtistaContratado extends ArtistaBase {
 		this.costo = costo;
 		this.maxCanciones = maxCanciones;
 	}
+	
+	public int getCantCancionesDisponiblesParaSerAsignado() {
+		return maxCanciones;
+	}
 
 //	probado
 	@Override
