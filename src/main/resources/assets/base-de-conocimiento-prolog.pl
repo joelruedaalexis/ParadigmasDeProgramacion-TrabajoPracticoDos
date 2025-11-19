@@ -1,4 +1,4 @@
-% --- GENERADO AUTOMATICAMENTE DESDE JAVA ---
+% --- GENERADO AUTOMATICAMENTE DESDE JAVA (MAVEN) ---
 
 % --- HECHOS DE ARTISTAS Y HABILIDADES ---
 artista(agustin_cruz, contratado).
@@ -63,13 +63,13 @@ max_canciones(rita_lee, 2).
 max_canciones(roberto_musso, 2).
 max_canciones(roger_taylor, 100).
 
-% --- MIEMBROS DE DISCOGRAFICA (ARTISTAS BASE) ---
+% --- MIEMBROS DE DISCOGRAFICA ---
 miembro_discografica(brian_may).
 miembro_discografica(john_deacon).
 miembro_discografica(lucy_patane).
 miembro_discografica(roger_taylor).
 
-% --- HECHOS DE ROLES REQUERIDOS (POR CADA CANCION) ---
+% --- HECHOS DE ROLES REQUERIDOS ---
 rol_instancia(i1, voz_principal).
 rol_instancia(i10, voz_principal).
 rol_instancia(i11, guitarra_electrica).
@@ -110,11 +110,9 @@ rol_instancia(i8, bajo).
 rol_instancia(i9, bateria).
 total_instancias_rol(38).
 
-% --- REGLAS ESTÁTICAS DE COSTE ---
+% --- REGLAS ---
 coste_entrenamiento(A, R, 0) :- habilidad(A, R).
 coste_entrenamiento(A, R, 1) :- artista(A, _), \+ habilidad(A, R).
-
-% --- REGLAS PARA CALCULAR ENTRENAMIENTOS MINIMOS ---
 requeridas(Rol, Cant) :- findall(1, rol_instancia(_, Rol), L), length(L, Cant).
 base_saben(Rol, Cant) :- findall(A, (habilidad(A, Rol), artista(A, base)), L), length(L, Cant).
 entrenamientos_necesarios(Rol, Ent) :- requeridas(Rol, Req), base_saben(Rol, Base), Temp is Req - Base, (Temp > 0 -> Ent = Temp ; Ent = 0).

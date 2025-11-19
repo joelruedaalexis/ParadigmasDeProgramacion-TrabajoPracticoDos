@@ -16,7 +16,7 @@ import recital.Recital;
 
 public class Main {
 	public static void main(String[] args) {
-		String rutaArchivo1 = Paths.get("src", "assets", "artistas-discografica.json").toString();
+		String rutaArchivo1 = Paths.get("src", "main", "resources", "assets", "artistas-discografica.json").toString();
 		List<String> artistasDeDiscografica = null;
 		try {
 			artistasDeDiscografica = Importacion.importarNombresDeArtistasDeDiscografica(rutaArchivo1);
@@ -32,7 +32,7 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		String rutaArchivo2 = Paths.get("src", "assets", "recital.json").toString();
+		String rutaArchivo2 = Paths.get("src", "main", "resources", "assets", "recital.json").toString();
 		List<Cancion> repertorio = null;
 		try {
 			repertorio = Importacion.importarRepertorio(rutaArchivo2);
@@ -49,7 +49,7 @@ public class Main {
 		}
 
 		List<String> roles = null;
-		String rutaArchivo3 = Paths.get("src", "assets", "roles-necesarios.json").toString();
+		String rutaArchivo3 = Paths.get("src", "main", "resources", "assets", "roles-necesarios.json").toString();
 		try {
 			roles = Importacion.importarRoles(rutaArchivo3);
 //			System.out.println(roles);
@@ -64,7 +64,7 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		String rutaArchivo4 = Paths.get("src", "assets", "artistas.json").toString();
+		String rutaArchivo4 = Paths.get("src", "main", "resources", "assets", "artistas.json").toString();
 		List<ArtistaBase> artistas = null;
 		try {
 			artistas = Importacion.importarArtistas(rutaArchivo4, roles, artistasDeDiscografica);
