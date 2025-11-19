@@ -14,21 +14,5 @@
   {
     "titulo": "Under Pressure",
     "rolesRequeridos": ["voz principal", "voz principal", "guitarra eléctrica", "bajo", "batería"]
-  },
-  {
-    "titulo": "Pushing Me Away",
-    "rolesRequeridos": ["bajo","bajo","bajo","bajo","bajo","bajo","bajo","bajo","bajo"]
-  },
-  {
-	"titulo": "O tempo nao para",
-	"rolesRequeridos": ["voz secundaria", "voz secundaria","batería"]
-  },
-  {
-	"titulo": "Lanca perfume",
-	"rolesRequeridos": ["voz principal", "saxofón","armónica","acordeón"]
-  },
-  {
-	"titulo": "Vida louca vida",
-	"rolesRequeridos": ["acordeón","armónica","voz principal", "saxofón"]
   }
 ]

@@ -100,15 +100,13 @@ public class Menu {
 				TransaccionAsignacionDeCancion transaccion1 = recital.contratarArtistasParaUnaCancion(indexCancion);
 				System.out.println(transaccion1.getInformeDeAsignacionDeArtistas());
 				if (transaccion1.esTransaccionEnCurso()) {
-					if (transaccion1.sePuedenEntrenarArtistasSuficientes()) {
-						System.out.printf(
-								"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"
-										+ "%02d)SI\n%02d)NO\n",
-								OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
-						int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
-						String informe = transaccion1.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
-						System.out.println(informe);
-					}
+					System.out.printf(
+							"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"
+									+ "%02d)SI\n%02d)NO\n",
+							OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+					int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+					String informe = transaccion1.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
+					System.out.println(informe);
 				}
 //				System.out.println(recital.getInformacionSobreCancion(indexCancion));
 				break;
@@ -168,65 +166,63 @@ public class Menu {
 					recital.quitarArtistaDeTodasLasCanciones(listaArtistasAsignados.get(indexArtista));
 				break;
 			case quitarArtistaContratadoDelLineUp:// 11
-			    Map<String, Integer> artistas = recital.getListadoArtistasContratados();
+				Map<String, Integer> artistas = recital.getListadoArtistasContratados();
 
-			    if (artistas.isEmpty()) {
-			        System.out.println("-> No hay artistas contratados para quitar.");
-			        break;
-			    }
+				if (artistas.isEmpty()) {
+					System.out.println("-> No hay artistas contratados para quitar.");
+					break;
+				}
 
-			    System.out.println("->Elija un artista contratado para quitarlo del lineUp.");
-			    String nombreArtista = this.elegirArtista(new ArrayList<>(artistas.keySet()));
+				System.out.println("->Elija un artista contratado para quitarlo del lineUp.");
+				String nombreArtista = this.elegirArtista(new ArrayList<>(artistas.keySet()));
 
-			    recital.quitarArtistaDelLineUp(artistas.get(nombreArtista));
-			    break;
+				recital.quitarArtistaDelLineUp(artistas.get(nombreArtista));
+				break;
 
 			case guardarEstadoDelRecital:// 12
-			    String rutaGuardar = this
-			            .ingresarRutaParaRecital("-> Ingrese el nombre del archivo para guardar el recital: ");
+				String rutaGuardar = this
+						.ingresarRutaParaRecital("-> Ingrese el nombre del archivo para guardar el recital: ");
 
-			    try {
-			        // Crea la carpeta si no existe (lógico para guardar)
-			        Files.createDirectories(Paths.get(Menu.rutaCarpetaRecitales));
-			        
-			        recital.guardarEnArchivoJSON(rutaGuardar);
-			        System.out.println("-> El archivo se ha guardado con éxito.");
-			        recitalesGuardados.add(rutaGuardar);
+				try {
+					// Crea la carpeta si no existe (lógico para guardar)
+					Files.createDirectories(Paths.get(Menu.rutaCarpetaRecitales));
 
-			    } catch (IOException e) {
-			        System.out.println("-> Error al guardar el archivo: " + e.getMessage());
-			    }
-			    break;
+					recital.guardarEnArchivoJSON(rutaGuardar);
+					System.out.println("-> El archivo se ha guardado con éxito.");
+					recitalesGuardados.add(rutaGuardar);
 
+				} catch (IOException e) {
+					System.out.println("-> Error al guardar el archivo: " + e.getMessage());
+				}
+				break;
 
 			case cargarEstadoDelRecital:// 13
-			    String rutaCargar = this
-			            .ingresarRutaParaRecital("-> Ingrese el nombre del archivo a cargar: ");
+				String rutaCargar = this.ingresarRutaParaRecital("-> Ingrese el nombre del archivo a cargar: ");
 
-			    File archivoCargar = new File(rutaCargar);
-			    File carpetaCargar = archivoCargar.getParentFile();
+				File archivoCargar = new File(rutaCargar);
+				File carpetaCargar = archivoCargar.getParentFile();
 
-			    // Verificar existencia de carpeta (pero NO crearla)
-			    if (carpetaCargar != null && !carpetaCargar.exists()) {
-			        System.out.println("-> La carpeta '" + carpetaCargar.getPath() + "' no existe.");
-			        break;
-			    }
+				// Verificar existencia de carpeta (pero NO crearla)
+				if (carpetaCargar != null && !carpetaCargar.exists()) {
+					System.out.println("-> La carpeta '" + carpetaCargar.getPath() + "' no existe.");
+					break;
+				}
 
-			    // Verificar existencia del archivo
-			    if (!archivoCargar.exists()) {
-			        System.out.println("-> El archivo '" + archivoCargar.getPath() + "' no existe.");
-			        break;
-			    }
+				// Verificar existencia del archivo
+				if (!archivoCargar.exists()) {
+					System.out.println("-> El archivo '" + archivoCargar.getPath() + "' no existe.");
+					break;
+				}
 
-			    try {
-			        recital.cargarEstadoDeArchivoJSON(rutaCargar);
-			        System.out.println("-> El archivo se ha cargado con éxito.");
-			        recitalesGuardados.add(rutaCargar);
+				try {
+					recital.cargarEstadoDeArchivoJSON(rutaCargar);
+					System.out.println("-> El archivo se ha cargado con éxito.");
+					recitalesGuardados.add(rutaCargar);
 
-			    } catch (IOException e) {
-			        System.out.println("-> Error al cargar el archivo: " + e.getMessage());
-			    }
-			    break;
+				} catch (IOException e) {
+					System.out.println("-> Error al cargar el archivo: " + e.getMessage());
+				}
+				break;
 
 			}
 			if (opcion != salir) {
@@ -296,10 +292,11 @@ public class Menu {
 
 	public void mostrarOpciones() {
 		System.out.println("Elija una de las siguientes opciones:");
-		System.out.printf("00) Salir \n01) Roles faltantes para una canción \n02) Roles faltantes para todas las canciones\n"
-				+ "03) Contratar artistas para una canción \n04) Contratar artistas para todas las canciones \n05) Entrenar artista \n"
-				+ "06) Listar artistas contratados \n07) Listar Canciones \n08) [PROLOG] - Consulta de entrenamientos mínimos\n09) Quitar artista de una canción \n"
-				+ "10) Quitar artista de todas las canciones \n11) Quitar artista del LineUp \n12) Guardar estado del recital actual \n13) Cargar estado de un recital\n");
+		System.out.printf(
+				"00) Salir \n01) Roles faltantes para una canción \n02) Roles faltantes para todas las canciones\n"
+						+ "03) Contratar artistas para una canción \n04) Contratar artistas para todas las canciones \n05) Entrenar artista \n"
+						+ "06) Listar artistas contratados \n07) Listar Canciones \n08) [PROLOG] - Consulta de entrenamientos mínimos\n09) Quitar artista de una canción \n"
+						+ "10) Quitar artista de todas las canciones \n11) Quitar artista del LineUp \n12) Guardar estado del recital actual \n13) Cargar estado de un recital\n");
 
 	}
 

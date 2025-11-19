@@ -43,9 +43,11 @@ public class TransaccionAsignacionDeCancion {
 	}
 
 	public String getInformeDeAsignacionDeArtistas() {
-		if (this.esTransaccionCommitted())
+		if (estado == EstadoDeTransaccion.CONFIRMADA)
 			return getInformeParaAsignacionExitosa();
-		return getInformeParaFallaEnAsignacion();
+		else if (estado == EstadoDeTransaccion.EN_CURSO)
+			return getInformeParaFallaEnAsignacion();
+		return "No se pueden asignar a todos los roles porque no hay artistas suficientes para entrenar.";
 	}
 
 	private String getInformeParaFallaEnAsignacion() {
@@ -127,5 +129,8 @@ public class TransaccionAsignacionDeCancion {
 		this.candidatosXRol = rolesXIntegrantesCandidatos;
 		this.artistasDisponiblesParaSerEntrenados = listaDeArtistasCandidatos.stream()
 				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAlmenosAUnaCancion()).toList();
+
+		if (!sePuedenEntrenarArtistasSuficientes())
+			estado = EstadoDeTransaccion.CANCELADA;
 	}
 }

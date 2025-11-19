@@ -15,6 +15,11 @@ import cancion.IntegranteDeUnRol;
 
 public class TransaccionAsignacionDeTodasLasCanciones {
 	private EstadoDeTransaccion estado;
+	private Map<Cancion, Map<String, IntegranteDeUnRol>> artistasCandidatosAsignadosACancion;
+	private Set<Cancion> cancionesConRolesFaltantes;
+	private Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones;
+	private List<ArtistaBase> artistasDisponiblesParaSerEntrenados;
+	private Map<String, List<ArtistaBase>> artistasEntrenadosEnRol;
 
 	public TransaccionAsignacionDeTodasLasCanciones(
 			Map<Cancion, Map<String, IntegranteDeUnRol>> artistasCandidatosAsignadosACancion) {
@@ -60,12 +65,6 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 		}
 		return true;
 	}
-
-	private Map<Cancion, Map<String, IntegranteDeUnRol>> artistasCandidatosAsignadosACancion;
-	private Set<Cancion> cancionesConRolesFaltantes;
-	private Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones;
-	private List<ArtistaBase> artistasDisponiblesParaSerEntrenados;
-	private Map<String, List<ArtistaBase>> artistasEntrenadosEnRol;
 
 	private Set<ArtistaBase> getCandidatosDeCancion(Cancion cancion) {
 		Set<ArtistaBase> candidatosUsadosEnCancion = new HashSet<>();
@@ -152,7 +151,7 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 		return str;
 	}
 
-	public void registrarFallaEnAsignacion(Set<Cancion> cancionesConRolesFaltantes,
+	protected void registrarFallaEnAsignacion(Set<Cancion> cancionesConRolesFaltantes,
 			Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones, List<ArtistaBase> artistasDisponibles) {
 		this.cancionesConRolesFaltantes = cancionesConRolesFaltantes;
 		this.artistasXCantDisponiblesDeCanciones = artistasXCantDisponiblesDeCanciones;
@@ -160,6 +159,9 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 		this.artistasDisponiblesParaSerEntrenados = artistasDisponibles.stream()
 				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAlmenosAUnaCancion())
 				.collect(Collectors.toList());
+
+		if (!sePuedenEntrenarParaTodosLosRoles())
+			estado = EstadoDeTransaccion.CANCELADA;
 	}
 
 	public void mostrar() {
@@ -169,17 +171,22 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 	public String getInformeDeAsignacionesDeArtistas() {
 		if (estado == EstadoDeTransaccion.CONFIRMADA)
 			return getInformeParaAsignacionExitosa();
-		return getInformeParaFallaEnAsignacion();
+		else if (estado == EstadoDeTransaccion.EN_CURSO)
+			return getInformeParaFallaEnAsignacion();
+		return "No hay artistas suficientes para entrenar en todos los roles";
 	}
 
 	private String getInformeParaFallaEnAsignacion() {
-		// TODO Auto-generated method stub
-		return null;
+		return "terminar";
 	}
 
 	private String getInformeParaAsignacionExitosa() {
-		// TODO Auto-generated method stub
-		return null;
+		String str = "Se han asignados los artistas con éxito. La información actualizada de las canciones son:\n";
+		for (Cancion cancion : artistasCandidatosAsignadosACancion.keySet()) {
+			str += "->" + cancion.toString();
+		}
+
+		return str;
 	}
 
 }
