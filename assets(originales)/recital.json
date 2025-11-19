@@ -1,0 +1,34 @@
+[
+  {
+    "titulo": "Somebody to Love",
+    "rolesRequeridos": ["voz principal", "guitarra eléctrica", "bajo", "batería", "piano"]
+  },
+  {
+    "titulo": "We Will Rock You",
+    "rolesRequeridos": ["voz principal", "guitarra eléctrica", "bajo", "batería"]
+  },
+  {
+    "titulo": "These Are the Days of Our Lives",
+    "rolesRequeridos": ["voz principal", "guitarra eléctrica", "bajo", "batería"]
+  },
+  {
+    "titulo": "Under Pressure",
+    "rolesRequeridos": ["voz principal", "voz principal", "guitarra eléctrica", "bajo", "batería"]
+  },
+  {
+    "titulo": "Pushing Me Away",
+    "rolesRequeridos": ["bajo","bajo","bajo","bajo","bajo","bajo","bajo","bajo","bajo"]
+  },
+  {
+	"titulo": "O tempo nao para",
+	"rolesRequeridos": ["voz secundaria", "voz secundaria","batería"]
+  },
+  {
+	"titulo": "Lanca perfume",
+	"rolesRequeridos": ["voz principal", "saxofón","armónica","acordeón"]
+  },
+  {
+	"titulo": "Vida louca vida",
+	"rolesRequeridos": ["acordeón","armónica","voz principal", "saxofón"]
+  }
+]

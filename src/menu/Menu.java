@@ -1,6 +1,8 @@
 package menu;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ public class Menu {
 			listarArtistasContratados = 6, listarCanciones = 7, prolog = 8, quitarArtistaDeCancion = 9,
 			quitarArtistaDeTodasLasCanciones = 10, quitarArtistaContratadoDelLineUp = 11, guardarEstadoDelRecital = 12,
 			cargarEstadoDelRecital = 13;
+	private static final String rutaCarpetaRecitales = "estadosCreados";
 	private Scanner scanner;
 	private Recital recital;
 	private List<String> recitalesGuardados;
@@ -41,7 +44,7 @@ public class Menu {
 				scanner.nextLine();
 			}
 			if (opcion < limInf || opcion > limSup)
-				System.out.println("XD");
+				System.out.println("Opción inválida. Ingrese Nuevamente: ");
 		} while (opcion < limInf || opcion > limSup);
 		return opcion;
 	}
@@ -129,7 +132,7 @@ public class Menu {
 			case entrenarArtista:// 5
 				Map<String, Integer> mapArtistaAEntrenar = recital.getListadoArtistasContratadosSinSerAsignados();
 				System.out.println("Elija un artista contratado para entrenarle un nuevo rol:");
-				String nombreArtistaAEntrenar = elegirArtistaAEntrenar(new ArrayList<>(mapArtistaAEntrenar.keySet()));
+				String nombreArtistaAEntrenar = elegirArtista(new ArrayList<>(mapArtistaAEntrenar.keySet()));
 				indexArtista = mapArtistaAEntrenar.get(nombreArtistaAEntrenar);
 				System.out.printf("Elija qué rol desea que %s entrene.\n", nombreArtistaAEntrenar);
 				String nuevoRol = this.elegirRolDelArtistaAEntrenar(indexArtista);
@@ -165,37 +168,66 @@ public class Menu {
 					recital.quitarArtistaDeTodasLasCanciones(listaArtistasAsignados.get(indexArtista));
 				break;
 			case quitarArtistaContratadoDelLineUp:// 11
-				Map<String, Integer> xd = recital.getListadoArtistasContratados();
-				System.out.println("->Elija un artista contratado para quitarlo del lineUp.");
-				String nombreArtista = this.elegirArtistaAEntrenar(new ArrayList<>(xd.keySet()));
-				recital.quitarArtistaDelLineUp(xd.get(nombreArtista));
-				break;
+			    Map<String, Integer> artistas = recital.getListadoArtistasContratados();
+
+			    if (artistas.isEmpty()) {
+			        System.out.println("-> No hay artistas contratados para quitar.");
+			        break;
+			    }
+
+			    System.out.println("->Elija un artista contratado para quitarlo del lineUp.");
+			    String nombreArtista = this.elegirArtista(new ArrayList<>(artistas.keySet()));
+
+			    recital.quitarArtistaDelLineUp(artistas.get(nombreArtista));
+			    break;
+
 			case guardarEstadoDelRecital:// 12
-				String ruta = this
-						.ingresarRutaParaRecital("-> Ingrese la ruta del archivo donde desea guardar el recital: ");
-				try {
-					recital.guardarEnArchivoJSON(ruta);
-					System.out.println("->El archivo se ha guardado con éxito.");
-					recitalesGuardados.add(ruta);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-//					e.printStackTrace();
-					System.out.println(e.getMessage());
-				}
-				break;
+			    String rutaGuardar = this
+			            .ingresarRutaParaRecital("-> Ingrese el nombre del archivo para guardar el recital: ");
+
+			    try {
+			        // Crea la carpeta si no existe (lógico para guardar)
+			        Files.createDirectories(Paths.get(Menu.rutaCarpetaRecitales));
+			        
+			        recital.guardarEnArchivoJSON(rutaGuardar);
+			        System.out.println("-> El archivo se ha guardado con éxito.");
+			        recitalesGuardados.add(rutaGuardar);
+
+			    } catch (IOException e) {
+			        System.out.println("-> Error al guardar el archivo: " + e.getMessage());
+			    }
+			    break;
+
+
 			case cargarEstadoDelRecital:// 13
-				String ruta2 = this
-						.ingresarRutaParaRecital("-> Ingrese la ruta del archivo donde desea guardar el recital: ");
-				try {
-					recital.cargarEstadoDeArchivoJSON(ruta2);
-					System.out.println("->El archivo se ha cargado con éxito.");
-					recitalesGuardados.add(ruta2);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-//					e.printStackTrace();
-					System.out.println(e.getMessage());
-				}
-				break;
+			    String rutaCargar = this
+			            .ingresarRutaParaRecital("-> Ingrese el nombre del archivo a cargar: ");
+
+			    File archivoCargar = new File(rutaCargar);
+			    File carpetaCargar = archivoCargar.getParentFile();
+
+			    // Verificar existencia de carpeta (pero NO crearla)
+			    if (carpetaCargar != null && !carpetaCargar.exists()) {
+			        System.out.println("-> La carpeta '" + carpetaCargar.getPath() + "' no existe.");
+			        break;
+			    }
+
+			    // Verificar existencia del archivo
+			    if (!archivoCargar.exists()) {
+			        System.out.println("-> El archivo '" + archivoCargar.getPath() + "' no existe.");
+			        break;
+			    }
+
+			    try {
+			        recital.cargarEstadoDeArchivoJSON(rutaCargar);
+			        System.out.println("-> El archivo se ha cargado con éxito.");
+			        recitalesGuardados.add(rutaCargar);
+
+			    } catch (IOException e) {
+			        System.out.println("-> Error al cargar el archivo: " + e.getMessage());
+			    }
+			    break;
+
 			}
 			if (opcion != salir) {
 				pausar();
@@ -233,7 +265,7 @@ public class Menu {
 		return ingresarOpcionVal(1, lista.size()) - 1;
 	}
 
-	public String elegirArtistaAEntrenar(List<String> lista) {
+	public String elegirArtista(List<String> lista) {
 		for (int i = 0; i < lista.size(); i++)
 			System.out.printf("%02d) %s\n", i + 1, lista.get(i));
 		int index = ingresarOpcionVal(1, lista.size());
@@ -264,10 +296,10 @@ public class Menu {
 
 	public void mostrarOpciones() {
 		System.out.println("Elija una de las siguientes opciones:");
-		System.out.printf("00) Salir \n01) rolesFaltantesParaCancion \n02) rolesFaltantesParaTodasLasCanciones\n"
-				+ "03) contratarArtistasParaUnaCancion \n04) contratarArtistasParaTodasLasCanciones \n05) entrenarArtista \n"
-				+ "06) listarArtistasContratados \n07) listarCanciones \n08) prolog\n09) quitarArtistaDeCancion \n"
-				+ "10) quitarArtistaDeTodasLasCanciones \n11)quitarArtistaDelLineUp \n12)guardarEstadoDelRecital \n13) cargarEstadoDelRecital\n");
+		System.out.printf("00) Salir \n01) Roles faltantes para una canción \n02) Roles faltantes para todas las canciones\n"
+				+ "03) Contratar artistas para una canción \n04) Contratar artistas para todas las canciones \n05) Entrenar artista \n"
+				+ "06) Listar artistas contratados \n07) Listar Canciones \n08) [PROLOG] - Consulta de entrenamientos mínimos\n09) Quitar artista de una canción \n"
+				+ "10) Quitar artista de todas las canciones \n11) Quitar artista del LineUp \n12) Guardar estado del recital actual \n13) Cargar estado de un recital\n");
 
 	}
 
@@ -282,6 +314,6 @@ public class Menu {
 			}
 		} while (!ruta.endsWith(".json") || ruta.length() <= 5);
 
-		return Paths.get("estadosCreados", ruta).toString();
+		return Paths.get(Menu.rutaCarpetaRecitales, ruta).toString();
 	}
 }
