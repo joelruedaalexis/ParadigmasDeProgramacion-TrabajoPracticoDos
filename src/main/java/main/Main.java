@@ -84,5 +84,6 @@ public class Main {
 		Menu menu = new Menu(scanner, recital);
 		menu.iniciar();
 		scanner.close();
+		
 	}
 }

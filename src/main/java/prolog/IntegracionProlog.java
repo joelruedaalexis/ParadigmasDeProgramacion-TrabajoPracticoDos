@@ -26,19 +26,18 @@ import org.jpl7.Query;
 import org.jpl7.Term;
 import org.jpl7.Variable;
 
-
 public class IntegracionProlog {
 
     private static final String ARTISTAS_JSON_PATH = "assets/artistas.json";
     private static final String RECITAL_JSON_PATH = "assets/recital.json";
     private static final String DISCOGRAFICA_JSON_PATH = "assets/artistas-discografica.json";
+
+    // Ahora escribimos en target/prolog/
+    private static final String OUTPUT_DIR = "target/prolog";
     private static final String PL_FILE_NAME = "base-de-conocimiento-prolog.pl";
-    private static final String ASSETS_FOLDER = "assets";
-    private static final String SRC_FOLDER = "src";
 
-    // Las líneas finales del archivo (sin ordenar)
+    // líneas finales del archivo (sin ordenar)
     private static final List<String> lineas = new ArrayList<>();
-
 
     // =====================================================================
     // GENERAR BASE DE CONOCIMIENTO
@@ -48,22 +47,26 @@ public class IntegracionProlog {
         lineas.clear();
 
         try {
-            String relativeFilePath = "." + File.separator + SRC_FOLDER +
-                    File.separator + ASSETS_FOLDER + File.separator + PL_FILE_NAME;
+            // Crear carpeta target/prolog si no existe
+            File dir = new File(OUTPUT_DIR);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
 
-            String canonicalPath = new File(relativeFilePath).getCanonicalPath();
+            String outputPath = OUTPUT_DIR + File.separator + PL_FILE_NAME;
+            String canonicalPath = new File(outputPath).getCanonicalPath();
 
             // Marca al inicio
             lineas.add("% --- GENERADO AUTOMATICAMENTE DESDE JAVA ---");
 
-            // bloques (no se ordenan, solo sus hechos internos)
+            // bloques
             generarHechosDeArtistas();
             generarHechosDeDiscografica();
             generarHechosDeRecital();
             agregarReglasEstaticas();
 
-            // escribir archivo final
-            try (PrintWriter pw = new PrintWriter(new FileWriter(relativeFilePath))) {
+            // Escribir archivo final
+            try (PrintWriter pw = new PrintWriter(new FileWriter(outputPath))) {
                 for (String l : lineas) {
                     pw.println(l);
                 }
@@ -76,9 +79,8 @@ public class IntegracionProlog {
         }
     }
 
-
     // =====================================================================
-    // HECHOS: ARTISTAS + HABILIDADES + HISTORIAL + COSTOS + MAX CANCIONES
+    // HECHOS: ARTISTAS
     // =====================================================================
     public static void generarHechosDeArtistas() throws IOException {
 
@@ -114,8 +116,8 @@ public class IntegracionProlog {
                 // habilidades
                 if (jsonArtista.has("roles") && jsonArtista.get("roles").isJsonArray()) {
                     for (JsonElement r : jsonArtista.getAsJsonArray("roles")) {
-                        String rol = toPrologAtom(r.getAsString());
-                        bloque.add(String.format("habilidad(%s, %s).", atom, rol));
+                        bloque.add(String.format("habilidad(%s, %s).",
+                                atom, toPrologAtom(r.getAsString())));
                     }
                 }
 
@@ -123,7 +125,8 @@ public class IntegracionProlog {
                 if (jsonArtista.has("historial") && jsonArtista.get("historial").isJsonArray()) {
                     for (JsonElement h : jsonArtista.getAsJsonArray("historial")) {
                         if (!h.isJsonNull()) {
-                            bloque.add(String.format("historial(%s, %s).", atom, toPrologAtom(h.getAsString())));
+                            bloque.add(String.format("historial(%s, %s).",
+                                    atom, toPrologAtom(h.getAsString())));
                         }
                     }
                 }
@@ -135,12 +138,10 @@ public class IntegracionProlog {
                 if (jsonArtista.has("maxCanciones") && !jsonArtista.get("maxCanciones").isJsonNull()) {
                     try { max = jsonArtista.get("maxCanciones").getAsInt(); } catch (Exception ignored) {}
                 }
-
                 bloque.add(String.format("max_canciones(%s, %d).", atom, max));
 
                 // contratado sin experiencia
                 boolean tieneRoles = jsonArtista.has("roles")
-                        && jsonArtista.get("roles").isJsonArray()
                         && jsonArtista.get("roles").getAsJsonArray().size() > 0;
 
                 if ("contratado".equals(tipo) && !tieneRoles) {
@@ -152,7 +153,6 @@ public class IntegracionProlog {
         Collections.sort(bloque);
         lineas.addAll(bloque);
     }
-
 
     // =====================================================================
     // HECHOS: DISCOGRAFICA
@@ -184,9 +184,8 @@ public class IntegracionProlog {
         lineas.addAll(bloque);
     }
 
-
     // =====================================================================
-    // HECHOS: RECITAL → rol_instancia/2 + total_instancias_rol/1
+    // HECHOS: RECITAL
     // =====================================================================
     public static void generarHechosDeRecital() throws IOException {
 
@@ -214,8 +213,8 @@ public class IntegracionProlog {
                         && cancion.get("rolesRequeridos").isJsonArray()) {
 
                     for (JsonElement r : cancion.getAsJsonArray("rolesRequeridos")) {
-                        String rol = toPrologAtom(r.getAsString());
-                        bloque.add(String.format("rol_instancia(i%d, %s).", id++, rol));
+                        bloque.add(String.format("rol_instancia(i%d, %s).",
+                                id++, toPrologAtom(r.getAsString())));
                     }
                 }
             }
@@ -226,7 +225,6 @@ public class IntegracionProlog {
 
         lineas.add(String.format("total_instancias_rol(%d).", id - 1));
     }
-
 
     // =====================================================================
     // REGLAS (NO se ordenan)
@@ -248,13 +246,12 @@ public class IntegracionProlog {
                 + "sumlist(Lista, Total).");
     }
 
-
     // =====================================================================
     // AUXILIARES
     // =====================================================================
     private static String toPrologAtom(String s) {
         String n = Normalizer.normalize(s, Normalizer.Form.NFD);
-        n = n.replaceAll("\\p{M}", "");      // sin acentos
+        n = n.replaceAll("\\p{M}", "");
         n = n.toLowerCase();
         return n.replaceAll("[^a-z0-9_]", "_");
     }
@@ -265,18 +262,17 @@ public class IntegracionProlog {
         return String.format(Locale.US, "%s", d);
     }
 
-
     // =====================================================================
     // CONSULTA PROLOG
     // =====================================================================
     public static int consultarEntrenamientosMinimos() {
 
-        String path = "./src/assets/base-de-conocimiento-prolog.pl";
+        String path = OUTPUT_DIR + File.separator + PL_FILE_NAME;
 
-        Query q1 = new Query(String.format("consult('%s')", path.replace("\\", "/")));
+        Query q1 = new Query("consult('" + path.replace("\\", "/") + "')");
 
         if (!q1.hasSolution())
-            throw new RuntimeException("No se pudo cargar el archivo Prolog.");
+            throw new RuntimeException("No se pudo cargar el archivo Prolog en: " + path);
 
         Variable total = new Variable("Total");
         Query q2 = new Query("entrenamientos_minimos", new Term[]{total});
@@ -284,9 +280,9 @@ public class IntegracionProlog {
         Map<String, Term> res = q2.oneSolution();
 
         if (res == null)
-            throw new RuntimeException("No se encontró solución.");
+            throw new RuntimeException("No se encontró solución al consultar Prolog.");
 
         return res.get("Total").intValue();
     }
-
 }
+

@@ -38,9 +38,6 @@
 			<artifactId>jpl</artifactId>
 			<version>7.4.0</version>
 		</dependency>
-
-
-
     </dependencies>
 
     <build>
