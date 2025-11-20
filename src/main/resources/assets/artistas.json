@@ -60,27 +60,27 @@
     "roles": ["voz principal","saxofón","armónica"],
     "bandas": ["Acru"],
     "costo": 500,
-    "maxCanciones": 2
+    "maxCanciones": 10
   },
   {
 	"nombre": "Roberto Musso",
     "roles": ["voz principal","saxofón","armónica"],
     "bandas": ["El Cuarteto de Nos","Queen"],
     "costo": 300,
-    "maxCanciones": 2
+    "maxCanciones": 10
   },
   {
 	"nombre": "Rita Lee",
     "roles": ["voz principal","saxofón","armónica","acordeón"],
     "bandas": ["Rita Lee"],
     "costo": 800,
-    "maxCanciones": 2
+    "maxCanciones": 10
   },
   {
 	"nombre": "Lucy Patané",
     "roles": ["voz principal","saxofón","armónica","acordeón"],
     "bandas": ["Lucy Patané","Queen"],
     "costo": 800,
-    "maxCanciones": 2
+    "maxCanciones": 15
   }
 ]

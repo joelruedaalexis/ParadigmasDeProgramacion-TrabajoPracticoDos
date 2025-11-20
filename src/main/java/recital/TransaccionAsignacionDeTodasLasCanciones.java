@@ -200,9 +200,7 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 				} else
 					listaArtistasEntrenadosEnRol = artistasEntrenadosEnRol.get(rol);
 //				Si entra a este for es xq ya entrené a artistas con este rol. Ahora asigno al artista SI Y SOLO SI tiene su cantMaxCanciones > 0
-
 				str += "\t~" + rol + ": ";
-
 				for (int i = 0; i < listaArtistasEntrenadosEnRol.size() && cupos > 0; i++) {
 					ArtistaBase artista = listaArtistasEntrenadosEnRol.get(i);
 					if (!artistasUsadosEnCancion.contains(artista)
@@ -239,7 +237,6 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 		for (Cancion cancion : artistasCandidatosAsignadosACancion.keySet()) {
 			str += "->" + cancion.toString();
 		}
-
 		return str;
 	}
 }

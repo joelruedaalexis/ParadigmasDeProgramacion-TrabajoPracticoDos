@@ -16,7 +16,8 @@ public class IntegranteDeUnRol {
 		cantDeIntegrantesNecesarios = integrantes.size();
 	}
 
-	public IntegranteDeUnRol(int cantIntegrantesDeRol) {
+	public IntegranteDeUnRol(String rol, int cantIntegrantesDeRol) {
+		this.rol = rol;
 		this.cantDeIntegrantesNecesarios = cantIntegrantesDeRol;
 		integrantes = new ArrayList<>(cantIntegrantesDeRol);
 	}

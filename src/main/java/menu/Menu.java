@@ -3,12 +3,14 @@ package menu;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import recital.EstadoDeTransaccion;
 import recital.OpcionDeTransaccion;
@@ -22,15 +24,17 @@ public class Menu {
 			listarArtistasContratados = 6, listarCanciones = 7, prolog = 8, quitarArtistaDeCancion = 9,
 			quitarArtistaDeTodasLasCanciones = 10, quitarArtistaContratadoDelLineUp = 11, guardarEstadoDelRecital = 12,
 			cargarEstadoDelRecital = 13;
-	private static final String rutaCarpetaRecitales = "estadosCreados";
+	private static final String rutaCarpetaRecitales = "src/main/resources/recitalesGuardados";
 	private Scanner scanner;
 	private Recital recital;
 	private List<String> recitalesGuardados;
 
-	public Menu(Scanner scanner, Recital recital) {
+	public Menu(Scanner scanner, Recital recital) throws IOException {
 		this.recital = recital;
 		this.scanner = scanner;
-		recitalesGuardados = new ArrayList<>();
+		recitalesGuardados = Files.list(Paths.get("src", "main", "resources", "recitalesGuardados"))
+				.map(f -> f.getFileName().toString()).collect(Collectors.toList());
+		System.out.println(recitalesGuardados);
 	}
 
 	private int ingresarOpcionVal(int limInf, int limSup) {
@@ -75,25 +79,19 @@ public class Menu {
 				}
 				break;
 			case rolesFaltantesParaTodasLasCanciones:// 2
-				Map<String, Integer> rolesFaltantesTotalesXCupo = recital.cantDeRolesFaltantesParaTodasLasCanciones();
-
-				if (rolesFaltantesTotalesXCupo.isEmpty())
+				Map<String, Integer> rolesFaltantesTotalesConSusCupos = recital
+						.cantDeRolesFaltantesParaTodasLasCanciones();
+				if (rolesFaltantesTotalesConSusCupos.isEmpty())
 					System.out.println("Todas las canciones ya tienen sus roles asignados a artistas.");
 				else {
 					String str = "Para poder asignar todas las canciones con artistas contratados se necesitan que tengan los siguientes roles:\n";
-					for (Map.Entry<String, Integer> nodo : rolesFaltantesTotalesXCupo.entrySet()) {
+					for (Map.Entry<String, Integer> nodo : rolesFaltantesTotalesConSusCupos.entrySet()) {
 						String rol = nodo.getKey();
 						Integer cupos = nodo.getValue();
 						str += String.format("\t~%d %s.\n", cupos, rol);
 					}
 					System.out.println(str);
 				}
-
-//				int cantDeRolesFaltantesParaTodasLasCanciones = recital.cantDeRolesFaltantesParaTodasLasCanciones();
-//				if (cantDeRolesFaltantesParaTodasLasCanciones == 0)
-//					System.out.println("->Todas las canciones tienen asignado a un artista.\n");
-//				else
-//					 System.out.printf("->Hay %d rol(es) sin asignar.\n", cantDeRolesFaltantesParaTodasLasCanciones);
 				break;
 			case contratarArtistasParaUnaCancion:// 3
 				indexCancion = elegirCancion();
@@ -115,16 +113,13 @@ public class Menu {
 						.contratarArtistasParaTodasLasCanciones();
 				System.out.println(transaccion2.getInformeDeAsignacionesDeArtistas());
 				if (transaccion2.getEstadoDeTransaccion() == EstadoDeTransaccion.EN_CURSO) {
-					if (transaccion2.sePuedenEntrenarParaTodosLosRoles()) {
-						System.out.printf(
-								"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"
-										+ "%02d)SI\n%02d)NO\n",
-								OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
-						int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
-						String informe = transaccion2.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
-						System.out.println(informe);
-					} else
-						System.out.println("No hay artistas suficientes para entrenar en los roles faltantes.");
+					System.out.printf(
+							"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"
+									+ "%02d)SI\n%02d)NO\n",
+							OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+					int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
+					String informe = transaccion2.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
+					System.out.println(informe);
 				}
 				break;
 			case entrenarArtista:// 5
@@ -158,72 +153,48 @@ public class Menu {
 			case quitarArtistaDeTodasLasCanciones:// 10
 				List<String> listaArtistasAsignados = recital
 						.getListaDeNombresDeArtistasQueEstanAsignadosAlMenosACancion();
-				indexArtista = this.elegirArtistaAQuitarDeTodasLasCanciones(listaArtistasAsignados);
-//				System.out.println(listaArtistasAsignados.get(indexArtista));
-				if (indexArtista == -1)
+				if (listaArtistasAsignados.isEmpty())
 					System.out.println("Todavía no se han asignado artistas.");
-				else
+				else {
+					indexArtista = this.elegirArtistaAQuitarDeTodasLasCanciones(listaArtistasAsignados);
 					recital.quitarArtistaDeTodasLasCanciones(listaArtistasAsignados.get(indexArtista));
+				}
 				break;
 			case quitarArtistaContratadoDelLineUp:// 11
 				Map<String, Integer> artistas = recital.getListadoArtistasContratados();
-
 				if (artistas.isEmpty()) {
-					System.out.println("-> No hay artistas contratados para quitar.");
+					System.out.println("No hay artistas contratados para quitar.");
 					break;
 				}
-
-				System.out.println("->Elija un artista contratado para quitarlo del lineUp.");
+				System.out.println("Elija un artista contratado para quitarlo del lineUp.");
 				String nombreArtista = this.elegirArtista(new ArrayList<>(artistas.keySet()));
 
 				recital.quitarArtistaDelLineUp(artistas.get(nombreArtista));
 				break;
-
 			case guardarEstadoDelRecital:// 12
-				String rutaGuardar = this
-						.ingresarRutaParaRecital("-> Ingrese el nombre del archivo para guardar el recital: ");
-
+				String nombreArchivo = this.ingresarArchivoParaGuardarRecital();
 				try {
-					// Crea la carpeta si no existe (lógico para guardar)
-					Files.createDirectories(Paths.get(Menu.rutaCarpetaRecitales));
-
-					recital.guardarEnArchivoJSON(rutaGuardar);
+					recital.guardarEnArchivoJSON(Paths.get(rutaCarpetaRecitales, nombreArchivo).toString());
 					System.out.println("-> El archivo se ha guardado con éxito.");
-					recitalesGuardados.add(rutaGuardar);
-
+					recitalesGuardados.add(nombreArchivo);
 				} catch (IOException e) {
 					System.out.println("-> Error al guardar el archivo: " + e.getMessage());
 				}
 				break;
-
 			case cargarEstadoDelRecital:// 13
-				String rutaCargar = this.ingresarRutaParaRecital("-> Ingrese el nombre del archivo a cargar: ");
-
-				File archivoCargar = new File(rutaCargar);
-				File carpetaCargar = archivoCargar.getParentFile();
-
-				// Verificar existencia de carpeta (pero NO crearla)
-				if (carpetaCargar != null && !carpetaCargar.exists()) {
-					System.out.println("-> La carpeta '" + carpetaCargar.getPath() + "' no existe.");
+				if (recitalesGuardados.isEmpty()) {
+					System.out.println("No hay ningun recital guardado.");
 					break;
 				}
-
-				// Verificar existencia del archivo
-				if (!archivoCargar.exists()) {
-					System.out.println("-> El archivo '" + archivoCargar.getPath() + "' no existe.");
-					break;
-				}
-
+				int op2 = cargarArchivoDelRecital();
+				String rutaArchivo = Paths.get(rutaCarpetaRecitales, recitalesGuardados.get(op2 - 1)).toString();
 				try {
-					recital.cargarEstadoDeArchivoJSON(rutaCargar);
-					System.out.println("-> El archivo se ha cargado con éxito.");
-					recitalesGuardados.add(rutaCargar);
-
+					recital.cargarEstadoDeArchivoJSON(rutaArchivo);
+					System.out.println("El archivo se ha cargado con éxito.");
 				} catch (IOException e) {
-					System.out.println("-> Error al cargar el archivo: " + e.getMessage());
+					System.out.println("Error al cargar el archivo: " + e.getMessage());
 				}
 				break;
-
 			}
 			if (opcion != salir) {
 				pausar();
@@ -231,11 +202,26 @@ public class Menu {
 //		} while (opcion == salir);//<------------------------CAMBIAR ESTO PARA LOOPEAR
 		} while (opcion != salir);
 		System.out.println("Saliendo...");
+		try {
+			String rutaArchivo = Paths.get("src", "main", "resources", "recitalesGuardados", "recital-out.json")
+					.toString();
+			recital.guardarEnArchivoJSON(rutaArchivo);
+			System.out.println("Se ha guardado la información del recital en el archivo \"recital-out.json\".");
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	public int cargarArchivoDelRecital() {
+		System.out.println("Elija uno de los siguientes estados para cargar:\n");
+		for (int i = 0; i < recitalesGuardados.size(); i++) {
+			System.out.printf("\t%02d) %s\n", i + 1, recitalesGuardados.get(i));
+		}
+		return ingresarOpcionVal(1, recitalesGuardados.size());
 	}
 
 	public int elegirCancion() {
 		List<String> cancionero = recital.getListadoDeTitulosDeCanciones();
-
 		System.out.println("Repertorio:");
 		for (int i = 0; i < cancionero.size(); i++) {
 			System.out.printf("%02d) %s\n", i + 1, cancionero.get(i));
@@ -300,17 +286,15 @@ public class Menu {
 
 	}
 
-	private String ingresarRutaParaRecital(String str) {
-		String ruta = "";
+	private String ingresarArchivoParaGuardarRecital() {
+		String nombreArchivo = "";
 		do {
-			System.out.printf(str);
-			ruta = this.scanner.nextLine().trim();
-
-			if (!ruta.endsWith(".json") || ruta.length() <= 5) {
-				System.out.println("->La ruta del archivo es inválida.");
+			System.out.println("Ingrese el nombre del archivo para guardar el recital: ");
+			nombreArchivo = this.scanner.nextLine().trim();
+			if (!nombreArchivo.endsWith(".json") || nombreArchivo.length() <= 5) {
+				System.out.println("El formato del archivo es inválido.");
 			}
-		} while (!ruta.endsWith(".json") || ruta.length() <= 5);
-
-		return Paths.get(Menu.rutaCarpetaRecitales, ruta).toString();
+		} while (!nombreArchivo.endsWith(".json") || nombreArchivo.length() <= 5);
+		return nombreArchivo;
 	}
 }

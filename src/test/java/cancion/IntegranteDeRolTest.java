@@ -27,7 +27,6 @@ class IntegranteDeRolTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		cantIntegrantesDeRol = 3;
-		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
 		integrantes = new ArrayList<>();
 		divididos = new BandaHistorico("Divididos");
 		artistaBase1 = new ArtistaBase("Ricardo Mollo", Arrays.asList("voz principal"), Arrays.asList(divididos));
@@ -39,9 +38,10 @@ class IntegranteDeRolTest {
 	@Test
 	void sepuedeInstanciar() {
 		cantIntegrantesDeRol = 1;
-		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
+		integranteDeRol = new IntegranteDeUnRol("voz principal", cantIntegrantesDeRol);
 		assertNotNull(integranteDeRol);
 		assertEquals(cantIntegrantesDeRol, integranteDeRol.getCantDeIntegrantesNecesarios());
+		assertEquals("voz principal", integranteDeRol.getRol());
 		assertEquals(new ArrayList<>(), integranteDeRol.getListaDeIntegrantes());
 
 		integrantes.add(artistaBase1);
@@ -75,7 +75,7 @@ class IntegranteDeRolTest {
 	@Test
 	void noSepuedeAgregarIntegranteEnRolYaOcupado() {
 		cantIntegrantesDeRol = 2;
-		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
+		integranteDeRol = new IntegranteDeUnRol(artistaBase1.getRoles().getFirst(), cantIntegrantesDeRol);
 		integranteDeRol.agregarIntegrante(artistaBase1);
 		assertTrue(integranteDeRol.hayCuposDisponibles(), "Es verdadero porque queda un cupo disponible");
 		integranteDeRol.agregarIntegrante(artistaBase2);
@@ -86,14 +86,14 @@ class IntegranteDeRolTest {
 
 	@Test
 	void noSepuedeAgregarIntegranteNull() {
-		integranteDeRol = new IntegranteDeUnRol(3);
+		integranteDeRol = new IntegranteDeUnRol("sarasa", 3);
 		assertThrows(IllegalArgumentException.class, () -> integranteDeRol.agregarIntegrante(null),
 				"No se puede agregar artista cuya referencia es null");
 	}
 
 	@Test
 	void sepuedeQuitarIntegrante() {
-		integranteDeRol = new IntegranteDeUnRol(cantIntegrantesDeRol);
+		integranteDeRol = new IntegranteDeUnRol(artistaBase1.getRoles().getFirst(), cantIntegrantesDeRol);
 		integranteDeRol.agregarIntegrante(artistaBase1);
 		assertTrue(integranteDeRol.quitarIntegrante(artistaBase1));
 		assertEquals(cantIntegrantesDeRol, integranteDeRol.getCantDeCuposDisponibles(),

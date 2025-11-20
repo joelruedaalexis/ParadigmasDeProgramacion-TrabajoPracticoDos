@@ -81,8 +81,14 @@ public class Main {
 
 		Scanner scanner = new Scanner(System.in);
 		Recital recital = new Recital(repertorio, artistas, roles);
-		Menu menu = new Menu(scanner, recital);
-		menu.iniciar();
-		scanner.close();
+		Menu menu;
+		try {
+			menu = new Menu(scanner, recital);
+			menu.iniciar();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			scanner.close();
+		}
 	}
 }

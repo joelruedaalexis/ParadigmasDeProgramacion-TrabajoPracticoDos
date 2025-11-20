@@ -14,5 +14,17 @@
   {
     "titulo": "Under Pressure",
     "rolesRequeridos": ["voz principal", "voz principal", "guitarra eléctrica", "bajo", "batería"]
+  },
+  {
+    "titulo": "Insensibilidad",
+    "rolesRequeridos": ["piano", "piano", "guitarra eléctrica", "bajo", "piano"]
+  },
+  {
+    "titulo": "Intifada",
+	"rolesRequeridos": ["piano", "saxofón", "saxofón", "bajo", "piano", "saxofón", "saxofón", "saxofón"]
+  },
+  {
+    "titulo": "Welcome To Hell",
+	"rolesRequeridos": ["armónica", "armónica", "armónica", "bajo", "piano", "saxofón", "saxofón", "saxofón"]
   }
 ]
