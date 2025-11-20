@@ -33,9 +33,9 @@ import prolog.IntegracionProlog;
 public class Recital {
 	private List<Cancion> repertorio;
 	private List<ArtistaBase> lineUp;
-	private List<String> roles;
+	private Set<String> roles;
 
-	public Recital(List<Cancion> repertorio, List<ArtistaBase> lineUp, List<String> roles) {
+	public Recital(List<Cancion> repertorio, List<ArtistaBase> lineUp, Set<String> roles) {
 		this.repertorio = repertorio;
 		this.lineUp = lineUp;
 		this.roles = roles;
@@ -356,7 +356,7 @@ public class Recital {
 		}
 
 		// ------- ROLES -------
-		List<String> rolesImportados = new ArrayList<>();
+		Set<String> rolesImportados = new HashSet<>();
 		JsonArray rolesJSON = jsonArch.getAsJsonArray("roles");
 		for (JsonElement rol : rolesJSON)
 			rolesImportados.add(rol.getAsString());
@@ -483,7 +483,7 @@ public class Recital {
 
 	public List<String> getListaDeRolesDisponiblesParaEntrenarArtista(int indexDelLineUp) {
 		if (indexDelLineUp < 0 || indexDelLineUp >= lineUp.size())
-			return null;// Exception out of bonds
+			throw new IndexOutOfBoundsException("El índice del artista es inválido.");
 		List<String> rolesDelArtista = lineUp.get(indexDelLineUp).getRoles();
 		return roles.stream().filter(rol -> !rolesDelArtista.contains(rol)).toList();
 	}

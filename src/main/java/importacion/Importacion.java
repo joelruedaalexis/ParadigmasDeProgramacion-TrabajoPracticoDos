@@ -6,8 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -36,12 +38,7 @@ public class Importacion {
 		return artistas;
 	}
 
-//	 "nombre": "Brian May",
-//	    "roles": ["guitarra eléctrica", "voz secundaria"],
-//	    "bandas": ["Queen"],
-//	    "costo": 0,
-//	    "maxCanciones": 100
-	public static List<ArtistaBase> importarArtistas(String rutaArch, List<String> listaDeRoles,
+	public static List<ArtistaBase> importarArtistas(String rutaArch, Set<String> listaDeRoles,
 			List<String> listaDeArtistasBase) throws FileNotFoundException, JsonSyntaxException, IOException {
 		FileReader fileReader = new FileReader(new File(rutaArch));
 		List<ArtistaBase> lineUp = new ArrayList<>();
@@ -53,11 +50,8 @@ public class Importacion {
 			JsonObject jsonArtistaObject = jsonArtistaElement.getAsJsonObject();
 			for (JsonElement jsonRolElement : jsonArtistaObject.get("bandas").getAsJsonArray()) {
 				String banda = jsonRolElement.getAsString();
-				if (!repositorioBanda.containsKey(banda)) {
-//					bandaXIntegrantes.put(banda, new ArrayList<>());
+				if (!repositorioBanda.containsKey(banda))
 					repositorioBanda.put(banda, new BandaHistorico(banda));
-//					repositorioBanda.put(banda, new BandaHistorico(banda, bandaXIntegrantes.get(banda)));
-				}
 			}
 		}
 
@@ -82,13 +76,9 @@ public class Importacion {
 				artista = new ArtistaContratado(nombreDelArtista, historicoDeRoles, historicoDeBanda, costoXCancion,
 						maxCanciones);
 			}
-//			for (BandaHistorico banda : historicoDeBanda) {
-//				bandaXIntegrantes.get(banda.getNombre()).add(artista);
-//			}
 			lineUp.add(artista);
 		}
 		fileReader.close();
-//		bandaXIntegrantes.clear();
 		repositorioBanda.clear();
 		return lineUp;
 	}
@@ -111,11 +101,11 @@ public class Importacion {
 		return repertorio;
 	}
 
-	public static List<String> importarRoles(String rutaArch)
+	public static Set<String> importarRoles(String rutaArch)
 			throws FileNotFoundException, JsonSyntaxException, IOException {
 		FileReader fileReader = new FileReader(new File(rutaArch));
 		Gson gson = new Gson();
-		List<String> roles = gson.fromJson(fileReader, new TypeToken<List<String>>() {
+		Set<String> roles = gson.fromJson(fileReader, new TypeToken<HashSet<String>>() {
 		}.getType());
 		fileReader.close();
 		return roles;

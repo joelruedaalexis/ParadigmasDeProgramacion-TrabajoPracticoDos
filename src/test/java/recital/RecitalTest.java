@@ -9,8 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +26,7 @@ import cancion.Cancion;
 class RecitalTest {
 	Recital recital;
 	List<Cancion> repertorio;
-	List<String> roles;
+	Set<String> roles;
 	Cancion cancion1, cancion2, cancion3, cancion4, cancion5;
 	final String vozPrincipal = "voz principal", vozSecundaria = "voz secundaria",
 			guitarraElectrica = "guitarra eléctrica", armonica = "armónica", bateria = "batería", piano = "piano",
@@ -39,7 +41,7 @@ class RecitalTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		roles = new ArrayList<>(Arrays.asList(vozPrincipal, vozSecundaria, guitarraElectrica, armonica, bateria, piano,
+		roles = new HashSet<>(Arrays.asList(vozPrincipal, vozSecundaria, guitarraElectrica, armonica, bateria, piano,
 				bajo, saxofon, acordeon));
 		cancion1 = new Cancion("Hábil", new ArrayList<>(List.of(vozPrincipal, vozSecundaria, guitarraElectrica)));
 		BandaHistorico redondos = new BandaHistorico("Patricio Rey y sus Redonditos de Ricota");
@@ -236,12 +238,11 @@ class RecitalTest {
 	@Test
 	void contratacionFallidaPorNoTenerArtistasContratadosParaEntrenarRolesDeCancion() {
 		repertorio.addLast(cancion2);
-
 		recital = new Recital(repertorio, lineUpArtistaBase, roles);
 		int indexCancion2 = repertorio.indexOf(cancion2);
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
 		assertFalse(transaccion.esTransaccionCommitted());
-		assertEquals(EstadoDeTransaccion.EN_CURSO, transaccion.getEstadoDeTransaccion());
+		assertEquals(EstadoDeTransaccion.CANCELADA, transaccion.getEstadoDeTransaccion());
 		assertFalse(transaccion.sePuedenEntrenarArtistasSuficientes());
 	}
 

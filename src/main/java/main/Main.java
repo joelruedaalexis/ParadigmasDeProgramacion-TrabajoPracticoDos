@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -20,15 +21,11 @@ public class Main {
 		List<String> artistasDeDiscografica = null;
 		try {
 			artistasDeDiscografica = Importacion.importarNombresDeArtistasDeDiscografica(rutaArchivo1);
-//			System.out.println(artistasDeDiscografia);
 		} catch (JsonSyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -36,31 +33,23 @@ public class Main {
 		List<Cancion> repertorio = null;
 		try {
 			repertorio = Importacion.importarRepertorio(rutaArchivo2);
-//			System.out.println(cancionero.stream().map(Cancion::getTitulo).toList());
 		} catch (JsonSyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		List<String> roles = null;
+		Set<String> roles = null;
 		String rutaArchivo3 = Paths.get("src", "main", "resources", "assets", "roles-necesarios.json").toString();
 		try {
 			roles = Importacion.importarRoles(rutaArchivo3);
-//			System.out.println(roles);
 		} catch (JsonSyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -69,13 +58,10 @@ public class Main {
 		try {
 			artistas = Importacion.importarArtistas(rutaArchivo4, roles, artistasDeDiscografica);
 		} catch (JsonSyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

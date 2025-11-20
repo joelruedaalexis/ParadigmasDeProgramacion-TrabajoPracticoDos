@@ -1,9 +1,7 @@
 package menu;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,12 +141,13 @@ public class Menu {
 				break;
 			case quitarArtistaDeCancion:// 9
 				indexCancion = elegirCancion();
-				indexArtista = this.elegirArtistaAQuitarDeCancion(indexCancion);
-//				System.out.printf("index C %d index A %d\n", indexCancion, indexArtista);
-				if (indexArtista == -1)
+				List<String> lista = recital.getListadoDeIntegrantesDeCancion(indexCancion);
+				if (lista.isEmpty())
 					System.out.println("La canción elegida todavía no tiene artistas asignados.");
-				else
+				else {
+					indexArtista = this.elegirArtistaAQuitarDeCancion(lista);
 					recital.quitarArtistaDeCancion(indexArtista, indexCancion);
+				}
 				break;
 			case quitarArtistaDeTodasLasCanciones:// 10
 				List<String> listaArtistasAsignados = recital
@@ -238,10 +237,7 @@ public class Menu {
 		return ingresarOpcionVal(1, lista.size()) - 1;
 	}
 
-	public int elegirArtistaAQuitarDeCancion(int indexDelRepertorio) {
-		List<String> lista = recital.getListadoDeIntegrantesDeCancion(indexDelRepertorio);
-		if (lista.isEmpty())
-			return -1;
+	public int elegirArtistaAQuitarDeCancion(List<String> lista) {
 		for (int i = 0; i < lista.size(); i++)
 			System.out.printf("%02d) %s\n", i + 1, lista.get(i));
 		return ingresarOpcionVal(1, lista.size()) - 1;
@@ -271,7 +267,6 @@ public class Menu {
 		try {
 			System.in.read();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -283,7 +278,6 @@ public class Menu {
 						+ "03) Contratar artistas para una canción \n04) Contratar artistas para todas las canciones \n05) Entrenar artista \n"
 						+ "06) Listar artistas contratados \n07) Listar Canciones \n08) [PROLOG] - Consulta de entrenamientos mínimos\n09) Quitar artista de una canción \n"
 						+ "10) Quitar artista de todas las canciones \n11) Quitar artista del LineUp \n12) Guardar estado del recital actual \n13) Cargar estado de un recital\n");
-
 	}
 
 	private String ingresarArchivoParaGuardarRecital() {
@@ -291,9 +285,8 @@ public class Menu {
 		do {
 			System.out.println("Ingrese el nombre del archivo para guardar el recital: ");
 			nombreArchivo = this.scanner.nextLine().trim();
-			if (!nombreArchivo.endsWith(".json") || nombreArchivo.length() <= 5) {
+			if (!nombreArchivo.endsWith(".json") || nombreArchivo.length() <= 5)
 				System.out.println("El formato del archivo es inválido.");
-			}
 		} while (!nombreArchivo.endsWith(".json") || nombreArchivo.length() <= 5);
 		return nombreArchivo;
 	}
