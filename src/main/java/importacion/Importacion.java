@@ -95,7 +95,7 @@ public class Importacion {
 			for (JsonElement jsonRolElement : jsonCancionObject.get("rolesRequeridos").getAsJsonArray()) {
 				roles.add(jsonRolElement.getAsString());
 			}
-			repertorio.add(new Cancion(titulo, roles));
+			repertorio.add(Cancion.crearCancionSinIntegrantesAsignados(titulo, roles));
 		}
 		fileReader.close();
 		return repertorio;

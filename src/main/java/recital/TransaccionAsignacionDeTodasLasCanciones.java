@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import artista.ArtistaBase;
+import artista.ArtistaContratado;
 import cancion.Cancion;
 import cancion.IntegranteDeUnRol;
 
@@ -88,8 +89,8 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 			return "No hay artistas disponibles para entrenar y asignar los roles faltantes";
 		}
 		artistasEntrenadosEnRol = new HashMap<>();
-		Iterator<Cancion> iterador = cancionesConRolesFaltantes.iterator();
 		Set<ArtistaBase> artistasUsadosEnCancion = new HashSet<>();
+		Iterator<Cancion> iterador = cancionesConRolesFaltantes.iterator();
 		while (iterador.hasNext()) {
 			Cancion cancion = iterador.next();
 			artistasUsadosEnCancion = getCandidatosDeCancion(cancion);
@@ -118,11 +119,13 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 				}
 //				Si entra a este for es xq NO tengo artistas entrenados (o no estan disponibles) en este rol
 				for (int i = 0; i < artistasDisponiblesParaSerEntrenados.size() && cupos > 0; i++) {
+					System.out.println("XDDDDDDDDDDDDD");
 					ArtistaBase artista = artistasDisponiblesParaSerEntrenados.get(i);
 					if (!artistasUsadosEnCancion.contains(artista)
 							&& artistasXCantDisponiblesDeCanciones.get(artista) > 0) {
 						artistasXCantDisponiblesDeCanciones.put(artista,
 								artistasXCantDisponiblesDeCanciones.get(artista) - 1);
+						((ArtistaContratado) artista).entrenarNuevoRol(rol);
 						integrantesDeUnRol.agregarIntegrante(artista);
 						artistasUsadosEnCancion.add(artista);
 						artistasEntrenadosEnRol.get(rol).addLast(artista);
@@ -145,7 +148,7 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 					cancion.agregarArtista(rol, artista);
 				}
 			}
-			str = "->" + cancion.toString() + "\n";
+			str = cancion.toString() + "\n";
 		}
 		estado = EstadoDeTransaccion.CONFIRMADA;
 		return str;

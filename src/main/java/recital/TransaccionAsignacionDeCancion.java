@@ -3,8 +3,10 @@ package recital;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import artista.ArtistaBase;
+import artista.ArtistaContratado;
 import cancion.Cancion;
 import cancion.IntegranteDeUnRol;
 
@@ -96,16 +98,15 @@ public class TransaccionAsignacionDeCancion {
 		for (Map.Entry<String, IntegranteDeUnRol> nodo : candidatosXRol.entrySet()) {
 			String rol = nodo.getKey();
 			List<ArtistaBase> lista = nodo.getValue().getListaDeIntegrantes();
+			int cupos = nodo.getValue().getCantDeCuposDisponibles();
 			lista.forEach(artista -> {
 				cancion.agregarArtista(rol, artista);
-				artista.asignar(this.cancion);
 			});
-			for (int i = 0; i < nodo.getValue().getCantDeCuposDisponibles(); i++) {
-				ArtistaBase artista = artistasDisponiblesParaSerEntrenados.get(i);
+			while (cupos > 0) {
+				ArtistaContratado artista = (ArtistaContratado) artistasDisponiblesParaSerEntrenados.removeFirst();
 				artista.entrenarNuevoRol(rol);
 				cancion.agregarArtista(rol, artista);
-				artista.asignar(this.cancion);
-
+				cupos--;
 			}
 		}
 		estado = EstadoDeTransaccion.CONFIRMADA;
@@ -116,7 +117,8 @@ public class TransaccionAsignacionDeCancion {
 			List<ArtistaBase> listaDeArtistasCandidatos) {
 		this.candidatosXRol = rolesXIntegrantesCandidatos;
 		this.artistasDisponiblesParaSerEntrenados = listaDeArtistasCandidatos.stream()
-				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAlmenosAUnaCancion()).toList();
+				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAlmenosAUnaCancion())
+				.collect(Collectors.toList());
 
 		if (!sePuedenEntrenarArtistasSuficientes())
 			estado = EstadoDeTransaccion.CANCELADA;

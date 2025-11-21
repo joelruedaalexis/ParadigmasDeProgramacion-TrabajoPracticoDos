@@ -2,13 +2,14 @@ package cancion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import artista.ArtistaBase;
 
 public class IntegranteDeUnRol {
-	String rol;
-	List<ArtistaBase> integrantes;
-	int cantDeIntegrantesNecesarios;
+	private String rol;
+	private List<ArtistaBase> integrantes;
+	private int cantDeIntegrantesNecesarios;
 
 	public IntegranteDeUnRol(String rol, List<ArtistaBase> integrantes) {
 		this.rol = rol;
@@ -22,10 +23,10 @@ public class IntegranteDeUnRol {
 		integrantes = new ArrayList<>(cantIntegrantesDeRol);
 	}
 
-	public IntegranteDeUnRol(List<ArtistaBase> integrantes, int cantDeIntegrantesNecesarios) {
-		this.integrantes = integrantes;
-		this.cantDeIntegrantesNecesarios = cantDeIntegrantesNecesarios;
-	}
+//	public IntegranteDeUnRol(String rol, List<ArtistaBase> integrantes, int cantDeIntegrantesNecesarios) {
+//		this.integrantes = integrantes;
+//		this.cantDeIntegrantesNecesarios = cantDeIntegrantesNecesarios;
+//	}
 
 	public double getCostoDeIntegrantesAsignados() {
 		double costo = 0;
@@ -35,29 +36,40 @@ public class IntegranteDeUnRol {
 		return costo;
 	}
 
-//
+	@Override
+	public int hashCode() {
+		return Objects.hash(cantDeIntegrantesNecesarios, rol);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IntegranteDeUnRol other = (IntegranteDeUnRol) obj;
+		return cantDeIntegrantesNecesarios == other.cantDeIntegrantesNecesarios && Objects.equals(rol, other.rol);
+	}
+
 	public List<ArtistaBase> getListaDeIntegrantes() {
 		return integrantes;
 	}
 
-//
 	public boolean artistaEstaAsignado(ArtistaBase artista) {
 		return integrantes.contains(artista);
 	}
 
-//
 	public int getCantDeCuposDisponibles() {
 		return cantDeIntegrantesNecesarios - integrantes.size();
 	}
 
-//
 	public boolean hayCuposDisponibles() {
 		return integrantes.size() < cantDeIntegrantesNecesarios;
 	}
 
-//
 	public boolean agregarIntegrante(ArtistaBase artista) {
-//		agregar validaciones !!!!!!!!!!
 		if (artista == null)
 			throw new IllegalArgumentException("No se puede agregar artista null.");
 		if (!this.hayCuposDisponibles())
@@ -88,5 +100,4 @@ public class IntegranteDeUnRol {
 		// TODO Auto-generated method stub
 		return rol;
 	}
-
 }

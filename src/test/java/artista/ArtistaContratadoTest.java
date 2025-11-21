@@ -79,7 +79,7 @@ class ArtistaContratadoTest {
 
 	@Test
 	void sePuedeAsignarCancion() {
-		Cancion cancion = new Cancion("Todo un palo", List.of("guitarra electrica"));
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("guitarra electrica"));
 		int expectedMaxCanciones = topeDeCanciones - 1;
 		List<Cancion> expectedCanciones = List.of(cancion);
 		assertTrue(guitarrista.puedeSerAsignadoACancion());
@@ -91,9 +91,11 @@ class ArtistaContratadoTest {
 
 	@Test
 	void noSePuedeAsignarCancionSiArtistaExcedeDelLimiteDeCanciones() {
-		Cancion cancion1 = new Cancion("Todo un palo", List.of("guitarra electrica"));
-		Cancion cancion2 = new Cancion("Un Pacman en el Savoy", List.of("guitarra electrica"));
-		Cancion cancion3 = new Cancion("Masacre en el Puticlub", List.of("guitarra electrica"));
+		Cancion cancion1 = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("guitarra electrica"));
+		Cancion cancion2 = Cancion.crearCancionSinIntegrantesAsignados("Un Pacman en el Savoy",
+				List.of("guitarra electrica"));
+		Cancion cancion3 = Cancion.crearCancionSinIntegrantesAsignados("Masacre en el Puticlub",
+				List.of("guitarra electrica"));
 		int expectedMaxCanciones = topeDeCanciones - 2;
 		List<Cancion> expectedCanciones = List.of(cancion1, cancion2);
 
@@ -113,14 +115,14 @@ class ArtistaContratadoTest {
 
 	@Test
 	void noSePuedeAsignarCancionRepetida() {
-		Cancion cancion = new Cancion("Todo un palo", List.of("guitarra electrica"));
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("guitarra electrica"));
 		assertTrue(guitarrista.asignar(cancion));
 		assertFalse(guitarrista.asignar(cancion));
 	}
 
 	@Test
 	void sePuedeDesignarCancionExistente() {
-		Cancion cancion = new Cancion("Todo un palo", List.of("guitarra electrica"));
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("guitarra electrica"));
 		int expectedMaxCanciones = topeDeCanciones;
 
 		guitarrista.asignar(cancion);
@@ -137,9 +139,11 @@ class ArtistaContratadoTest {
 
 	@Test
 	void noSePuedeDesignarCancionInexistente() {
-		Cancion cancion1 = new Cancion("Todo un palo", List.of("guitarra electrica"));
-		Cancion cancion2 = new Cancion("Esa estrella era mi lujo", List.of("saxofón", "guitarra electrica"));
-		Cancion cancionInexistente = new Cancion("Vencedores Vencidos", List.of("voz principal", "guitarra electrica"));
+		Cancion cancion1 = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("guitarra electrica"));
+		Cancion cancion2 = Cancion.crearCancionSinIntegrantesAsignados("Esa estrella era mi lujo",
+				List.of("saxofón", "guitarra electrica"));
+		Cancion cancionInexistente = Cancion.crearCancionSinIntegrantesAsignados("Vencedores Vencidos",
+				List.of("voz principal", "guitarra electrica"));
 		guitarrista.asignar(cancion1);
 		guitarrista.asignar(cancion2);
 		assertFalse(guitarrista.designar(cancionInexistente));

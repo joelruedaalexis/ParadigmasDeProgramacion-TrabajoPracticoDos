@@ -77,11 +77,6 @@ public class ArtistaBase {
 		return nombre;
 	}
 
-//	sin probar!!!
-	public boolean entrenarNuevoRol(String nuevoRol) {// ¿Exception?
-		return false;
-	}
-
 //  probado
 	public boolean asignar(Cancion cancion) {
 		if (cancion == null)
@@ -112,6 +107,8 @@ public class ArtistaBase {
 		String str = "->Nombre: " + this.nombre + "\n";
 		str += "\tRoles: " + this.roles + "\n";
 		str += "\tHistórico de bandas: " + bandaHistorico.stream().map(b -> b.getNombre()).toList() + "\n";
+		str += "\tCanciones asignadas: " + cancionesEnLasQueEstaAsignado.stream().map(c -> c.getTitulo()).toList()
+				+ "\n";
 		str += "\tPertenece a discografica: " + (perteneceADiscografica() ? "Si" : "No") + "\n";
 		return str;
 	}

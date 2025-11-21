@@ -1,0 +1,42 @@
+{
+  "roles": [
+    "piano",
+    "voz principal",
+    "bajo",
+    "voz secundaria",
+    "guitarra eléctrica",
+    "acordeón",
+    "armónica",
+    "batería",
+    "saxofón"
+  ],
+  "repertorio": [
+    {
+      "titulo": "Welcome To Hell",
+      "rolesXArtista": [
+        {
+          "rol": "armónica",
+          "integrantes": [
+            "Lucy Patané"
+          ]
+        }
+      ],
+      "costo": 1200.0
+    }
+  ],
+  "lineUp": [
+    {
+      "nombre": "Lucy Patané",
+      "roles": [
+        "voz principal",
+        "armónica"
+      ],
+      "bandas": [
+        "Lucy Patané",
+        "Queen"
+      ],
+      "costo": 1200.0,
+      "maxCanciones": 15
+    }
+  ]
+}

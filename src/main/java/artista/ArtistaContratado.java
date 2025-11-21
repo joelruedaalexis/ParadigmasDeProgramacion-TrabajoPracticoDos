@@ -16,13 +16,12 @@ public class ArtistaContratado extends ArtistaBase {
 		this.costo = costo;
 		this.maxCanciones = maxCanciones;
 	}
-	
+
 	public int getCantCancionesDisponiblesParaSerAsignado() {
 		return maxCanciones;
 	}
 
 //	probado
-	@Override
 	public boolean entrenarNuevoRol(String nuevoRol) {
 		if (nuevoRol == null)
 			throw new IllegalArgumentException("El rol no puede ser null.");
@@ -96,6 +95,7 @@ public class ArtistaContratado extends ArtistaBase {
 				: "El costo es: " + super.costo) + "\n";
 		str += String.format("\tCantidad máxima de canciones en las que puede estar: %d \n",
 				this.maxCanciones + super.cancionesEnLasQueEstaAsignado.size());
+		str += String.format("\tCantidad canciones restantes en las que puede estar: %d \n", this.maxCanciones);
 		return str;
 	}
 

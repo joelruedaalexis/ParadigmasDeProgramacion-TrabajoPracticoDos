@@ -232,16 +232,14 @@ public class Recital {
 
 //	entrenarArtista = 5
 	public boolean entrenarArtista(int index, String nuevoRol) {
-		if (index < 0 || index >= lineUp.size())
-			return false;// Exception fuera del limite?
 		ArtistaBase artista = lineUp.get(index);
 		if (artista.perteneceADiscografica())
-			return false;
+			return false;// Solo se puede entrenar a artistas contratados!!!
 		if (artista.getRoles().contains(nuevoRol))
-			return false;// Exception?
+			return false;// El artista ya tiene ese rol xd
 		if (artista.estaAsignadoAlmenosAUnaCancion())
-			return false;
-		artista.entrenarNuevoRol(nuevoRol);
+			return false;// No se puede entrenar a artistas que están asignados almenos a una cancion
+		((ArtistaContratado) artista).entrenarNuevoRol(nuevoRol);
 		return true;
 	}
 
@@ -339,7 +337,7 @@ public class Recital {
 		recitalJSON.add("repertorio", repertorioJSON);
 		recitalJSON.add("lineUp", lineUpJSON);
 
-		// try-with-resources = cierra solo
+		// try-with-resources = cierra solo!!!
 		try (FileWriter fileWriter = new FileWriter(rutaArchivo)) {
 			gson.toJson(recitalJSON, fileWriter);
 		}
@@ -424,7 +422,7 @@ public class Recital {
 
 			String titulo = cancionJSON.get("titulo").getAsString();
 
-			Map<String, IntegranteDeUnRol> rolesXCupos = new HashMap<>();
+			List<IntegranteDeUnRol> integrantesDeRol = new ArrayList<>();
 
 			for (JsonElement rolElem : cancionJSON.get("rolesXArtista").getAsJsonArray()) {
 				JsonObject rolJSON = rolElem.getAsJsonObject();
@@ -446,10 +444,10 @@ public class Recital {
 					}
 				}
 
-				rolesXCupos.put(rol, integrantes);
+				integrantesDeRol.addLast(integrantes);
 			}
 
-			repertorioImportado.add(new Cancion(titulo, rolesXCupos));
+			repertorioImportado.add(Cancion.crearCancionConIntegrantesAAsignar(titulo, integrantesDeRol));
 		}
 
 		// ------- Asignar a la instancia actual -------
@@ -468,7 +466,6 @@ public class Recital {
 		for (int i = 0; i < repertorio.size(); i++) {
 			titulos.add(repertorio.get(i).getTitulo());
 		}
-
 		return titulos;
 	}
 
