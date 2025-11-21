@@ -239,15 +239,33 @@ public class IntegracionProlog {
         lineas.add("coste_entrenamiento(A, R, 1) :- artista(A, _), \\+ habilidad(A, R).");
 
         lineas.add("\n% --- REGLAS PARA CALCULAR ENTRENAMIENTOS MINIMOS ---");
+
+        // Cantidad de veces que se requiere un rol
         lineas.add("requeridas(Rol, Cant) :- findall(1, rol_instancia(_, Rol), L), length(L, Cant).");
-        lineas.add("base_saben(Rol, Cant) :- findall(A, (habilidad(A, Rol), artista(A, base)), L), length(L, Cant).");
-        lineas.add("entrenamientos_necesarios(Rol, Ent) :- requeridas(Rol, Req), base_saben(Rol, Base), "
-                + "Temp is Req - Base, (Temp > 0 -> Ent = Temp ; Ent = 0).");
+
+        // Lista de artistas base que saben el rol
+        lineas.add("base_saben(Rol, Lista) :- findall(A, (habilidad(A, Rol), artista(A, base)), Lista).");
+
+        // Capacidad total de los artistas base según max_canciones/2
+        lineas.add("capacidad_total(Rol, Capacidad) :- "
+                + "base_saben(Rol, Lista), "
+                + "findall(Max, (member(A, Lista), max_canciones(A, Max)), Maximos), "
+                + "sumlist(Maximos, Capacidad).");
+
+        // Entrenamientos necesarios considerando límite de canciones
+        lineas.add("entrenamientos_necesarios(Rol, Ent) :- "
+                + "requeridas(Rol, Req), "
+                + "capacidad_total(Rol, CapacidadBase), "
+                + "Temp is Req - CapacidadBase, "
+                + "(Temp > 0 -> Ent = Temp ; Ent = 0).");
+
+        // Suma total de entrenamientos mínimos
         lineas.add("entrenamientos_minimos(Total) :- "
                 + "setof(R, I^rol_instancia(I, R), Roles), "
                 + "findall(E, (member(R, Roles), entrenamientos_necesarios(R, E)), Lista), "
                 + "sumlist(Lista, Total).");
     }
+
 
     private static String toPrologAtom(String s) {
         String n = Normalizer.normalize(s, Normalizer.Form.NFD);
