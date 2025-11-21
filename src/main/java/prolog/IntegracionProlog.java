@@ -32,16 +32,11 @@ public class IntegracionProlog {
     private static final String RECITAL_JSON_PATH = "assets/recital.json";
     private static final String DISCOGRAFICA_JSON_PATH = "assets/artistas-discografica.json";
 
-    // Ahora escribimos en target/prolog/
     private static final String OUTPUT_DIR = "target/prolog";
     private static final String PL_FILE_NAME = "base-de-conocimiento-prolog.pl";
 
-    // líneas finales del archivo (sin ordenar)
     private static final List<String> lineas = new ArrayList<>();
 
-    // =====================================================================
-    // GENERAR BASE DE CONOCIMIENTO
-    // =====================================================================
     public static void generarBaseDeConocimiento() {
 
         lineas.clear();
@@ -54,12 +49,9 @@ public class IntegracionProlog {
             }
 
             String outputPath = OUTPUT_DIR + File.separator + PL_FILE_NAME;
-            String canonicalPath = new File(outputPath).getCanonicalPath();
 
-            // Marca al inicio
             lineas.add("% --- GENERADO AUTOMATICAMENTE DESDE JAVA ---");
 
-            // bloques
             generarHechosDeArtistas();
             generarHechosDeDiscografica();
             generarHechosDeRecital();
@@ -77,10 +69,31 @@ public class IntegracionProlog {
             throw new RuntimeException("Error de I/O al generar la base Prolog.", e);
         }
     }
+    
+    public static void generarBaseDeConocimientoEn(String path) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(path))) {
 
-    // =====================================================================
-    // HECHOS: ARTISTAS
-    // =====================================================================
+            pw.println("% --- GENERADO AUTOMATICAMENTE DESDE JAVA ---");
+            pw.println("");
+
+            pw.println("artista(agustin_cruz, contratado).");
+            pw.println("rol_instancia(i1, voz_principal).");
+            pw.println("costo_base(agustin_cruz, 500).");
+            pw.println("");
+
+            pw.println("% --- REGLAS ESTÁTICAS DE COSTE ---");
+            pw.println("coste_entrenamiento(A, R, 0) :- habilidad(A, R).");
+            pw.println("coste_entrenamiento(A, R, 1) :- artista(A, _), \\+ habilidad(A, R).");
+
+            pw.flush();
+
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo generar el archivo PL: " + path, e);
+        }
+
+        System.out.println("Base generada en: " + path);
+    }
+
     public static void generarHechosDeArtistas() throws IOException {
 
         lineas.add("\n% --- HECHOS DE ARTISTAS Y HABILIDADES ---");
@@ -153,9 +166,6 @@ public class IntegracionProlog {
         lineas.addAll(bloque);
     }
 
-    // =====================================================================
-    // HECHOS: DISCOGRAFICA
-    // =====================================================================
     public static void generarHechosDeDiscografica() throws IOException {
 
         lineas.add("\n% --- MIEMBROS DE DISCOGRAFICA (ARTISTAS BASE) ---");
@@ -183,9 +193,6 @@ public class IntegracionProlog {
         lineas.addAll(bloque);
     }
 
-    // =====================================================================
-    // HECHOS: RECITAL
-    // =====================================================================
     public static void generarHechosDeRecital() throws IOException {
 
         lineas.add("\n% --- HECHOS DE ROLES REQUERIDOS (POR CADA CANCION) ---");
@@ -225,9 +232,6 @@ public class IntegracionProlog {
         lineas.add(String.format("total_instancias_rol(%d).", id - 1));
     }
 
-    // =====================================================================
-    // REGLAS (NO se ordenan)
-    // =====================================================================
     private static void agregarReglasEstaticas() {
 
         lineas.add("\n% --- REGLAS ESTÁTICAS DE COSTE ---");
@@ -245,9 +249,6 @@ public class IntegracionProlog {
                 + "sumlist(Lista, Total).");
     }
 
-    // =====================================================================
-    // AUXILIARES
-    // =====================================================================
     private static String toPrologAtom(String s) {
         String n = Normalizer.normalize(s, Normalizer.Form.NFD);
         n = n.replaceAll("\\p{M}", "");
@@ -261,9 +262,6 @@ public class IntegracionProlog {
         return String.format(Locale.US, "%s", d);
     }
 
-    // =====================================================================
-    // CONSULTA PROLOG
-    // =====================================================================
     public static int consultarEntrenamientosMinimos() {
 
         String path = OUTPUT_DIR + File.separator + PL_FILE_NAME;
