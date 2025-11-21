@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import artista.ArtistaBase;
 
-public class IntegranteDeUnRol {
+public class IntegranteDeUnRol implements Cloneable{
 	private String rol;
 	private List<ArtistaBase> integrantes;
 	private int cantDeIntegrantesNecesarios;
@@ -21,6 +21,12 @@ public class IntegranteDeUnRol {
 		this.rol = rol;
 		this.cantDeIntegrantesNecesarios = cantIntegrantesDeRol;
 		integrantes = new ArrayList<>(cantIntegrantesDeRol);
+	}
+
+	public IntegranteDeUnRol(IntegranteDeUnRol otro) {
+		this.rol = otro.rol;
+		this.cantDeIntegrantesNecesarios = otro.cantDeIntegrantesNecesarios;
+		integrantes = new ArrayList<>(otro.integrantes);
 	}
 
 //	public IntegranteDeUnRol(String rol, List<ArtistaBase> integrantes, int cantDeIntegrantesNecesarios) {

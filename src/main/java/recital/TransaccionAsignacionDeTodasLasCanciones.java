@@ -119,7 +119,6 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 				}
 //				Si entra a este for es xq NO tengo artistas entrenados (o no estan disponibles) en este rol
 				for (int i = 0; i < artistasDisponiblesParaSerEntrenados.size() && cupos > 0; i++) {
-					System.out.println("XDDDDDDDDDDDDD");
 					ArtistaBase artista = artistasDisponiblesParaSerEntrenados.get(i);
 					if (!artistasUsadosEnCancion.contains(artista)
 							&& artistasXCantDisponiblesDeCanciones.get(artista) > 0) {
@@ -194,7 +193,9 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 				if (!integrantesXRol.getValue().hayCuposDisponibles())
 					continue;
 				String rol = integrantesXRol.getKey();
-				IntegranteDeUnRol integrantesDeUnRol = integrantesXRol.getValue();
+				IntegranteDeUnRol integrantesDeUnRol = new IntegranteDeUnRol(integrantesXRol.getValue());// <---
+																											// CHEQUEAR
+																											// ESTO
 				int cupos = integrantesDeUnRol.getCantDeCuposDisponibles();
 				List<ArtistaBase> listaArtistasEntrenadosEnRol;
 				if (!artistasEntrenadosEnRol.containsKey(rol)) {
