@@ -17,26 +17,87 @@
         {
           "rol": "armónica",
           "integrantes": [
-            "Lucy Patané"
+            "vacante",
+            "vacante",
+            "vacante",
+            "vacante",
+            "vacante"
           ]
         }
       ],
-      "costo": 1200.0
+      "costo": 0.0
+    },
+    {
+      "titulo": "On Top",
+      "rolesXArtista": [
+        {
+          "rol": "armónica",
+          "integrantes": [
+            "vacante"
+          ]
+        }
+      ],
+      "costo": 0.0
     }
   ],
   "lineUp": [
     {
-      "nombre": "Lucy Patané",
+      "nombre": "Annie Lennox",
       "roles": [
-        "voz principal",
-        "armónica"
+        "voz principal"
       ],
       "bandas": [
-        "Lucy Patané",
-        "Queen"
+        "Eurythmics"
+      ],
+      "costo": 900.0,
+      "maxCanciones": 1
+    },
+    {
+      "nombre": "David Bowie",
+      "roles": [
+        "voz principal"
+      ],
+      "bandas": [
+        "Tin Machine",
+        "David Bowie"
+      ],
+      "costo": 1500.0,
+      "maxCanciones": 1
+    },
+    {
+      "nombre": "Elton John",
+      "roles": [
+        "voz principal",
+        "piano"
+      ],
+      "bandas": [
+        "Elton John Band"
       ],
       "costo": 1200.0,
-      "maxCanciones": 15
+      "maxCanciones": 1
+    },
+    {
+      "nombre": "George Michael",
+      "roles": [
+        "voz principal"
+      ],
+      "bandas": [
+        "Wham!",
+        "George Michael"
+      ],
+      "costo": 1000.0,
+      "maxCanciones": 1
+    },
+    {
+      "nombre": "Lisa Stansfield",
+      "roles": [
+        "voz principal"
+      ],
+      "bandas": [
+        "Lisa Stansfield"
+      ],
+      "costo": 800.0,
+      "maxCanciones": 1
     }
   ]
 }

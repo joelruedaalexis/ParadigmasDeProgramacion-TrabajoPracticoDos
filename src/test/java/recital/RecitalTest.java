@@ -27,7 +27,7 @@ class RecitalTest {
 	Recital recital;
 	List<Cancion> repertorio;
 	Set<String> roles;
-	Cancion cancion,cancion1, cancion2, cancion3, cancion4, cancion5;
+	Cancion cancion, cancion1, cancion2, cancion3, cancion4, cancion5;
 	final String vozPrincipal = "voz principal", vozSecundaria = "voz secundaria",
 			guitarraElectrica = "guitarra eléctrica", armonica = "armónica", bateria = "batería", piano = "piano",
 			bajo = "bajo", saxofon = "saxofón", acordeon = "acordeón";
@@ -296,14 +296,20 @@ class RecitalTest {
 				new ArrayList<>(List.of(vozPrincipal, piano, piano, armonica, vozSecundaria)));
 		repertorio.addLast(cancion2);
 		int indexCancion2 = 0;
-		lineUp = new ArrayList<>(
-				List.of(bateristaContratado, bajistaContratado, cantanteContratado, cantanteBase, bajistaContratado));
+		lineUp = new ArrayList<>(List.of(bateristaContratado, bajistaContratado, cantanteContratado, cantanteBase,
+				cantantePrincSecunBase));
 		recital = new Recital(repertorio, lineUp, roles);
 		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
 		assertFalse(transaccion.esTransaccionCommitted());
 		assertTrue(transaccion.sePuedenEntrenarArtistasSuficientes());
+		assertFalse(bateristaContratado.getRoles().contains(piano));
+		assertFalse(cantanteContratado.getRoles().contains(piano));
+		assertFalse(bajistaContratado.getRoles().contains(armonica));
 		transaccion.entrenarArtistasRecomendadosYAsignarLosCandidatos(OpcionDeTransaccion.SI);
+		assertTrue(bateristaContratado.getRoles().contains(piano));
+		assertTrue(cantanteContratado.getRoles().contains(piano));
+		assertTrue(bajistaContratado.getRoles().contains(armonica));
 		int expectedCuposDisponibles = 0;
 		assertEquals(expectedCuposDisponibles, cancion2.getCantDeCuposDisponibles());
 	}
@@ -315,18 +321,21 @@ class RecitalTest {
 				new ArrayList<>(List.of(vozPrincipal, piano, piano, armonica, vozSecundaria)));
 		repertorio.addLast(cancion2);
 		int indexCancion2 = 0;
-		lineUp = new ArrayList<>(
-				List.of(bateristaContratado, bajistaContratado, cantanteContratado, cantanteBase, bajistaContratado));
+		lineUp = new ArrayList<>(List.of(bateristaContratado, bajistaContratado, cantanteContratado, cantanteBase,
+				cantantePrincSecunBase));
 		recital = new Recital(repertorio, lineUp, roles);
 		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
 		assertFalse(transaccion.esTransaccionCommitted());
 		assertTrue(transaccion.sePuedenEntrenarArtistasSuficientes());
+		assertFalse(bateristaContratado.getRoles().contains(piano));
+		assertFalse(cantanteContratado.getRoles().contains(piano));
+		assertFalse(bajistaContratado.getRoles().contains(armonica));
 		transaccion.entrenarArtistasRecomendadosYAsignarLosCandidatos(OpcionDeTransaccion.NO);
+		assertFalse(bateristaContratado.getRoles().contains(piano));
+		assertFalse(cantanteContratado.getRoles().contains(piano));
+		assertFalse(bajistaContratado.getRoles().contains(armonica));
 		assertEquals(expectedCuposDisponibles, cancion2.getCantDeCuposDisponibles());
-		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
-		assertThrows(IllegalStateException.class,
-				() -> transaccion.entrenarArtistasRecomendadosYAsignarLosCandidatos(OpcionDeTransaccion.SI));
 	}
 
 	@Test
@@ -456,14 +465,53 @@ class RecitalTest {
 		recital = new Recital(repertorio, lineUp, roles);
 		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
 		TransaccionAsignacionDeTodasLasCanciones transaccion = recital.contratarArtistasParaTodasLasCanciones();
-		assertTrue(transaccion.sePuedenEntrenarParaTodosLosRoles(), "SARASa");
+		assertTrue(transaccion.sePuedenEntrenarParaTodosLosRoles());
+		assertEquals(EstadoDeTransaccion.EN_CURSO, transaccion.getEstadoDeTransaccion());
+		assertFalse(cantanteContratado.getRoles().contains(saxofon));
+		assertFalse(cantanteContratado.getRoles().contains(armonica));
+		assertFalse(bateristaContratado.getRoles().contains(armonica));
+		assertFalse(bajistaContratado.getRoles().contains(saxofon));
 		transaccion.entrenarArtistasRecomendadosYAsignarLosCandidatos(OpcionDeTransaccion.SI);
+		assertTrue(cantanteContratado.getRoles().contains(saxofon));
+		assertTrue(cantanteContratado.getRoles().contains(armonica));
+		assertTrue(bateristaContratado.getRoles().contains(armonica));
+		assertTrue(bajistaContratado.getRoles().contains(saxofon));
 		assertTrue(transaccion.esTransaccionCommitted());
 		assertEquals(expectedCuposDisponibles, cancion2.getCantDeCuposDisponibles());
 		assertEquals(expectedCuposDisponibles, cancion3.getCantDeCuposDisponibles());
 	}
 
-//	quitarArtista
+	@Test
+	void contratacionFallidaaDeTodasLasCancionesPorNoQuererEntrenarAArtistasContratados() {
+		ArtistaBase bajistaYPianistaContratado = new ArtistaBase("Kamasi Washington",
+				new ArrayList<>(List.of(bajo, piano)),
+				new ArrayList<>(List.of(new BandaHistorico("Kamasi Washington"))));
+		cancion2 = Cancion.crearCancionSinIntegrantesAsignados("Román", new ArrayList<>(List.of(armonica, saxofon)));
+		cancion3 = Cancion.crearCancionSinIntegrantesAsignados("220",
+				new ArrayList<>(List.of(piano, armonica, saxofon, bateria)));
+		repertorio.addLast(cancion2);
+		repertorio.addLast(cancion3);
+		lineUp = new ArrayList<>(
+				List.of(bajistaContratado, cantanteContratado, bateristaContratado, bajistaYPianistaContratado));
+		recital = new Recital(repertorio, lineUp, roles);
+		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
+		TransaccionAsignacionDeTodasLasCanciones transaccion = recital.contratarArtistasParaTodasLasCanciones();
+		assertTrue(transaccion.sePuedenEntrenarParaTodosLosRoles());
+		assertEquals(EstadoDeTransaccion.EN_CURSO, transaccion.getEstadoDeTransaccion());
+		assertFalse(cantanteContratado.getRoles().contains(saxofon));
+		assertFalse(cantanteContratado.getRoles().contains(armonica));
+		assertFalse(bateristaContratado.getRoles().contains(armonica));
+		assertFalse(bajistaContratado.getRoles().contains(saxofon));
+		transaccion.entrenarArtistasRecomendadosYAsignarLosCandidatos(OpcionDeTransaccion.NO);
+		assertFalse(cantanteContratado.getRoles().contains(saxofon));
+		assertFalse(cantanteContratado.getRoles().contains(armonica));
+		assertFalse(bateristaContratado.getRoles().contains(armonica));
+		assertFalse(bajistaContratado.getRoles().contains(saxofon));
+		assertEquals(EstadoDeTransaccion.CANCELADA, transaccion.getEstadoDeTransaccion());
+		assertEquals(2, cancion2.getCantDeCuposDisponibles());
+		assertEquals(4, cancion3.getCantDeCuposDisponibles());
+	}
+
 	@Test
 	void sePuedeQuitarArtistaBaseDeUnaCancion() {
 		int expectedCuposDisponibles = 1;
