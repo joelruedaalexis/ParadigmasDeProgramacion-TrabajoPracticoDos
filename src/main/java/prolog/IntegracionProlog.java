@@ -65,14 +65,13 @@ public class IntegracionProlog {
             generarHechosDeRecital();
             agregarReglasEstaticas();
 
-            // Escribir archivo final
             try (PrintWriter pw = new PrintWriter(new FileWriter(outputPath))) {
                 for (String l : lineas) {
                     pw.println(l);
                 }
             }
 
-            System.out.println("Base de conocimiento generada en: " + canonicalPath);
+            //System.out.println("Base de conocimiento generada en: " + canonicalPath);
 
         } catch (IOException e) {
             throw new RuntimeException("Error de I/O al generar la base Prolog.", e);
