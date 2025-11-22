@@ -266,10 +266,9 @@ public class Recital {
 	}
 
 //	prolog = 8
-	public void prolog() {
+	public int prolog() {
 		IntegracionProlog.generarBaseDeConocimiento();
-		System.out.println("El número mínimo de entrenamientos para cubrir el recital es: "
-				+ IntegracionProlog.consultarEntrenamientosMinimos());
+		return IntegracionProlog.consultarEntrenamientosMinimos();
 	}
 
 //	quitarArtistaDeCancion = 9
@@ -512,5 +511,23 @@ public class Recital {
 				listado.put(artista.getNombre(), i);
 		}
 		return listado;
+	}
+
+	public String getInformacionDeArtistasDeDiscografia() {
+		String str = "";
+		for (ArtistaBase artista : lineUp) {
+			if (artista.perteneceADiscografica()) {
+				str += artista.toString() + "\n";
+			}
+		}
+		return str;
+	}
+
+	public String getInformacionDeLineUp() {
+		String str = "";
+		for (ArtistaBase artista : lineUp) {
+			str += artista.toString() + "\n";
+		}
+		return str;
 	}
 }

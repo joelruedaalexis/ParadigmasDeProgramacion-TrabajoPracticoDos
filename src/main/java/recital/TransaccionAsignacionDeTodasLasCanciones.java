@@ -171,7 +171,7 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 			return getInformeParaAsignacionExitosa();
 		else if (estado == EstadoDeTransaccion.EN_CURSO)
 			return getInformeParaFallaEnAsignacion();
-		return "No hay artistas suficientes para entrenar en todos los roles";
+		return "No hay artistas suficientes para ocupar en todos los roles";
 	}
 
 	private String getInformeParaFallaEnAsignacion() {
@@ -183,7 +183,6 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 				this.artistasXCantDisponiblesDeCanciones);
 		Iterator<Cancion> iterador = cancionesConRolesFaltantes.iterator();
 		Set<ArtistaBase> artistasUsadosEnCancion = new HashSet<>();
-//		Map<String, List<ArtistaBase>>
 		while (iterador.hasNext()) {
 			Cancion cancion = iterador.next();
 			artistasUsadosEnCancion = getCandidatosDeCancion(cancion);
@@ -193,9 +192,7 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 				if (!integrantesXRol.getValue().hayCuposDisponibles())
 					continue;
 				String rol = integrantesXRol.getKey();
-				IntegranteDeUnRol integrantesDeUnRol = new IntegranteDeUnRol(integrantesXRol.getValue());// <---
-																											// CHEQUEAR
-																											// ESTO
+				IntegranteDeUnRol integrantesDeUnRol = new IntegranteDeUnRol(integrantesXRol.getValue());
 				int cupos = integrantesDeUnRol.getCantDeCuposDisponibles();
 				List<ArtistaBase> listaArtistasEntrenadosEnRol;
 				if (!artistasEntrenadosEnRol.containsKey(rol)) {
