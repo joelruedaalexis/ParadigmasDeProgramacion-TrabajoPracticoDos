@@ -21,7 +21,6 @@ public class ArtistaContratado extends ArtistaBase {
 		return maxCanciones;
 	}
 
-//	probado
 	public boolean entrenarNuevoRol(String nuevoRol) {
 		if (nuevoRol == null)
 			throw new IllegalArgumentException("El rol no puede ser null.");
@@ -32,25 +31,21 @@ public class ArtistaContratado extends ArtistaBase {
 		return true;
 	}
 
-//	probado
 	@Override
 	public boolean perteneceADiscografica() {
 		return false;
 	}
 
-//	probado
 	@Override
 	public double getCosto() {
 		return tieneDescuento() ? super.getCosto() * 0.5 : super.getCosto();
 	}
 
-//	probado
 	@Override
 	public boolean puedeSerAsignadoACancion() {
 		return this.maxCanciones > 0;
 	}
 
-//	probado
 	@Override
 	public boolean asignar(Cancion cancion) {
 		if (cancion == null)
@@ -71,10 +66,9 @@ public class ArtistaContratado extends ArtistaBase {
 		if (getClass() != obj.getClass())
 			return false;
 		ArtistaContratado other = (ArtistaContratado) obj;
-		return Objects.equals(nombre, other.nombre);
+		return Objects.equals(this.getNombre(), other.getNombre());
 	}
 
-	// probado
 	@Override
 	public boolean designar(Cancion cancion) {
 		if (cancion == null)
@@ -99,7 +93,6 @@ public class ArtistaContratado extends ArtistaBase {
 		return str;
 	}
 
-//	probado
 	@Override
 	public boolean tieneDescuento() {
 		for (int i = 0; i < getListaDeBandas().size(); i++)
@@ -108,7 +101,6 @@ public class ArtistaContratado extends ArtistaBase {
 		return false;
 	}
 
-//	probado
 	@Override
 	public JsonObject toJson() {
 		JsonObject artistaJSON = super.toJson();

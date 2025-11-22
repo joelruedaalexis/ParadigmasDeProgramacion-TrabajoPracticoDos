@@ -91,6 +91,14 @@ public class Cancion {
 		return rolesFaltantesXCupos;
 	}
 
+	public boolean tieneRolesDisponibles() {
+		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol) {
+			if (integrantesDeRol.hayCuposDisponibles())
+				return true;
+		}
+		return false;
+	}
+
 	public List<ArtistaBase> getListadoDeIntegrantes() {
 		List<ArtistaBase> listadoDeIntegrantes = new ArrayList<>();
 		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol) {

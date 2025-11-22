@@ -92,7 +92,12 @@ public class Menu {
 				}
 				break;
 			case contratarArtistasParaUnaCancion:// 3
-				indexCancion = elegirCancion();
+				Map<String, Integer> cancionesConRolesDisponibles = recital.getTitulosDeCancionesConRolesDisponibles();
+				if (cancionesConRolesDisponibles.isEmpty()) {
+					System.out.println("Todas las canciones ya tienen artistas asignados");
+					break;
+				}
+				indexCancion = elegirCancion(cancionesConRolesDisponibles);
 				TransaccionAsignacionDeCancion transaccion1 = recital.contratarArtistasParaUnaCancion(indexCancion);
 				System.out.println(transaccion1.getInformeDeAsignacionDeArtistas());
 				if (transaccion1.esTransaccionEnCurso()) {
@@ -134,7 +139,6 @@ public class Menu {
 				break;
 			case listarCanciones:// 7
 				System.out.println(recital.getInformacionCompletaDelRepertorio());
-//				this.imprimirListadoDeCanciones();
 				break;
 			case prolog:// 8
 				recital.prolog();
@@ -226,6 +230,16 @@ public class Menu {
 			System.out.printf("%02d) %s\n", i + 1, cancionero.get(i));
 		}
 		return ingresarOpcionVal(1, cancionero.size()) - 1;
+	}
+
+	public int elegirCancion(Map<String, Integer> cancionesConRolesDisponibles) {
+		List<String> cancionero = List.copyOf(cancionesConRolesDisponibles.keySet());
+		System.out.println("Repertorio:");
+		for (int i = 0; i < cancionero.size(); i++) {
+			System.out.printf("%02d) %s\n", i + 1, cancionero.get(i));
+		}
+		int index = ingresarOpcionVal(1, cancionero.size()) - 1;
+		return cancionesConRolesDisponibles.get(cancionero.get(index));
 	}
 
 	public int elegirArtistaAQuitarDeTodasLasCanciones(List<String> lista) {

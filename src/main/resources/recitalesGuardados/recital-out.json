@@ -17,22 +17,26 @@
         {
           "rol": "armónica",
           "integrantes": [
-            "vacante",
-            "vacante",
-            "vacante",
-            "vacante",
-            "vacante"
+            "Lisa Stansfield",
+            "Annie Lennox",
+            "George Michael",
+            "Elton John",
+            "David Bowie"
           ]
         }
       ],
-      "costo": 0.0
+      "costo": 8100.0
     },
     {
-      "titulo": "On Top",
+      "titulo": "Somebody told Me",
       "rolesXArtista": [
         {
           "rol": "armónica",
           "integrantes": [
+            "vacante",
+            "vacante",
+            "vacante",
+            "vacante",
             "vacante"
           ]
         }
@@ -44,59 +48,64 @@
     {
       "nombre": "Annie Lennox",
       "roles": [
-        "voz principal"
+        "voz principal",
+        "armónica"
       ],
       "bandas": [
         "Eurythmics"
       ],
-      "costo": 900.0,
-      "maxCanciones": 1
+      "costo": 1350.0,
+      "maxCanciones": 2
     },
     {
       "nombre": "David Bowie",
       "roles": [
-        "voz principal"
+        "voz principal",
+        "armónica"
       ],
       "bandas": [
         "Tin Machine",
         "David Bowie"
       ],
-      "costo": 1500.0,
-      "maxCanciones": 1
+      "costo": 2250.0,
+      "maxCanciones": 2
     },
     {
       "nombre": "Elton John",
       "roles": [
         "voz principal",
-        "piano"
+        "piano",
+        "armónica"
       ],
       "bandas": [
         "Elton John Band"
       ],
-      "costo": 1200.0,
-      "maxCanciones": 1
+      "costo": 1800.0,
+      "maxCanciones": 2
     },
     {
       "nombre": "George Michael",
       "roles": [
-        "voz principal"
+        "voz principal",
+        "armónica"
       ],
       "bandas": [
         "Wham!",
         "George Michael"
       ],
-      "costo": 1000.0,
-      "maxCanciones": 1
+      "costo": 1500.0,
+      "maxCanciones": 3
     },
     {
       "nombre": "Lisa Stansfield",
       "roles": [
-        "voz principal"
+        "voz principal",
+        "armónica"
       ],
       "bandas": [
         "Lisa Stansfield"
       ],
-      "costo": 800.0,
+      "costo": 1200.0,
       "maxCanciones": 1
     }
   ]

@@ -469,6 +469,15 @@ public class Recital {
 		return titulos;
 	}
 
+	public Map<String, Integer> getTitulosDeCancionesConRolesDisponibles() {
+		Map<String, Integer> canciones = new HashMap<>();
+		for (int i = 0; i < repertorio.size(); i++) {
+			if (repertorio.get(i).tieneRolesDisponibles())
+				canciones.put(repertorio.get(i).getTitulo(), i);
+		}
+		return canciones;
+	}
+
 	public List<String> getListaDeNombresDeArtistasQueEstanAsignadosAlMenosACancion() {
 		List<String> artistasAsignadosAUnaCancion = new ArrayList<>();
 		for (ArtistaBase artista : lineUp) {
