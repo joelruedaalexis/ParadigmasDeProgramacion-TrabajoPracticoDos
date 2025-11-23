@@ -44,7 +44,6 @@ public class Importacion {
 		List<ArtistaBase> lineUp = new ArrayList<>();
 		JsonArray json = JsonParser.parseReader(fileReader).getAsJsonArray();
 		Map<String, BandaHistorico> repositorioBanda = new HashMap<>();
-//		Map<String, List<ArtistaBase>> bandaXIntegrantes = new HashMap<>();
 		ArtistaBase artista;
 		for (JsonElement jsonArtistaElement : json) {
 			JsonObject jsonArtistaObject = jsonArtistaElement.getAsJsonObject();

@@ -2,8 +2,7 @@ package artista;
 
 import java.util.Comparator;
 
-public class ComparadorArtistaPorCostoDeCancion implements Comparator<ArtistaBase>{
-
+public class ComparadorArtistaPorCostoDeCancion implements Comparator<ArtistaBase> {
 	@Override
 	public int compare(ArtistaBase o1, ArtistaBase o2) {
 		// TODO Auto-generated method stub
