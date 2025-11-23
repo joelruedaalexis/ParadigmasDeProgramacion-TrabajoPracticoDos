@@ -112,7 +112,7 @@ public class Menu {
 			case contratarArtistasParaTodasLasCanciones:// 4
 				TransaccionAsignacionDeTodasLasCanciones transaccion2 = recital
 						.contratarArtistasParaTodasLasCanciones();
-				System.out.println(transaccion2.getInformeDeAsignacionesDeArtistas());
+				System.out.println(transaccion2.getInformeDeAsignacionDeArtistas());
 				if (transaccion2.getEstadoDeTransaccion() == EstadoDeTransaccion.EN_CURSO) {
 					System.out.printf(
 							"Seleccione la opcion \"Si\" si desea entrenarlos y luego se asignarán automaticamente a la canción:\n"

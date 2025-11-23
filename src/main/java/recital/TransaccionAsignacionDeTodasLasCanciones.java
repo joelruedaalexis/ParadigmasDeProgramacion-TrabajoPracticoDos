@@ -14,12 +14,10 @@ import artista.ArtistaContratado;
 import cancion.Cancion;
 import cancion.IntegranteDeUnRol;
 
-public class TransaccionAsignacionDeTodasLasCanciones {
-	private EstadoDeTransaccion estado;
+public class TransaccionAsignacionDeTodasLasCanciones extends Transaccion {
 	private Map<Cancion, Map<String, IntegranteDeUnRol>> artistasCandidatosAsignadosACancion;
 	private Set<Cancion> cancionesConRolesFaltantes;
 	private Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones;
-	private List<ArtistaBase> artistasDisponiblesParaSerEntrenados;
 	private Map<String, List<ArtistaBase>> artistasEntrenadosEnRol;
 
 	protected TransaccionAsignacionDeTodasLasCanciones(
@@ -28,54 +26,7 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 		estado = EstadoDeTransaccion.EN_CURSO;
 	}
 
-	protected void confirmarTransaccion() {
-		estado = EstadoDeTransaccion.CONFIRMADA;
-	}
-
-	public boolean esTransaccionCommitted() {
-		return estado == EstadoDeTransaccion.CONFIRMADA;
-	}
-
-	public EstadoDeTransaccion getEstadoDeTransaccion() {
-		return estado;
-	}
-
-	public boolean sePuedenEntrenarParaTodosLosRoles() {
-		int cuposDeCancion = 0;
-		Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones = new HashMap<>(
-				this.artistasXCantDisponiblesDeCanciones);
-		for (Map.Entry<Cancion, Map<String, IntegranteDeUnRol>> nodo : artistasCandidatosAsignadosACancion.entrySet()) {
-			Cancion cancion = nodo.getKey();
-			cuposDeCancion = 0;
-			for (Map.Entry<String, IntegranteDeUnRol> integrantesDeRolDeCancion : nodo.getValue().entrySet()) {
-				IntegranteDeUnRol integranteDeUnRol = integrantesDeRolDeCancion.getValue();
-				cuposDeCancion += integranteDeUnRol.getCantDeCuposDisponibles();
-			}
-			Set<ArtistaBase> candidatosUsadosEnCancion = getCandidatosDeCancion(cancion);
-			for (int i = 0; i < artistasDisponiblesParaSerEntrenados.size() && cuposDeCancion > 0; i++) {
-				ArtistaBase artista = artistasDisponiblesParaSerEntrenados.get(i);
-				if (!candidatosUsadosEnCancion.contains(artista)
-						&& artistasXCantDisponiblesDeCanciones.get(artista) > 0) {
-					artistasXCantDisponiblesDeCanciones.put(artista,
-							artistasXCantDisponiblesDeCanciones.get(artista) - 1);
-					cuposDeCancion--;
-				}
-			}
-			if (cuposDeCancion != 0)
-				return false;
-		}
-		return true;
-	}
-
-	private Set<ArtistaBase> getCandidatosDeCancion(Cancion cancion) {
-		Set<ArtistaBase> candidatosUsadosEnCancion = new HashSet<>();
-		for (Map.Entry<String, IntegranteDeUnRol> integrantesDeRol : artistasCandidatosAsignadosACancion.get(cancion)
-				.entrySet()) {
-			candidatosUsadosEnCancion.addAll(integrantesDeRol.getValue().getListaDeIntegrantes());
-		}
-		return candidatosUsadosEnCancion;
-	}
-
+	@Override
 	public String entrenarArtistasRecomendadosYAsignarLosCandidatos(int opcion) {
 		if (estado != EstadoDeTransaccion.EN_CURSO)
 			throw new IllegalStateException(
@@ -153,28 +104,28 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 		return str;
 	}
 
-	protected void registrarFallaEnAsignacion(Set<Cancion> cancionesConRolesFaltantes,
-			Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones, List<ArtistaBase> artistasDisponibles) {
-		this.cancionesConRolesFaltantes = cancionesConRolesFaltantes;
-		this.artistasXCantDisponiblesDeCanciones = artistasXCantDisponiblesDeCanciones;
-
-		this.artistasDisponiblesParaSerEntrenados = artistasDisponibles.stream()
-				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAlmenosAUnaCancion())
-				.collect(Collectors.toList());
-
-		if (!sePuedenEntrenarParaTodosLosRoles())
-			estado = EstadoDeTransaccion.CANCELADA;
+	private Set<ArtistaBase> getCandidatosDeCancion(Cancion cancion) {
+		Set<ArtistaBase> candidatosUsadosEnCancion = new HashSet<>();
+		for (Map.Entry<String, IntegranteDeUnRol> integrantesDeRol : artistasCandidatosAsignadosACancion.get(cancion)
+				.entrySet()) {
+			candidatosUsadosEnCancion.addAll(integrantesDeRol.getValue().getListaDeIntegrantes());
+		}
+		return candidatosUsadosEnCancion;
 	}
 
-	public String getInformeDeAsignacionesDeArtistas() {
-		if (estado == EstadoDeTransaccion.CONFIRMADA)
-			return getInformeParaAsignacionExitosa();
-		else if (estado == EstadoDeTransaccion.EN_CURSO)
-			return getInformeParaFallaEnAsignacion();
-		return "No hay artistas suficientes para ocupar en todos los roles";
+	public EstadoDeTransaccion getEstadoDeTransaccion() {
+		return estado;
 	}
 
-	private String getInformeParaFallaEnAsignacion() {
+	protected String getInformeParaAsignacionExitosa() {
+		String str = "Se han asignados los artistas con éxito. La información actualizada de las canciones son:\n";
+		for (Cancion cancion : artistasCandidatosAsignadosACancion.keySet()) {
+			str += "->" + cancion.toString();
+		}
+		return str;
+	}
+
+	protected String getInformeParaFallaEnAsignacion() {
 		String str = "Para completar todos los roles del repertorio se necesitan entrenar a artistas. "
 				+ "Las canciones y roles con espacios disponibles son :\n";
 		artistasEntrenadosEnRol = new HashMap<>();
@@ -233,11 +184,44 @@ public class TransaccionAsignacionDeTodasLasCanciones {
 		return str;
 	}
 
-	private String getInformeParaAsignacionExitosa() {
-		String str = "Se han asignados los artistas con éxito. La información actualizada de las canciones son:\n";
-		for (Cancion cancion : artistasCandidatosAsignadosACancion.keySet()) {
-			str += "->" + cancion.toString();
+	protected void registrarFallaEnAsignacion(Set<Cancion> cancionesConRolesFaltantes,
+			Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones, List<ArtistaBase> artistasDisponibles) {
+		this.cancionesConRolesFaltantes = cancionesConRolesFaltantes;
+		this.artistasXCantDisponiblesDeCanciones = artistasXCantDisponiblesDeCanciones;
+
+		this.artistasDisponiblesParaSerEntrenados = artistasDisponibles.stream()
+				.filter(a -> !a.perteneceADiscografica() && !a.estaAsignadoAlmenosAUnaCancion())
+				.collect(Collectors.toList());
+
+		if (!sePuedenEntrenarParaTodosLosRoles())
+			estado = EstadoDeTransaccion.CANCELADA;
+	}
+
+	@Override
+	public boolean sePuedenEntrenarParaTodosLosRoles() {
+		int cuposDeCancion = 0;
+		Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones = new HashMap<>(
+				this.artistasXCantDisponiblesDeCanciones);
+		for (Map.Entry<Cancion, Map<String, IntegranteDeUnRol>> nodo : artistasCandidatosAsignadosACancion.entrySet()) {
+			Cancion cancion = nodo.getKey();
+			cuposDeCancion = 0;
+			for (Map.Entry<String, IntegranteDeUnRol> integrantesDeRolDeCancion : nodo.getValue().entrySet()) {
+				IntegranteDeUnRol integranteDeUnRol = integrantesDeRolDeCancion.getValue();
+				cuposDeCancion += integranteDeUnRol.getCantDeCuposDisponibles();
+			}
+			Set<ArtistaBase> candidatosUsadosEnCancion = getCandidatosDeCancion(cancion);
+			for (int i = 0; i < artistasDisponiblesParaSerEntrenados.size() && cuposDeCancion > 0; i++) {
+				ArtistaBase artista = artistasDisponiblesParaSerEntrenados.get(i);
+				if (!candidatosUsadosEnCancion.contains(artista)
+						&& artistasXCantDisponiblesDeCanciones.get(artista) > 0) {
+					artistasXCantDisponiblesDeCanciones.put(artista,
+							artistasXCantDisponiblesDeCanciones.get(artista) - 1);
+					cuposDeCancion--;
+				}
+			}
+			if (cuposDeCancion != 0)
+				return false;
 		}
-		return str;
+		return true;
 	}
 }

@@ -249,7 +249,7 @@ class RecitalTest {
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
 		assertFalse(transaccion.esTransaccionCommitted());
 		assertEquals(EstadoDeTransaccion.CANCELADA, transaccion.getEstadoDeTransaccion());
-		assertFalse(transaccion.sePuedenEntrenarArtistasSuficientes());
+		assertFalse(transaccion.sePuedenEntrenarParaTodosLosRoles());
 	}
 
 	@Test
@@ -285,7 +285,7 @@ class RecitalTest {
 		assertTrue(recital.contratarArtistasParaUnaCancion(indexCancion2).esTransaccionCommitted());
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion3);
 		assertFalse(transaccion.esTransaccionCommitted());
-		assertFalse(transaccion.sePuedenEntrenarArtistasSuficientes());
+		assertFalse(transaccion.sePuedenEntrenarParaTodosLosRoles());
 		assertEquals(expectedCuposDisponibles, cancion4.getCantDeCuposDisponibles());
 
 	}
@@ -302,7 +302,7 @@ class RecitalTest {
 		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
 		assertFalse(transaccion.esTransaccionCommitted());
-		assertTrue(transaccion.sePuedenEntrenarArtistasSuficientes());
+		assertTrue(transaccion.sePuedenEntrenarParaTodosLosRoles());
 		assertFalse(bateristaContratado.getRoles().contains(piano));
 		assertFalse(cantanteContratado.getRoles().contains(piano));
 		assertFalse(bajistaContratado.getRoles().contains(armonica));
@@ -327,7 +327,7 @@ class RecitalTest {
 		assertTrue(cancion2.getListadoDeIntegrantes().isEmpty());
 		TransaccionAsignacionDeCancion transaccion = recital.contratarArtistasParaUnaCancion(indexCancion2);
 		assertFalse(transaccion.esTransaccionCommitted());
-		assertTrue(transaccion.sePuedenEntrenarArtistasSuficientes());
+		assertTrue(transaccion.sePuedenEntrenarParaTodosLosRoles());
 		assertFalse(bateristaContratado.getRoles().contains(piano));
 		assertFalse(cantanteContratado.getRoles().contains(piano));
 		assertFalse(bajistaContratado.getRoles().contains(armonica));
