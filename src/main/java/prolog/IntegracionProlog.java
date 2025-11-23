@@ -26,60 +26,74 @@ import org.jpl7.Query;
 import org.jpl7.Term;
 import org.jpl7.Variable;
 
-
 public class IntegracionProlog {
 
     private static final String ARTISTAS_JSON_PATH = "assets/artistas.json";
     private static final String RECITAL_JSON_PATH = "assets/recital.json";
     private static final String DISCOGRAFICA_JSON_PATH = "assets/artistas-discografica.json";
-    private static final String PL_FILE_NAME = "base-de-conocimiento-prolog.pl";
-    private static final String ASSETS_FOLDER = "assets";
-    private static final String SRC_FOLDER = "src";
 
-    // Las líneas finales del archivo (sin ordenar)
+    private static final String OUTPUT_DIR = "target/prolog";
+    private static final String PL_FILE_NAME = "base-de-conocimiento-prolog.pl";
+
     private static final List<String> lineas = new ArrayList<>();
 
-
-    // =====================================================================
-    // GENERAR BASE DE CONOCIMIENTO
-    // =====================================================================
     public static void generarBaseDeConocimiento() {
 
         lineas.clear();
 
         try {
-            String relativeFilePath = "." + File.separator + SRC_FOLDER +
-                    File.separator + ASSETS_FOLDER + File.separator + PL_FILE_NAME;
+            // Crear carpeta target/prolog si no existe
+            File dir = new File(OUTPUT_DIR);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
 
-            String canonicalPath = new File(relativeFilePath).getCanonicalPath();
+            String outputPath = OUTPUT_DIR + File.separator + PL_FILE_NAME;
 
-            // Marca al inicio
             lineas.add("% --- GENERADO AUTOMATICAMENTE DESDE JAVA ---");
 
-            // bloques (no se ordenan, solo sus hechos internos)
             generarHechosDeArtistas();
             generarHechosDeDiscografica();
             generarHechosDeRecital();
             agregarReglasEstaticas();
 
-            // escribir archivo final
-            try (PrintWriter pw = new PrintWriter(new FileWriter(relativeFilePath))) {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(outputPath))) {
                 for (String l : lineas) {
                     pw.println(l);
                 }
             }
 
-            System.out.println("Base de conocimiento generada en: " + canonicalPath);
+            //System.out.println("Base de conocimiento generada en: " + canonicalPath);
 
         } catch (IOException e) {
             throw new RuntimeException("Error de I/O al generar la base Prolog.", e);
         }
     }
+    
+    public static void generarBaseDeConocimientoEn(String path) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(path))) {
 
+            pw.println("% --- GENERADO AUTOMATICAMENTE DESDE JAVA ---");
+            pw.println("");
 
-    // =====================================================================
-    // HECHOS: ARTISTAS + HABILIDADES + HISTORIAL + COSTOS + MAX CANCIONES
-    // =====================================================================
+            pw.println("artista(agustin_cruz, contratado).");
+            pw.println("rol_instancia(i1, voz_principal).");
+            pw.println("costo_base(agustin_cruz, 500).");
+            pw.println("");
+
+            pw.println("% --- REGLAS ESTÁTICAS DE COSTE ---");
+            pw.println("coste_entrenamiento(A, R, 0) :- habilidad(A, R).");
+            pw.println("coste_entrenamiento(A, R, 1) :- artista(A, _), \\+ habilidad(A, R).");
+
+            pw.flush();
+
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo generar el archivo PL: " + path, e);
+        }
+
+        System.out.println("Base generada en: " + path);
+    }
+
     public static void generarHechosDeArtistas() throws IOException {
 
         lineas.add("\n% --- HECHOS DE ARTISTAS Y HABILIDADES ---");
@@ -114,8 +128,8 @@ public class IntegracionProlog {
                 // habilidades
                 if (jsonArtista.has("roles") && jsonArtista.get("roles").isJsonArray()) {
                     for (JsonElement r : jsonArtista.getAsJsonArray("roles")) {
-                        String rol = toPrologAtom(r.getAsString());
-                        bloque.add(String.format("habilidad(%s, %s).", atom, rol));
+                        bloque.add(String.format("habilidad(%s, %s).",
+                                atom, toPrologAtom(r.getAsString())));
                     }
                 }
 
@@ -123,7 +137,8 @@ public class IntegracionProlog {
                 if (jsonArtista.has("historial") && jsonArtista.get("historial").isJsonArray()) {
                     for (JsonElement h : jsonArtista.getAsJsonArray("historial")) {
                         if (!h.isJsonNull()) {
-                            bloque.add(String.format("historial(%s, %s).", atom, toPrologAtom(h.getAsString())));
+                            bloque.add(String.format("historial(%s, %s).",
+                                    atom, toPrologAtom(h.getAsString())));
                         }
                     }
                 }
@@ -135,12 +150,10 @@ public class IntegracionProlog {
                 if (jsonArtista.has("maxCanciones") && !jsonArtista.get("maxCanciones").isJsonNull()) {
                     try { max = jsonArtista.get("maxCanciones").getAsInt(); } catch (Exception ignored) {}
                 }
-
                 bloque.add(String.format("max_canciones(%s, %d).", atom, max));
 
                 // contratado sin experiencia
                 boolean tieneRoles = jsonArtista.has("roles")
-                        && jsonArtista.get("roles").isJsonArray()
                         && jsonArtista.get("roles").getAsJsonArray().size() > 0;
 
                 if ("contratado".equals(tipo) && !tieneRoles) {
@@ -153,10 +166,6 @@ public class IntegracionProlog {
         lineas.addAll(bloque);
     }
 
-
-    // =====================================================================
-    // HECHOS: DISCOGRAFICA
-    // =====================================================================
     public static void generarHechosDeDiscografica() throws IOException {
 
         lineas.add("\n% --- MIEMBROS DE DISCOGRAFICA (ARTISTAS BASE) ---");
@@ -184,10 +193,6 @@ public class IntegracionProlog {
         lineas.addAll(bloque);
     }
 
-
-    // =====================================================================
-    // HECHOS: RECITAL → rol_instancia/2 + total_instancias_rol/1
-    // =====================================================================
     public static void generarHechosDeRecital() throws IOException {
 
         lineas.add("\n% --- HECHOS DE ROLES REQUERIDOS (POR CADA CANCION) ---");
@@ -214,8 +219,8 @@ public class IntegracionProlog {
                         && cancion.get("rolesRequeridos").isJsonArray()) {
 
                     for (JsonElement r : cancion.getAsJsonArray("rolesRequeridos")) {
-                        String rol = toPrologAtom(r.getAsString());
-                        bloque.add(String.format("rol_instancia(i%d, %s).", id++, rol));
+                        bloque.add(String.format("rol_instancia(i%d, %s).",
+                                id++, toPrologAtom(r.getAsString())));
                     }
                 }
             }
@@ -227,10 +232,6 @@ public class IntegracionProlog {
         lineas.add(String.format("total_instancias_rol(%d).", id - 1));
     }
 
-
-    // =====================================================================
-    // REGLAS (NO se ordenan)
-    // =====================================================================
     private static void agregarReglasEstaticas() {
 
         lineas.add("\n% --- REGLAS ESTÁTICAS DE COSTE ---");
@@ -238,10 +239,27 @@ public class IntegracionProlog {
         lineas.add("coste_entrenamiento(A, R, 1) :- artista(A, _), \\+ habilidad(A, R).");
 
         lineas.add("\n% --- REGLAS PARA CALCULAR ENTRENAMIENTOS MINIMOS ---");
+
+        // Cantidad de veces que se requiere un rol
         lineas.add("requeridas(Rol, Cant) :- findall(1, rol_instancia(_, Rol), L), length(L, Cant).");
-        lineas.add("base_saben(Rol, Cant) :- findall(A, (habilidad(A, Rol), artista(A, base)), L), length(L, Cant).");
-        lineas.add("entrenamientos_necesarios(Rol, Ent) :- requeridas(Rol, Req), base_saben(Rol, Base), "
-                + "Temp is Req - Base, (Temp > 0 -> Ent = Temp ; Ent = 0).");
+
+        // Lista de artistas base que saben el rol
+        lineas.add("base_saben(Rol, Lista) :- findall(A, (habilidad(A, Rol), artista(A, base)), Lista).");
+
+        // Capacidad total de los artistas base según max_canciones/2
+        lineas.add("capacidad_total(Rol, Capacidad) :- "
+                + "base_saben(Rol, Lista), "
+                + "findall(Max, (member(A, Lista), max_canciones(A, Max)), Maximos), "
+                + "sumlist(Maximos, Capacidad).");
+
+        // Entrenamientos necesarios considerando límite de canciones
+        lineas.add("entrenamientos_necesarios(Rol, Ent) :- "
+                + "requeridas(Rol, Req), "
+                + "capacidad_total(Rol, CapacidadBase), "
+                + "Temp is Req - CapacidadBase, "
+                + "(Temp > 0 -> Ent = Temp ; Ent = 0).");
+
+        // Suma total de entrenamientos mínimos
         lineas.add("entrenamientos_minimos(Total) :- "
                 + "setof(R, I^rol_instancia(I, R), Roles), "
                 + "findall(E, (member(R, Roles), entrenamientos_necesarios(R, E)), Lista), "
@@ -249,12 +267,9 @@ public class IntegracionProlog {
     }
 
 
-    // =====================================================================
-    // AUXILIARES
-    // =====================================================================
     private static String toPrologAtom(String s) {
         String n = Normalizer.normalize(s, Normalizer.Form.NFD);
-        n = n.replaceAll("\\p{M}", "");      // sin acentos
+        n = n.replaceAll("\\p{M}", "");
         n = n.toLowerCase();
         return n.replaceAll("[^a-z0-9_]", "_");
     }
@@ -265,18 +280,14 @@ public class IntegracionProlog {
         return String.format(Locale.US, "%s", d);
     }
 
-
-    // =====================================================================
-    // CONSULTA PROLOG
-    // =====================================================================
     public static int consultarEntrenamientosMinimos() {
 
-        String path = "./src/assets/base-de-conocimiento-prolog.pl";
+        String path = OUTPUT_DIR + File.separator + PL_FILE_NAME;
 
-        Query q1 = new Query(String.format("consult('%s')", path.replace("\\", "/")));
+        Query q1 = new Query("consult('" + path.replace("\\", "/") + "')");
 
         if (!q1.hasSolution())
-            throw new RuntimeException("No se pudo cargar el archivo Prolog.");
+            throw new RuntimeException("No se pudo cargar el archivo Prolog en: " + path);
 
         Variable total = new Variable("Total");
         Query q2 = new Query("entrenamientos_minimos", new Term[]{total});
@@ -284,9 +295,9 @@ public class IntegracionProlog {
         Map<String, Term> res = q2.oneSolution();
 
         if (res == null)
-            throw new RuntimeException("No se encontró solución.");
+            throw new RuntimeException("No se encontró solución al consultar Prolog.");
 
         return res.get("Total").intValue();
     }
-
 }
+
