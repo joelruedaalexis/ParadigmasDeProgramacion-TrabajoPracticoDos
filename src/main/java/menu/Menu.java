@@ -145,7 +145,8 @@ public class Menu {
 				System.out.println(recital.getInformacionCompletaDelRepertorio());
 				break;
 			case prolog:// 10
-				System.out.printf("El número mínimo de entrenamientos para cubrir el recital es: %d", recital.prolog());
+				System.out.printf("El número mínimo de entrenamientos para cubrir el recital es: %d\n",
+						recital.prolog());
 				break;
 			case quitarArtistaDeCancion:// 11
 				indexCancion = elegirCancion();
@@ -289,11 +290,6 @@ public class Menu {
 		}
 	}
 
-//	private static final int salir = 0, rolesFaltantesParaCancion = 1, rolesFaltantesParaTodasLasCanciones = 2,
-//			contratarArtistasParaUnaCancion = 3, contratarArtistasParaTodasLasCanciones = 4, entrenarArtista = 5,
-//			listarArtistasBase = 6, listarArtistasContratados = 7, listarLineUp = 8, listarCanciones = 9, prolog = 10,
-//			quitarArtistaDeCancion = 11, quitarArtistaDeTodasLasCanciones = 12, quitarArtistaContratadoDelLineUp = 13,
-//			guardarEstadoDelRecital = 14, cargarEstadoDelRecital = 15;
 	public void mostrarOpciones() {
 		System.out.println("Elija una de las siguientes opciones:");
 		System.out.printf(

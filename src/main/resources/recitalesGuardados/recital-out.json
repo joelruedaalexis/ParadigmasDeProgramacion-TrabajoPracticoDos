@@ -17,15 +17,15 @@
         {
           "rol": "armónica",
           "integrantes": [
-            "Lisa Stansfield",
-            "Annie Lennox",
-            "George Michael",
-            "Elton John",
-            "David Bowie"
+            "vacante",
+            "vacante",
+            "vacante",
+            "vacante",
+            "vacante"
           ]
         }
       ],
-      "costo": 8100.0
+      "costo": 0.0
     },
     {
       "titulo": "Somebody told Me",
@@ -46,67 +46,91 @@
   ],
   "lineUp": [
     {
+      "nombre": "Adrian Barilari",
+      "roles": [
+        "voz principal"
+      ],
+      "bandas": [
+        "Rata Blanca"
+      ],
+      "costo": 900.0,
+      "maxCanciones": 2
+    },
+    {
       "nombre": "Annie Lennox",
       "roles": [
-        "voz principal",
-        "armónica"
+        "voz principal"
       ],
       "bandas": [
         "Eurythmics"
       ],
-      "costo": 1350.0,
+      "costo": 900.0,
       "maxCanciones": 2
+    },
+    {
+      "nombre": "Brian May",
+      "roles": [
+        "guitarra eléctrica",
+        "voz secundaria"
+      ],
+      "bandas": [
+        "Queen"
+      ]
     },
     {
       "nombre": "David Bowie",
       "roles": [
-        "voz principal",
-        "armónica"
+        "voz principal"
       ],
       "bandas": [
         "Tin Machine",
         "David Bowie"
       ],
-      "costo": 2250.0,
+      "costo": 1500.0,
       "maxCanciones": 2
     },
     {
       "nombre": "Elton John",
       "roles": [
         "voz principal",
-        "piano",
-        "armónica"
+        "piano"
       ],
       "bandas": [
         "Elton John Band"
       ],
-      "costo": 1800.0,
+      "costo": 1200.0,
       "maxCanciones": 2
     },
     {
       "nombre": "George Michael",
       "roles": [
-        "voz principal",
-        "armónica"
+        "voz principal"
       ],
       "bandas": [
         "Wham!",
         "George Michael"
       ],
-      "costo": 1500.0,
+      "costo": 1000.0,
       "maxCanciones": 3
     },
     {
-      "nombre": "Lisa Stansfield",
+      "nombre": "John Deacon",
       "roles": [
-        "voz principal",
-        "armónica"
+        "bajo"
       ],
       "bandas": [
-        "Lisa Stansfield"
+        "Queen"
+      ]
+    },
+    {
+      "nombre": "Roger Taylor",
+      "roles": [
+        "batería",
+        "voz secundaria"
       ],
-      "costo": 1200.0,
-      "maxCanciones": 1
+      "bandas": [
+        "Queen"
+      ]
     }
   ]
 }

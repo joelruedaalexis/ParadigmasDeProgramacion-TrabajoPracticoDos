@@ -1,14 +1,14 @@
 [
 	{
    "nombre": "Brian May",
-   "roles": ["guitarra eléctrica", "voz secundaria"],
+   "roles": ["guitarra eléctrica", "voz secundaria","armónica"],
    "bandas": ["Queen"],
    "costo": 0,
    "maxCanciones": 100
  },
  {
    "nombre": "Roger Taylor",
-   "roles": ["batería", "voz secundaria"],
+   "roles": ["batería", "voz secundaria","armónica"],
    "bandas": ["Queen"],
    "costo": 0,
    "maxCanciones": 100
@@ -43,9 +43,16 @@
   },
   {
     "nombre": "Annie Lennox",
-    "roles": ["voz principal"],
+    "roles": ["voz principal","armónica"],
     "bandas": ["Eurythmics"],
     "costo": 900,
     "maxCanciones": 2
-  }
+  }	,
+	  {
+	    "nombre": "Adrian Barilari",
+	    "roles": ["voz principal","armónica"],
+	    "bandas": ["Rata Blanca"],
+	    "costo": 900,
+	    "maxCanciones": 2
+	  }
 ]
