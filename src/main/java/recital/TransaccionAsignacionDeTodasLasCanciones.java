@@ -98,7 +98,7 @@ public class TransaccionAsignacionDeTodasLasCanciones extends Transaccion {
 					cancion.agregarArtista(rol, artista);
 				}
 			}
-			str = cancion.toString() + "\n";
+			str += cancion.toString() + "\n";
 		}
 		estado = EstadoDeTransaccion.CONFIRMADA;
 		return str;
@@ -120,7 +120,7 @@ public class TransaccionAsignacionDeTodasLasCanciones extends Transaccion {
 	protected String getInformeParaAsignacionExitosa() {
 		String str = "Se han asignados los artistas con éxito. La información actualizada de las canciones son:\n";
 		for (Cancion cancion : artistasCandidatosAsignadosACancion.keySet()) {
-			str += "->" + cancion.toString();
+			str += cancion.toString();
 		}
 		return str;
 	}

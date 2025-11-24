@@ -255,13 +255,8 @@ public class Recital {
 //	listarCanciones = 7
 	public String getInformacionCompletaDelRepertorio() {
 		String str = "";
-		for (int i = 0; i < repertorio.size(); i++) {
-			Cancion cancion = repertorio.get(i);
-			double costoDeCancion = 0;
-			for (ArtistaBase artista : cancion.getListadoDeIntegrantes())
-				costoDeCancion += artista.getCosto();
-			str += cancion.toString() + String.format("  Y su costo es de $%.02f\n", costoDeCancion);
-		}
+		for (int i = 0; i < repertorio.size(); i++)
+			str += repertorio.get(i).toString();
 		return str;
 	}
 

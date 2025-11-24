@@ -147,22 +147,22 @@ public class IntegracionProlog {
 	private static void agregarReglasEstaticas() {
 		lineas.add("coste_entrenamiento(A, R, 0) :- habilidad(A, R).");
 		lineas.add("coste_entrenamiento(A, R, 1) :- artista(A, _), \\+ habilidad(A, R).");
-//		 Artistas base que saben el rol
+
 		lineas.add("saben_rol(Rol, Lista) :- findall(A, habilidad(A, Rol), Lista).");
-//		 Capacidad de artistas base (1 instancia por artista base)
+
 		lineas.add("capacidad_total(Rol, Cap) :- saben_rol(Rol, L), length(L, Cap).");
-//		 Cantidad de ese rol por canción (simultáneo)
+
 		lineas.add("cantidad_por_cancion(Cancion, Rol, Cant) :- "
 				+ "findall(1, rol_instancia(Cancion, Rol), L), length(L, Cant).");
-//		 Listado de todas las canciones
+
 		lineas.add("canciones(Lista) :- setof(C, R^rol_instancia(C, R), Lista).");
-//		 Máximo simultáneo del rol entre canciones
+
 		lineas.add("maximo_simultaneo(Rol, Max) :- " + "canciones(Cs), "
 				+ "findall(Cant, (member(C, Cs), cantidad_por_cancion(C, Rol, Cant)), L), " + "max_list(L, Max).");
-//		 Entrenamientos necesarios = max simultáneo – art existentes
+
 		lineas.add("entrenamientos_necesarios(Rol, Ent) :- " + "maximo_simultaneo(Rol, Max), "
 				+ "capacidad_total(Rol, Cap), " + "Temp is Max - Cap, " + "(Temp > 0 -> Ent = Temp ; Ent = 0).");
-//		 Suma total
+
 		lineas.add("entrenamientos_minimos(Total) :- " + "setof(R, I^rol_instancia(I, R), Roles), "
 				+ "findall(E, (member(R, Roles), entrenamientos_necesarios(R, E)), Lista), "
 				+ "sumlist(Lista, Total).");

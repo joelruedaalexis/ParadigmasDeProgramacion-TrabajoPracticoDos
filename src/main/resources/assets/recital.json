@@ -1,10 +1,6 @@
 [
   {
-    "titulo": "Somebody to Love",
-    "rolesRequeridos": ["bajo", "bajo", "bajo", "bajo", "bajo"]
-  },
-  {
-      "titulo": "sarasa",
-      "rolesRequeridos": ["bajo", "bajo", "bajo", "bajo", "bajo"]
-    }
+    "titulo": "Perro Dinamita",
+    "rolesRequeridos": ["saxofón", "armónica","batería","bajo"]
+  }
 ]

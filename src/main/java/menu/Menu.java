@@ -32,7 +32,8 @@ public class Menu {
 		this.scanner = scanner;
 		recitalesGuardados = Files.list(Paths.get("src", "main", "resources", "recitalesGuardados"))
 				.map(f -> f.getFileName().toString()).collect(Collectors.toList());
-		System.out.println(recitalesGuardados);
+		recitalesGuardados.sort(null);
+//		System.out.println(recitalesGuardados);
 	}
 
 	private int ingresarOpcionVal(int limInf, int limSup) {
@@ -120,7 +121,7 @@ public class Menu {
 							OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
 					int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
 					String informe = transaccion2.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
-					System.out.println(informe);
+					System.out.println("jijoi" + informe);
 				}
 				break;
 			case entrenarArtista:// 5
@@ -185,8 +186,9 @@ public class Menu {
 					recital.guardarEnArchivoJSON(Paths.get(rutaCarpetaRecitales, nombreArchivo).toString());
 					System.out.println("-> El archivo se ha guardado con éxito.");
 					recitalesGuardados.add(nombreArchivo);
+					recitalesGuardados.sort(null);
 				} catch (IOException e) {
-					System.out.println("-> Error al guardar el archivo: " + e.getMessage());
+					System.err.println("-> Error al guardar el archivo: " + e.getMessage());
 				}
 				break;
 			case cargarEstadoDelRecital:// 15
@@ -195,12 +197,13 @@ public class Menu {
 					break;
 				}
 				int op2 = cargarArchivoDelRecital();
-				String rutaArchivo = Paths.get(rutaCarpetaRecitales, recitalesGuardados.get(op2 - 1)).toString();
+				String nombreEstadoDeRecitalACargar = recitalesGuardados.get(op2 - 1);
+				String rutaArchivo = Paths.get(rutaCarpetaRecitales, nombreEstadoDeRecitalACargar).toString();
 				try {
 					recital.cargarEstadoDeArchivoJSON(rutaArchivo);
-					System.out.println("El archivo se ha cargado con éxito.");
+					System.out.printf("El archivo %s se ha cargado con éxito.\n", nombreEstadoDeRecitalACargar);
 				} catch (IOException e) {
-					System.out.println("Error al cargar el archivo: " + e.getMessage());
+					System.err.println("Error al cargar el archivo: " + e.getMessage());
 				}
 				break;
 			}
@@ -216,14 +219,14 @@ public class Menu {
 			recital.guardarEnArchivoJSON(rutaArchivo);
 			System.out.println("Se ha guardado la información del recital en el archivo \"recital-out.json\".");
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 		}
 	}
 
 	public int cargarArchivoDelRecital() {
-		System.out.println("Elija uno de los siguientes estados para cargar:\n");
+		System.out.println("Elija uno de los siguientes estados para cargar:");
 		for (int i = 0; i < recitalesGuardados.size(); i++) {
-			System.out.printf("\t%02d) %s\n", i + 1, recitalesGuardados.get(i));
+			System.out.printf("%02d) %s\n", i + 1, recitalesGuardados.get(i));
 		}
 		return ingresarOpcionVal(1, recitalesGuardados.size());
 	}

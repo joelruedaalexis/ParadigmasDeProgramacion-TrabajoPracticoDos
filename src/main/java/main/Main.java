@@ -72,7 +72,7 @@ public class Main {
 			menu = new Menu(scanner, recital);
 			menu.iniciar();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} finally {
 			scanner.close();
 		}

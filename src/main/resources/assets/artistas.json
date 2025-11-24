@@ -21,38 +21,17 @@
     "maxCanciones": 100
   },
   {
-    "nombre": "George Michael",
-    "roles": ["voz principal"],
-    "bandas": ["Wham!", "George Michael"],
-    "costo": 1000,
-    "maxCanciones": 3
+	"nombre": "Ciro Martinez",
+	"roles": ["saxofón","armónica"],
+	"bandas": ["Ciro y los Persas","Los Piojos"],
+	"costo": 300,
+	"maxCanciones": 5
   },
   {
-    "nombre": "Elton John",
-    "roles": ["voz principal", "piano"],
-    "bandas": ["Elton John Band"],
-    "costo": 1200,
-    "maxCanciones": 2
-  },
-  {
-    "nombre": "David Bowie",
-    "roles": ["voz principal"],
-    "bandas": ["Tin Machine", "David Bowie"],
-    "costo": 1500,
-    "maxCanciones": 2
-  },
-  {
-    "nombre": "Annie Lennox",
-    "roles": ["voz principal"],
-    "bandas": ["Eurythmics"],
-    "costo": 900,
-    "maxCanciones": 2
-  },
-  {
-    "nombre": "Lisa Stansfield",
-    "roles": ["voz principal"],
-    "bandas": ["Lisa Stansfield"],
-    "costo": 800,
-    "maxCanciones": 2
+	"nombre": "Adrián Barilari",
+	"roles": ["bajo"],
+	"bandas": ["Adrián Barilari", "Rata Blanca"],
+	"costo": 50,
+	"maxCanciones": 10
   }
 ]

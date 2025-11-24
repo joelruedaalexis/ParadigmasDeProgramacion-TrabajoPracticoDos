@@ -181,16 +181,21 @@ public class Cancion {
 	}
 
 	private String integrantesToString(int cuposDisponibles, List<ArtistaBase> lista) {
-		String str = "";
-		str += lista.isEmpty() ? "disponible" : lista.getFirst().getNombre();
-		for (int i = 1; i < lista.size(); i++)
-			str += ", " + lista.get(i).getNombre();
-		if (cuposDisponibles > 1) {
-			cuposDisponibles--;
-			str += String.format(", %s", "disponible").repeat(cuposDisponibles);
-		}
-		return str;
+	    String str = "";
+	    for (int i = 0; i < lista.size(); i++) {
+	        if (!str.isEmpty())
+	            str += ", ";
+	        str += lista.get(i).getNombre();
+	    }
+	    for (int i = 0; i < cuposDisponibles; i++) {
+	        if (!str.isEmpty())
+	            str += ", ";
+	        str += "disponible";
+	    }
+
+	    return str;
 	}
+
 
 	@Override
 	public String toString() {

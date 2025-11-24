@@ -1,0 +1,101 @@
+{
+  "roles": [
+    "piano",
+    "voz principal",
+    "bajo",
+    "voz secundaria",
+    "guitarra eléctrica",
+    "acordeón",
+    "armónica",
+    "batería",
+    "saxofón"
+  ],
+  "repertorio": [
+    {
+      "titulo": "Perro Dinamita",
+      "rolesXArtista": [
+        {
+          "rol": "bajo",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "armónica",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "saxofón",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "batería",
+          "integrantes": [
+            "vacante"
+          ]
+        }
+      ],
+      "costo": 0.0
+    }
+  ],
+  "lineUp": [
+    {
+      "nombre": "Adrián Barilari",
+      "roles": [
+        "bajo"
+      ],
+      "bandas": [
+        "Adrián Barilari",
+        "Rata Blanca"
+      ],
+      "costo": 50.0,
+      "maxCanciones": 10
+    },
+    {
+      "nombre": "Brian May",
+      "roles": [
+        "guitarra eléctrica",
+        "voz secundaria"
+      ],
+      "bandas": [
+        "Queen"
+      ]
+    },
+    {
+      "nombre": "Ciro Martinez",
+      "roles": [
+        "saxofón",
+        "armónica"
+      ],
+      "bandas": [
+        "Ciro y los Persas",
+        "Los Piojos"
+      ],
+      "costo": 300.0,
+      "maxCanciones": 5
+    },
+    {
+      "nombre": "John Deacon",
+      "roles": [
+        "bajo"
+      ],
+      "bandas": [
+        "Queen"
+      ]
+    },
+    {
+      "nombre": "Roger Taylor",
+      "roles": [
+        "batería",
+        "voz secundaria"
+      ],
+      "bandas": [
+        "Queen"
+      ]
+    }
+  ]
+}

@@ -99,8 +99,8 @@ public class ArtistaBase {
 		String str = "->Nombre: " + this.nombre + "\n";
 		str += "\tRoles: " + this.roles + "\n";
 		str += "\tHistórico de bandas: " + bandaHistorico.stream().map(b -> b.getNombre()).toList() + "\n";
-		str += "\tCanciones asignadas: " + cancionesEnLasQueEstaAsignado.stream().map(c -> c.getTitulo()).toList()
-				+ "\n";
+		str += "\tCanciones asignadas: " + (cancionesEnLasQueEstaAsignado.isEmpty() ? "Ninguna"
+				: cancionesEnLasQueEstaAsignado.stream().map(c -> c.getTitulo()).toList()) + "\n";
 		str += "\tPertenece a discografica: " + (perteneceADiscografica() ? "Si" : "No") + "\n";
 		return str;
 	}
