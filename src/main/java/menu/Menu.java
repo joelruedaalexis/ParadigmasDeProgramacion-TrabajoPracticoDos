@@ -176,8 +176,8 @@ public class Menu {
 				}
 				System.out.println("Elija un artista contratado para quitarlo del lineUp.");
 				String nombreArtista = this.elegirArtista(new ArrayList<>(artistas.keySet()));
-
 				recital.quitarArtistaDelLineUp(artistas.get(nombreArtista));
+				System.out.println("Se ha quitado al artista del lineUp.");
 				break;
 			case guardarEstadoDelRecital:// 14
 				String nombreArchivo = this.ingresarArchivoParaGuardarRecital();

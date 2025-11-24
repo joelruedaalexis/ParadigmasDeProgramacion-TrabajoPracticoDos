@@ -199,7 +199,7 @@ public class Cancion {
 			str += String.format("\t~%s= %s\n", integrantesDeUnRol.getRol(), integrantesToString(
 					integrantesDeUnRol.getCantDeCuposDisponibles(), integrantesDeUnRol.getListaDeIntegrantes()));
 		}
-		str += "\tY su costo es de $" + this.getCostoDeCancion();
+		str += "\tY su costo es de $" + this.getCostoDeCancion() + "\n";
 		return str;
 	}
 
