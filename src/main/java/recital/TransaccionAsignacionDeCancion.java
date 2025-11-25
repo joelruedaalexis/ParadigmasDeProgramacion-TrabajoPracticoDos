@@ -65,7 +65,7 @@ public class TransaccionAsignacionDeCancion extends Transaccion {
 	protected String getInformeParaFallaEnAsignacion() {
 		String informe = "";
 		informe += "Para completar los integrantes para la canción \"" + cancion.getTitulo()
-				+ "\"elegida se necesitan artistas con los siguientes roles:\n";
+				+ "\" se necesitan artistas con los siguientes roles:\n";
 
 		String rolesFaltantes = "";
 		for (Map.Entry<String, IntegranteDeUnRol> nodo : candidatosXRol.entrySet()) {

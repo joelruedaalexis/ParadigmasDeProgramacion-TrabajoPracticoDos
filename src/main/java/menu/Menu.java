@@ -33,7 +33,6 @@ public class Menu {
 		recitalesGuardados = Files.list(Paths.get("src", "main", "resources", "recitalesGuardados"))
 				.map(f -> f.getFileName().toString()).collect(Collectors.toList());
 		recitalesGuardados.sort(null);
-//		System.out.println(recitalesGuardados);
 	}
 
 	private int ingresarOpcionVal(int limInf, int limSup) {
@@ -121,7 +120,7 @@ public class Menu {
 							OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
 					int opcionEntrenar = ingresarOpcionVal(OpcionDeTransaccion.SI, OpcionDeTransaccion.NO);
 					String informe = transaccion2.entrenarArtistasRecomendadosYAsignarLosCandidatos(opcionEntrenar);
-					System.out.println("jijoi" + informe);
+					System.out.println(informe);
 				}
 				break;
 			case entrenarArtista:// 5
