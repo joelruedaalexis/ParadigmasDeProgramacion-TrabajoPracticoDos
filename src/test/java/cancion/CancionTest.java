@@ -40,7 +40,7 @@ class CancionTest {
 				new ArrayList<>(Arrays.asList("guitarra electrica")),
 				Arrays.asList(new BandaHistorico("Walter Giardino")), costoDeArtista, topeDeCanciones);
 
-		cancion = new Cancion("La Hija del Fletero",
+		cancion = Cancion.crearCancionSinIntegrantesAsignados("La Hija del Fletero",
 				new ArrayList<>(List.of("guitarra electrica", "voz principal", "armónica")));
 	}
 
@@ -53,7 +53,7 @@ class CancionTest {
 			expectedRolesFaltantesXCupos.put(rol, 1);
 		}
 		String expectedTitulo = "La Hija del Fletero";
-		Cancion cancion = new Cancion("La Hija del Fletero",
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("La Hija del Fletero",
 				new ArrayList<>(List.of("guitarra electrica", "voz principal", "armónica")));
 		assertNotNull(cancion);
 		assertEquals(expectedTitulo, cancion.getTitulo());
@@ -65,14 +65,14 @@ class CancionTest {
 
 	@Test
 	void noSePuedeAgregarArtistaConRolEnNull() {
-		Cancion cancion = new Cancion("La Hija del Fletero",
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("La Hija del Fletero",
 				new ArrayList<>(List.of("guitarra electrica", "voz principal", "armónica")));
 		assertThrows(IllegalArgumentException.class, () -> cancion.agregarArtista(null, guitarristaContratado));
 	}
 
 	@Test
 	void noSePuedeAgregarArtistaEnNull() {
-		Cancion cancion = new Cancion("La Hija del Fletero",
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("La Hija del Fletero",
 				new ArrayList<>(List.of("guitarra electrica", "voz principal", "armónica")));
 		assertThrows(IllegalArgumentException.class, () -> cancion.agregarArtista("armónica", null));
 
@@ -106,7 +106,7 @@ class CancionTest {
 		for (String rol : expectedRolesFaltantes) {
 			expectedRolesFaltantesXCupos.put(rol, 1);
 		}
-		Cancion cancion = new Cancion("La Hija del Fletero",
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("La Hija del Fletero",
 				new ArrayList<>(List.of("guitarra electrica", "voz principal", "armónica")));
 
 		assertTrue(cancion.agregarArtista("guitarra electrica", guitarristaSolistaContratado));
@@ -142,8 +142,8 @@ class CancionTest {
 
 	@Test
 	void noSePuedeAgregarArtistaPorExcederLimiteDeCanciones() {
-		Cancion cancion2 = new Cancion("Rock para el Negro Atila", new ArrayList<>(List.of("guitarra electrica")));
-		Cancion cancion3 = new Cancion("Un Ángel para tu Soledad", new ArrayList<>(List.of("guitarra electrica")));
+		Cancion cancion2 = Cancion.crearCancionSinIntegrantesAsignados("Rock para el Negro Atila", new ArrayList<>(List.of("guitarra electrica")));
+		Cancion cancion3 = Cancion.crearCancionSinIntegrantesAsignados("Un Ángel para tu Soledad", new ArrayList<>(List.of("guitarra electrica")));
 		cancion.agregarArtista("guitarra electrica", guitarristaSolistaContratado);
 		assertTrue(guitarristaSolistaContratado.puedeSerAsignadoACancion());
 		cancion2.agregarArtista("guitarra electrica", guitarristaSolistaContratado);

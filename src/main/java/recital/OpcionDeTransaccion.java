@@ -1,6 +1,6 @@
 package recital;
 
 public abstract class OpcionDeTransaccion {
-	public static int SI = 0;
-	public static int NO = 1;
+	public final static int SI = 0;
+	public final static int NO = 1;
 }

@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 import cancion.Cancion;
 
 public class ArtistaBase {
-	protected String nombre;
+	private final String nombre;
 	protected List<String> roles;
 	private List<BandaHistorico> bandaHistorico;
 	protected Set<Cancion> cancionesEnLasQueEstaAsignado;
@@ -44,7 +44,6 @@ public class ArtistaBase {
 		return Objects.equals(nombre, other.nombre);
 	}
 
-	// probado
 	public boolean tieneRol(String rolAConsultar) {
 		return roles.contains(rolAConsultar);
 	}
@@ -53,7 +52,6 @@ public class ArtistaBase {
 		return !cancionesEnLasQueEstaAsignado.isEmpty();
 	}
 
-//	probado
 	public List<Cancion> getListaDeCancionesEnLasQueEstaAsignado() {
 		return new ArrayList<>(cancionesEnLasQueEstaAsignado);
 	}
@@ -62,27 +60,18 @@ public class ArtistaBase {
 		return this.cancionesEnLasQueEstaAsignado.contains(cancion);
 	}
 
-//	probado
 	public List<BandaHistorico> getListaDeBandas() {
 		return bandaHistorico;
 	}
 
-//	probado
 	public double getCosto() {
 		return costo;
 	}
 
-//	probado
 	public String getNombre() {
 		return nombre;
 	}
 
-//	sin probar!!!
-	public boolean entrenarNuevoRol(String nuevoRol) {// ¿Exception?
-		return false;
-	}
-
-//  probado
 	public boolean asignar(Cancion cancion) {
 		if (cancion == null)
 			throw new IllegalArgumentException("La canción no puede ser null.");
@@ -92,7 +81,6 @@ public class ArtistaBase {
 		return true;
 	}
 
-//	probado
 	public boolean designar(Cancion cancion) {
 		if (cancion == null)
 			throw new IllegalArgumentException("La canción no puede ser null.");
@@ -102,7 +90,6 @@ public class ArtistaBase {
 		return true;
 	}
 
-//	probado
 	public List<String> getRoles() {
 		return roles;
 	}
@@ -112,11 +99,12 @@ public class ArtistaBase {
 		String str = "->Nombre: " + this.nombre + "\n";
 		str += "\tRoles: " + this.roles + "\n";
 		str += "\tHistórico de bandas: " + bandaHistorico.stream().map(b -> b.getNombre()).toList() + "\n";
+		str += "\tCanciones asignadas: " + (cancionesEnLasQueEstaAsignado.isEmpty() ? "Ninguna"
+				: cancionesEnLasQueEstaAsignado.stream().map(c -> c.getTitulo()).toList()) + "\n";
 		str += "\tPertenece a discografica: " + (perteneceADiscografica() ? "Si" : "No") + "\n";
 		return str;
 	}
 
-//	probado
 	public JsonObject toJson() {
 		JsonObject artistaJSON = new JsonObject();
 		JsonArray rolesJSON = new JsonArray(roles.size());
@@ -129,17 +117,14 @@ public class ArtistaBase {
 		return artistaJSON;
 	}
 
-//	probado
 	public boolean perteneceADiscografica() {
 		return true;
 	}
 
-//	probado
 	public boolean puedeSerAsignadoACancion() {
 		return true;
 	}
 
-//	probado
 	public boolean tieneDescuento() {
 		return false;
 	}

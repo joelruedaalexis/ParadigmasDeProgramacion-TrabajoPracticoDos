@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class BandaHistorico {
-	protected String nombre;
+	private String nombre;
 	private List<ArtistaBase> integrantes;
 
 	public BandaHistorico(String nombre) {

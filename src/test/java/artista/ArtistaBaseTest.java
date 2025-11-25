@@ -76,7 +76,7 @@ class ArtistaBaseTest {
 
 	@Test
 	void sePuedeAsignarCancionUnica() {
-		Cancion cancion = new Cancion("Todo un palo", List.of("voz principal"));
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("voz principal"));
 		List<Cancion> expectedCanciones = List.of(cancion);
 		assertTrue(cantante.asignar(cancion));
 		assertEquals(expectedCanciones, cantante.getListaDeCancionesEnLasQueEstaAsignado());
@@ -89,15 +89,15 @@ class ArtistaBaseTest {
 	}
 
 	@Test
-	void noSePuedeAsignarCancionRepetida() {
-		Cancion cancion = new Cancion("Todo un palo", List.of("voz principal"));
+	void noSePuedeAsignarCancionRepetida() {		
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("voz principal"));
 		assertTrue(cantante.asignar(cancion));
 		assertFalse(cantante.asignar(cancion));
 	}
 
 	@Test
 	void sePuedeDesignarCancionExistente() {
-		Cancion cancion = new Cancion("Todo un palo", List.of("voz principal"));
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("voz principal"));
 		cantante.asignar(cancion);
 		assertTrue(cantante.designar(cancion));
 		assertFalse(cantante.estaAsignadoAlmenosAUnaCancion());
@@ -111,9 +111,9 @@ class ArtistaBaseTest {
 
 	@Test
 	void noSePuedeDesignarCancionInexistente() {
-		Cancion cancion = new Cancion("Todo un palo", List.of("voz principal"));
-		Cancion cancion2 = new Cancion("Mas que nada", List.of("acordeón", "voz principal"));
-		Cancion cancionInexistente = new Cancion("Mi enfermedad", List.of("armonica", "voz principal"));
+		Cancion cancion = Cancion.crearCancionSinIntegrantesAsignados("Todo un palo", List.of("voz principal"));
+		Cancion cancion2 = Cancion.crearCancionSinIntegrantesAsignados("Mas que nada", List.of("acordeón", "voz principal"));
+		Cancion cancionInexistente = Cancion.crearCancionSinIntegrantesAsignados("Mi enfermedad", List.of("armonica", "voz principal"));
 		cantante.asignar(cancion);
 		cantante.asignar(cancion2);
 		assertFalse(cantante.designar(cancionInexistente));

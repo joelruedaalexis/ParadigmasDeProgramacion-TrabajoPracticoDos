@@ -2,7 +2,6 @@ package cancion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,25 +12,28 @@ import com.google.gson.JsonObject;
 import artista.ArtistaBase;
 
 public class Cancion {
-	private String titulo = null;
-//	private Map<String, List<ArtistaBaseBase>> rolesXIntegrantes;
-//	private Map<String, Integer> rolesXCuposDeIntegrantes;
-	private Map<String, IntegranteDeUnRol> rolesXListaDeIntegrantes;
+	private String titulo;
+	private List<IntegranteDeUnRol> integrantesXRol;
 
-	public Cancion(String titulo, List<String> roles) {
+	private Cancion(String titulo) {
 		this.titulo = titulo;
-		inicializarRolesXIntegrantes(new LinkedList<String>(roles));
 	}
 
-	public Cancion(String titulo, Map<String, IntegranteDeUnRol> rolesXListaDeIntegrantes) {
-		this.titulo = titulo;
-		this.rolesXListaDeIntegrantes = rolesXListaDeIntegrantes;
-		this.inicializarRolesXIntegrantes();
+	public static Cancion crearCancionSinIntegrantesAsignados(String titulo, List<String> roles) {
+		Cancion cancion = new Cancion(titulo);
+		cancion.inicializarIntegrantesXRol(roles);
+		return cancion;
+	}
+
+	public static Cancion crearCancionConIntegrantesAAsignar(String titulo, List<IntegranteDeUnRol> integrantesXRol) {
+		Cancion cancion = new Cancion(titulo);
+		cancion.integrantesXRol = integrantesXRol;
+		return cancion;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(rolesXListaDeIntegrantes, titulo);
+		return Objects.hash(integrantesXRol, titulo);
 	}
 
 	@Override
@@ -43,173 +45,166 @@ public class Cancion {
 		if (getClass() != obj.getClass())
 			return false;
 		Cancion other = (Cancion) obj;
-		return Objects.equals(rolesXListaDeIntegrantes, other.rolesXListaDeIntegrantes)
-				&& Objects.equals(titulo, other.titulo);
+		return Objects.equals(integrantesXRol, other.integrantesXRol) && Objects.equals(titulo, other.titulo);
 	}
 
-	private void inicializarRolesXIntegrantes() {
-		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
+	private void inicializarIntegrantesXRol(List<String> roles) {
+		this.integrantesXRol = new ArrayList<>();
+		Map<String, Integer> cupoXRol = new HashMap<>();
+		for (int i = 0; i < roles.size(); i++) {
+			cupoXRol.put(roles.get(i), cupoXRol.getOrDefault(roles.get(i), 0) + 1);
+		}
+		for (Map.Entry<String, Integer> nodo : cupoXRol.entrySet()) {
 			String rol = nodo.getKey();
-			List<ArtistaBase> artistasDeRol = nodo.getValue().getListaDeIntegrantes();
-			artistasDeRol.forEach(a -> this.agregarArtista(rol, a));
+			Integer cantIntegrantesQueNecesitaEseRol = nodo.getValue();
+			IntegranteDeUnRol integranteDeUnRol = new IntegranteDeUnRol(rol, cantIntegrantesQueNecesitaEseRol);
+			integrantesXRol.addLast(integranteDeUnRol);
 		}
+		cupoXRol.clear();
 	}
 
-	private void inicializarRolesXIntegrantes(List<String> listaRoles) {
-		this.rolesXListaDeIntegrantes = new HashMap<>();
-		while (!listaRoles.isEmpty()) {
-			String rol = listaRoles.removeFirst();
-			int cantRoles = 1;
-			int i = 0;
-			while (i < listaRoles.size()) {
-				if (listaRoles.get(i).equals(rol)) {
-					cantRoles++;
-					listaRoles.remove(i);
-				} else
-					i++;
-			}
-			this.rolesXListaDeIntegrantes.put(rol, new IntegranteDeUnRol(cantRoles));
-
-		}
-	}
-
-//	probado
 	public boolean artistaEstaAsignado(ArtistaBase artista) {
 		if (artista == null)
-			throw new IllegalArgumentException("No se puede asignar un artista en null");// Exception?
-		for (IntegranteDeUnRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
-			if (integrantesDeRol.artistaEstaAsignado(artista))
+			throw new IllegalArgumentException("No se puede asignar un artista en null");
+		boolean encontroArtista = false;
+		for (int i = 0; i < integrantesXRol.size() && !encontroArtista; i++) {
+			if (integrantesXRol.get(i).artistaEstaAsignado(artista))
+				encontroArtista = true;
+		}
+		return encontroArtista;
+	}
+
+	public int getCantDeCuposDisponibles() {
+		int cant = 0;
+		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol) {
+			cant += integrantesDeRol.getCantDeCuposDisponibles();
+		}
+		return cant;
+	}
+
+	public Map<String, Integer> getRolesFaltantesXCupos() {
+		Map<String, Integer> rolesFaltantesXCupos = new HashMap<>();
+		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol) {
+			if (integrantesDeRol.hayCuposDisponibles())
+				rolesFaltantesXCupos.put(integrantesDeRol.getRol(), integrantesDeRol.getCantDeCuposDisponibles());
+		}
+		return rolesFaltantesXCupos;
+	}
+
+	public boolean tieneRolesDisponibles() {
+		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol) {
+			if (integrantesDeRol.hayCuposDisponibles())
 				return true;
 		}
 		return false;
 	}
 
-//	probado
-	public int getCantDeCuposDisponibles() {
-		int cant = 0;
-		for (IntegranteDeUnRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
-			cant += integrantesDeRol.getCantDeCuposDisponibles();
-		}
-		return cant;
-//		return rolesXCuposDeIntegrantes.values().stream().mapToInt(cupos -> cupos).sum();
-	}
-
-//	
-	public Map<String, Integer> getRolesFaltantesXCupos() {
-		Map<String, Integer> rolesFaltantesXCupos = new HashMap<>();
-		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
-			if (nodo.getValue().hayCuposDisponibles())
-				rolesFaltantesXCupos.put(nodo.getKey(), nodo.getValue().getCantDeCuposDisponibles());
-		}
-		return rolesFaltantesXCupos;
-//		return rolesXCuposDeIntegrantes.values().stream().mapToInt(cupos -> cupos).sum();
-	}
-
-//	probado
 	public List<ArtistaBase> getListadoDeIntegrantes() {
 		List<ArtistaBase> listadoDeIntegrantes = new ArrayList<>();
-		for (IntegranteDeUnRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {
+		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol) {
 			List<ArtistaBase> listaIntegrantesDeRol = integrantesDeRol.getListaDeIntegrantes();
 			listadoDeIntegrantes.addAll(listaIntegrantesDeRol);
 		}
-//		System.out.println(listadoDeIntegrantes);
-		// Y si no hay integrantes ? throw Exception?
 		return listadoDeIntegrantes;
 	}
 
-//	probado
-	public boolean agregarArtista(String rol, ArtistaBase artista) {// chequear si el artista en null o si rol es null
+	public boolean agregarArtista(String rol, ArtistaBase artista) {
 		if (rol == null)
 			throw new IllegalArgumentException("No se puede agregar un artista con rol en null.");
 		if (artista == null)
 			throw new IllegalArgumentException("No se puede agregar un artista en null.");
-		if (!rolesXListaDeIntegrantes.containsKey(rol))
-			return false;// Exception?
-		if (!rolesXListaDeIntegrantes.get(rol).hayCuposDisponibles())
-			return false;// ya estan asignados todos los artistas a ese rol!!!!
-		// chequear q el artista pueda ser asignado por su limite en participaciones en
-		// canciones
+		IntegranteDeUnRol integranteDeUnRol;
+		boolean encontroRol = false;
+		int i = 0;
+		while (i < integrantesXRol.size() && !encontroRol) {
+			if (integrantesXRol.get(i).getRol().equals(rol)) {
+				encontroRol = true;
+			} else
+				i++;
+		}
+		if (!encontroRol || !integrantesXRol.get(i).hayCuposDisponibles())
+			return false;
+		integranteDeUnRol = integrantesXRol.get(i);
 		if (!artista.puedeSerAsignadoACancion())
 			return false;
-		rolesXListaDeIntegrantes.get(rol).agregarIntegrante(artista);
+		if (!artista.getRoles().contains(rol))
+			return false;
+		integranteDeUnRol.agregarIntegrante(artista);
 		artista.asignar(this);
 		return true;
 	}
 
-//	probado
 	public boolean quitarArtista(ArtistaBase artista) {
 		if (artista == null)
 			throw new IllegalArgumentException("No se puede quitar un artista null.");
-		for (IntegranteDeUnRol integrantesDeRol : rolesXListaDeIntegrantes.values()) {// cambiar al for tradicional!!!
-			if (integrantesDeRol.artistaEstaAsignado(artista)) {
-				integrantesDeRol.quitarIntegrante(artista);
+		if (!artista.estaAsignadoACancion(this))
+			return false;
+		boolean quitoArtista = false;
+		for (int i = 0; i < integrantesXRol.size() && !quitoArtista; i++) {
+			if (integrantesXRol.get(i).artistaEstaAsignado(artista)) {
+				integrantesXRol.get(i).quitarIntegrante(artista);
 				artista.designar(this);
-				return true;
+				quitoArtista = true;
 			}
 		}
-		return false;
+		return true;
 	}
 
-//	probado
 	public List<String> getRoles() {
 		List<String> roles = new ArrayList<>();
-		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
-			String rol = nodo.getKey();
-			IntegranteDeUnRol integrantesDeRol = nodo.getValue();
-			for (int i = 0; i < integrantesDeRol.getCantDeIntegrantesNecesarios(); i++)
-				roles.add(rol);
+		for (IntegranteDeUnRol integrantesDeUnRol : integrantesXRol) {
+			for (int i = 0; i < integrantesDeUnRol.getCantDeIntegrantesNecesarios(); i++)
+				roles.add(integrantesDeUnRol.getRol());
 		}
 		return roles;
 	}
 
 	public Map<String, IntegranteDeUnRol> getRolesFaltantes() {
-//		return new HashMap<>(rolesXCuposDeIntegrantes);
 		Map<String, IntegranteDeUnRol> rolesXCuposDeIntegrantes = new HashMap<>();
-		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
-			String rol = nodo.getKey();
-			IntegranteDeUnRol integrantesDeRol = nodo.getValue();
-			if (integrantesDeRol.hayCuposDisponibles())
-				rolesXCuposDeIntegrantes.put(rol, new IntegranteDeUnRol(integrantesDeRol.getCantDeCuposDisponibles()));
+		for (IntegranteDeUnRol integrantesDeUnRol : integrantesXRol) {
+			if (integrantesDeUnRol.hayCuposDisponibles())
+				rolesXCuposDeIntegrantes.put(integrantesDeUnRol.getRol(), new IntegranteDeUnRol(
+						integrantesDeUnRol.getRol(), integrantesDeUnRol.getCantDeCuposDisponibles()));
 		}
 		return rolesXCuposDeIntegrantes;
 	}
 
-//	probado
 	public String getTitulo() {
 		return this.titulo;
 	}
 
-//	probado
 	public double getCostoDeCancion() {
 		double costo = 0;
-		for (IntegranteDeUnRol integrantesDeRol : rolesXListaDeIntegrantes.values())
+		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol)
 			costo += integrantesDeRol.getCostoDeIntegrantesAsignados();
 		return costo;
 	}
 
 	private String integrantesToString(int cuposDisponibles, List<ArtistaBase> lista) {
-		String str = "";
-		str += lista.isEmpty() ? "disponible" : lista.getFirst().getNombre();
-		for (int i = 1; i < lista.size(); i++)
-			str += ", " + lista.get(i).getNombre();
-		if (cuposDisponibles > 1) {
-			cuposDisponibles--;
-			str += String.format(", %s", "disponible").repeat(cuposDisponibles);
-		}
-		return str;
+	    String str = "";
+	    for (int i = 0; i < lista.size(); i++) {
+	        if (!str.isEmpty())
+	            str += ", ";
+	        str += lista.get(i).getNombre();
+	    }
+	    for (int i = 0; i < cuposDisponibles; i++) {
+	        if (!str.isEmpty())
+	            str += ", ";
+	        str += "disponible";
+	    }
+
+	    return str;
 	}
+
 
 	@Override
 	public String toString() {
 		String str = "->La canción \"" + titulo + "\" está constituida por:\n";
-		for (Map.Entry<String, IntegranteDeUnRol> nodo : rolesXListaDeIntegrantes.entrySet()) {
-			String rol = nodo.getKey();
-			IntegranteDeUnRol integrantesDeRol = nodo.getValue();
-//			str += String.format("\t%c%s= ", 158, rol);
-//			str += String.format("\t%c%s= %s\n", 158, rol, integrantesToString(artistas));
-			str += String.format("\t~%s= %s\n", rol, integrantesToString(integrantesDeRol.getCantDeCuposDisponibles(),
-					integrantesDeRol.getListaDeIntegrantes()));
+		for (IntegranteDeUnRol integrantesDeUnRol : integrantesXRol) {
+			str += String.format("\t~%s= %s\n", integrantesDeUnRol.getRol(), integrantesToString(
+					integrantesDeUnRol.getCantDeCuposDisponibles(), integrantesDeUnRol.getListaDeIntegrantes()));
 		}
+		str += "\tY su costo es de $" + this.getCostoDeCancion() + "\n";
 		return str;
 	}
 
@@ -217,9 +212,7 @@ public class Cancion {
 		double costo = 0;
 		JsonObject cancionJSON = new JsonObject();
 		JsonArray arrayRolesXIntegrantesJSON = new JsonArray();
-		for (Map.Entry<String, IntegranteDeUnRol> rolXIntegrante : rolesXListaDeIntegrantes.entrySet()) {
-			String rol = rolXIntegrante.getKey();
-			IntegranteDeUnRol integrantesDeRol = rolXIntegrante.getValue();
+		for (IntegranteDeUnRol integrantesDeRol : integrantesXRol) {
 			int lugaresDisponibles = integrantesDeRol.getCantDeCuposDisponibles();
 			JsonObject rolXIntegranteJSON = new JsonObject();
 			JsonArray arrayIntegrantes = new JsonArray(integrantesDeRol.getCantDeIntegrantesNecesarios());
@@ -230,30 +223,10 @@ public class Cancion {
 			}
 			for (int j = lugaresDisponibles; j > 0; j--)
 				arrayIntegrantes.add("vacante");
-			rolXIntegranteJSON.addProperty("rol", rol);
+			rolXIntegranteJSON.addProperty("rol", integrantesDeRol.getRol());
 			rolXIntegranteJSON.add("integrantes", arrayIntegrantes);
 			arrayRolesXIntegrantesJSON.add(rolXIntegranteJSON);
 		}
-//		for (Map.Entry<String, List<ArtistaBase>> rolXIntegrante : rolesXIntegrantes.entrySet()) {
-//			String rol = rolXIntegrante.getKey();
-//			List<ArtistaBase> listaIntegrantesDeRol = rolXIntegrante.getValue();
-//			int lugaresDisponibles = rolesXCuposDeIntegrantes.get(rol);
-//			int i;
-//			JsonObject rolXIntegranteJSON = new JsonObject();
-//			JsonArray arrayIntegrantes = new JsonArray(listaIntegrantesDeRol.size());
-//			for (i = 0; i < listaIntegrantesDeRol.size(); i++) {
-//				arrayIntegrantes.add(listaIntegrantesDeRol.get(i).getNombre());
-//				costo += listaIntegrantesDeRol.get(i).getCosto();
-//			}
-//			
-//			while (i < listaIntegrantesDeRol.size()) {
-//				arrayIntegrantes.add("vacante");
-//				i++;
-//			}
-//			rolXIntegranteJSON.addProperty("rol", rol);
-//			rolXIntegranteJSON.add("integrantes", arrayIntegrantes);
-//			arrayRolesXIntegrantesJSON.add(rolXIntegranteJSON);
-//		}
 		cancionJSON.addProperty("titulo", this.titulo);
 		cancionJSON.add("rolesXArtista", arrayRolesXIntegrantesJSON);
 		cancionJSON.addProperty("costo", costo);

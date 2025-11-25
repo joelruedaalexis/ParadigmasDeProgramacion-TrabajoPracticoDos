@@ -31,22 +31,11 @@ import cancion.IntegranteDeUnRol;
 import prolog.IntegracionProlog;
 
 public class Recital {
-//	private class ResultadoTransaccionContratacion{
-//		Map<String, Integer> rolesXCantidadFaltante;
-//		Map<Artista, List<String>> artistaXRolFaltante;
-//		
-//		public String getRecomendacionesArtistasEntrenables() {
-//			return null;
-//		}
-//	}
 	private List<Cancion> repertorio;
 	private List<ArtistaBase> lineUp;
-	private List<String> roles;
-//	private Map<String, List<Artista>> todosLosRolesXArtista;
-//	private ResultadoTransaccionContratacion resTransaccionContratacion;
-//	private Map<String>
+	private Set<String> roles;
 
-	public Recital(List<Cancion> repertorio, List<ArtistaBase> lineUp, List<String> roles) {
+	public Recital(List<Cancion> repertorio, List<ArtistaBase> lineUp, Set<String> roles) {
 		this.repertorio = repertorio;
 		this.lineUp = lineUp;
 		this.roles = roles;
@@ -57,7 +46,6 @@ public class Recital {
 	public Map<String, Integer> cantDeRolesFaltantesParaUnaCancion(int index) {
 		if (index < 0 || index >= repertorio.size())
 			throw new IllegalArgumentException("Los indices están fuera del limite permitido");
-//		Chequear si el index es válido y blablabla
 		Cancion cancion = repertorio.get(index);
 		return cancion.getRolesFaltantesXCupos();
 	}
@@ -95,7 +83,7 @@ public class Recital {
 						cupos--;
 					}
 				}
-				if (cupos > 0)// https://medium.com/@AlexanderObregon/javas-map-merge-method-explained-a2f0b5de9c8a
+				if (cupos > 0)
 					rolesFaltantesTotales.merge(rol, cupos, Integer::sum);
 			}
 			artistasUsadosEnCancion.clear();
@@ -171,7 +159,7 @@ public class Recital {
 				.collect(Collectors.toList());
 //		Al ordenarlo por costo, me van a quedar los artistas bases adelante de la lista.
 		artistasDisponibles.sort(new ComparadorArtistaPorCostoDeCancion());
-		Map<ArtistaBase, Integer> artistasXCantDisponiblesDeCanciones = new HashMap<>();
+		Map<ArtistaBase, Integer> cantDisponibleDeCancionesDeArtistas = new HashMap<>();
 		Map<String, List<ArtistaBase>> artistasQueTienenRol = new HashMap<>();
 //		Encasillo todos los artistas en todos los roles que tienen. De esta manera ya sé cuáles son los roles que menos artistas tiene
 		for (ArtistaBase artista : artistasDisponibles) {
@@ -183,7 +171,7 @@ public class Recital {
 			}
 			if (!artista.perteneceADiscografica()) {
 				ArtistaContratado artistaContratado = (ArtistaContratado) artista;
-				artistasXCantDisponiblesDeCanciones.put(artistaContratado,
+				cantDisponibleDeCancionesDeArtistas.put(artistaContratado,
 						artistaContratado.getCantCancionesDisponiblesParaSerAsignado());
 			}
 		}
@@ -196,8 +184,6 @@ public class Recital {
 			List<String> rolesDeCancion = new ArrayList<>(candidatosXRol.keySet());
 			ComparadoraDeArtistasXRoles comparadoraDeArtistasXRoles = new ComparadoraDeArtistasXRoles(
 					artistasQueTienenRol);
-//			List<String> rolesQueTienenArtistas = new ArrayList<>(
-//					artistasQueTienenRol.keySet().stream().filter(rol -> candidatosXRol.containsKey(rol)).toList());
 			rolesDeCancion.sort(comparadoraDeArtistasXRoles);
 			for (String rol : rolesDeCancion) {
 				int cupos = candidatosXRol.get(rol).getCantDeIntegrantesNecesarios();
@@ -205,14 +191,14 @@ public class Recital {
 				for (int i = 0; i < artistasDeEseRol.size() && cupos > 0; i++) {
 					ArtistaBase artista = artistasDeEseRol.get(i);
 					if (!artista.estaAsignadoACancion(cancion) && !artistasUsadosEnCancion.contains(artista)
-							&& artistasXCantDisponiblesDeCanciones.getOrDefault(artista, Integer.MAX_VALUE) > 0) {
+							&& cantDisponibleDeCancionesDeArtistas.getOrDefault(artista, Integer.MAX_VALUE) > 0) {
 //						Si no está en "artistasXCantDisponiblesDeCanciones" es porque es una artista BASE!!!!
 						candidatosXRol.get(rol).agregarIntegrante(artista);
 						artistasUsadosEnCancion.add(artista);
 						cupos--;
 						if (!artista.perteneceADiscografica())
-							artistasXCantDisponiblesDeCanciones.put(artista,
-									artistasXCantDisponiblesDeCanciones.get(artista) - 1);
+							cantDisponibleDeCancionesDeArtistas.put(artista,
+									cantDisponibleDeCancionesDeArtistas.get(artista) - 1);
 					}
 				}
 				if (hayArtistasSuficientes && cupos > 0) {
@@ -226,7 +212,7 @@ public class Recital {
 		TransaccionAsignacionDeTodasLasCanciones transaccion = new TransaccionAsignacionDeTodasLasCanciones(
 				artistasCandidatosAsignadosACancion);
 		if (!cancionesConRolesFaltantes.isEmpty()) {
-			transaccion.registrarFallaEnAsignacion(cancionesConRolesFaltantes, artistasXCantDisponiblesDeCanciones,
+			transaccion.registrarFallaEnAsignacion(cancionesConRolesFaltantes, cantDisponibleDeCancionesDeArtistas,
 					artistasDisponibles);
 			return transaccion;
 		}
@@ -240,28 +226,20 @@ public class Recital {
 				artistasAAsignar.forEach(artista -> cancion.agregarArtista(rol, artista));
 			}
 		}
-
-//		for (Cancion cancion : repertorio) {
-//			System.out.println(cancion);
-//		}
 		transaccion.confirmarTransaccion();
 		return transaccion;
 	}
 
 //	entrenarArtista = 5
 	public boolean entrenarArtista(int index, String nuevoRol) {
-		if (index < 0 || index >= lineUp.size())
-			return false;// Exception fuera del limite?
 		ArtistaBase artista = lineUp.get(index);
 		if (artista.perteneceADiscografica())
-			return false;
+			return false;// Solo se puede entrenar a artistas contratados!!!
 		if (artista.getRoles().contains(nuevoRol))
-			return false;// Exception?
+			return false;// El artista ya tiene ese rol xd
 		if (artista.estaAsignadoAlmenosAUnaCancion())
-			return false;
-//		System.out.println(artista);
-		artista.entrenarNuevoRol(nuevoRol);
-//		System.out.println(artista);
+			return false;// No se puede entrenar a artistas que están asignados almenos a una cancion
+		((ArtistaContratado) artista).entrenarNuevoRol(nuevoRol);
 		return true;
 	}
 
@@ -272,31 +250,23 @@ public class Recital {
 			if (!artista.perteneceADiscografica())
 				str += artista.toString() + "\n";
 		return str;
-//		return lineUp.stream().filter(a -> !a.perteneceADiscografica()).map(a -> a.toString()).toList();
 	}
 
 //	listarCanciones = 7
 	public String getInformacionCompletaDelRepertorio() {
 		String str = "";
-		for (int i = 0; i < repertorio.size(); i++) {
-			Cancion cancion = repertorio.get(i);
-			double costoDeCancion = 0;
-			for (ArtistaBase artista : cancion.getListadoDeIntegrantes())
-				costoDeCancion += artista.getCosto();
-			str += cancion.toString() + String.format("  Y su costo es de $%.02f\n", costoDeCancion);
-		}
+		for (int i = 0; i < repertorio.size(); i++)
+			str += repertorio.get(i).toString();
 		return str;
-//		return repertorio.stream().map(c -> c.toString()).toList();
 	}
 
-//	prolog = 8
-	public void prolog() {
+//	prolog = 10
+	public int prolog() {
 		IntegracionProlog.generarBaseDeConocimiento();
-		System.out.println("El número mínimo de entrenamientos para cubrir el recital es: " +
-		IntegracionProlog.consultarEntrenamientosMinimos());
+		return IntegracionProlog.consultarEntrenamientosMinimos();
 	}
 
-//	quitarArtistaDeCancion = 9
+//	quitarArtistaDeCancion = 11
 	public void quitarArtistaDeCancion(int indexArtista, int indexCancion) {
 		if (indexCancion < 0 || indexCancion >= repertorio.size())
 			throw new IllegalArgumentException("El índice de canción está fuera de los limites permitidos.");
@@ -307,7 +277,7 @@ public class Recital {
 		cancion.quitarArtista(artista);
 	}
 
-//	quitarArtistaDeTodasLasCanciones = 10
+//	quitarArtistaDeTodasLasCanciones = 12
 	public boolean quitarArtistaDeTodasLasCanciones(String nombreDeArtista) {
 		if (nombreDeArtista == null)
 			throw new IllegalArgumentException("El nombre de artista no puede ser null.");
@@ -320,19 +290,16 @@ public class Recital {
 				encontro = true;
 			else
 				i++;
-		if (!encontro/* && i == lineUp.size() */)// borrar la 2da condicion!!!!
-			throw new RuntimeException("No hay ningun artista que tenga ese nombre"); // CREAR EXCEPTION -> el artista
-																						// con ese nombre no existe
+		if (!encontro)
+			throw new RuntimeException("No hay ningun artista que tenga ese nombre");
 		artista = lineUp.get(i);
 		if (!artista.estaAsignadoAlmenosAUnaCancion())
 			return false;
-		repertorio.stream().filter(cancion -> cancion.artistaEstaAsignado(artista)).forEach(cancion -> {
-			cancion.quitarArtista(artista);
-		});
+		artista.getListaDeCancionesEnLasQueEstaAsignado().forEach(cancion -> cancion.quitarArtista(artista));
 		return true;
 	}
 
-//	quitarArtistaDelLineUp = 11
+//	quitarArtistaDelLineUp = 13
 	public boolean quitarArtistaDelLineUp(int indexLineUp) {
 		if (indexLineUp < 0 || indexLineUp >= lineUp.size())
 			throw new IllegalArgumentException("El índice ingresado está fuera de los límites  permitidos.");
@@ -345,149 +312,95 @@ public class Recital {
 		return true;
 	}
 
-//	guardarEstadoDelRecital = 12
+//	guardarEstadoDelRecital = 14
 	public void guardarEnArchivoJSON(String rutaArchivo) throws IOException {
-	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-	    JsonObject recitalJSON = new JsonObject();
-
-	    JsonArray repertorioJSON = new JsonArray(repertorio.size());
-	    repertorio.forEach(cancion -> repertorioJSON.add(cancion.toJSON()));
-
-	    JsonArray rolesJSON = new JsonArray(roles.size());
-	    roles.forEach(rol -> rolesJSON.add(rol));
-
-	    JsonArray lineUpJSON = new JsonArray(lineUp.size());
-	    lineUp.forEach(artista -> lineUpJSON.add(artista.toJson()));
-
-	    recitalJSON.add("roles", rolesJSON);
-	    recitalJSON.add("repertorio", repertorioJSON);
-	    recitalJSON.add("lineUp", lineUpJSON);
-
-	    // try-with-resources = cierra solo
-	    try (FileWriter fileWriter = new FileWriter(rutaArchivo)) {
-	        gson.toJson(recitalJSON, fileWriter);
-	    }
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		JsonObject recitalJSON = new JsonObject();
+		JsonArray repertorioJSON = new JsonArray(repertorio.size());
+		repertorio.forEach(cancion -> repertorioJSON.add(cancion.toJSON()));
+		JsonArray rolesJSON = new JsonArray(roles.size());
+		roles.forEach(rol -> rolesJSON.add(rol));
+		JsonArray lineUpJSON = new JsonArray(lineUp.size());
+		lineUp.forEach(artista -> lineUpJSON.add(artista.toJson()));
+		recitalJSON.add("roles", rolesJSON);
+		recitalJSON.add("repertorio", repertorioJSON);
+		recitalJSON.add("lineUp", lineUpJSON);
+		try (FileWriter fileWriter = new FileWriter(rutaArchivo)) {
+			gson.toJson(recitalJSON, fileWriter);
+		}
 	}
 
-
-//	cargarEstadoDelRecital = 13
+//	cargarEstadoDelRecital = 15
 	public void cargarEstadoDeArchivoJSON(String rutaArch) throws FileNotFoundException {
-	    JsonObject jsonArch;
-
-	    try (FileReader fileReader = new FileReader(new File(rutaArch))) {
-	        jsonArch = JsonParser.parseReader(fileReader).getAsJsonObject();
-	    } catch (IOException e) {
-	        throw new FileNotFoundException("No se pudo leer el archivo: " + e.getMessage());
-	    }
-
-	    // ------- ROLES -------
-	    List<String> rolesImportados = new ArrayList<>();
-	    JsonArray rolesJSON = jsonArch.getAsJsonArray("roles");
-	    for (JsonElement rol : rolesJSON)
-	        rolesImportados.add(rol.getAsString());
-
-	    // ------- LINE-UP -------
-	    JsonArray lineUpJSON = jsonArch.getAsJsonArray("lineUp");
-
-	    Map<String, BandaHistorico> bancoBandas = new HashMap<>();
-	    List<ArtistaBase> lineUpImportado = new ArrayList<>();
-
-	    // Primer pasada: crear bandas
-	    for (JsonElement e : lineUpJSON) {
-	        JsonArray bandasJSON = e.getAsJsonObject().get("bandas").getAsJsonArray();
-	        for (JsonElement b : bandasJSON) {
-	            String nombreBanda = b.getAsString();
-	            bancoBandas.putIfAbsent(nombreBanda, new BandaHistorico(nombreBanda));
-	        }
-	    }
-
-	    // Segunda pasada: crear artistas
-	    for (JsonElement e : lineUpJSON) {
-	        JsonObject artistaJSON = e.getAsJsonObject();
-
-	        String nombre = artistaJSON.get("nombre").getAsString();
-
-	        // roles
-	        List<String> histRoles = new ArrayList<>();
-	        for (JsonElement r : artistaJSON.get("roles").getAsJsonArray())
-	            histRoles.add(r.getAsString());
-
-	        // bandas
-	        List<BandaHistorico> histBandas = new ArrayList<>();
-	        for (JsonElement b : artistaJSON.get("bandas").getAsJsonArray())
-	            histBandas.add(bancoBandas.get(b.getAsString()));
-
-	        // artista base o contratado
-	     // detectar si existe costo
-	        JsonElement costoElem = artistaJSON.get("costo");
-
-	        ArtistaBase artista;
-
-	        if (costoElem != null && !costoElem.isJsonNull()) {
-	            // es artista contratado
-	            double costo = costoElem.getAsDouble();
-
-	            JsonElement maxElem = artistaJSON.get("maxCanciones");
-	            int max = (maxElem != null && !maxElem.isJsonNull())
-	                    ? maxElem.getAsInt()
-	                    : 0;
-
-	            artista = new ArtistaContratado(nombre, histRoles, histBandas, costo, max);
-
-	        } else {
-	            // es artista base
-	            artista = new ArtistaBase(nombre, histRoles, histBandas);
-	        }
-
-
-	        lineUpImportado.add(artista);
-	    }
-
-	    // ------- REPERTORIO -------
-	    List<Cancion> repertorioImportado = new ArrayList<>();
-	    JsonArray repertorioJSON = jsonArch.getAsJsonArray("repertorio");
-
-	    for (JsonElement elem : repertorioJSON) {
-	        JsonObject cancionJSON = elem.getAsJsonObject();
-
-	        String titulo = cancionJSON.get("titulo").getAsString();
-
-	        Map<String, IntegranteDeUnRol> rolesXCupos = new HashMap<>();
-
-	        for (JsonElement rolElem : cancionJSON.get("rolesXArtista").getAsJsonArray()) {
-	            JsonObject rolJSON = rolElem.getAsJsonObject();
-
-	            String rol = rolJSON.get("rol").getAsString();
-	            JsonArray integrantesJSON = rolJSON.get("integrantes").getAsJsonArray();
-
-	            IntegranteDeUnRol integrantes = new IntegranteDeUnRol(integrantesJSON.size());
-
-	            for (JsonElement art : integrantesJSON) {
-	                String nombreArt = art.getAsString();
-
-	                if (!nombreArt.equals("vacante")) {
-	                    ArtistaBase artista = lineUpImportado.stream()
-	                        .filter(a -> a.getNombre().equals(nombreArt))
-	                        .findFirst().orElse(null);
-
-	                    if (artista != null)
-	                        integrantes.agregarIntegrante(artista);
-	                }
-	            }
-
-	            rolesXCupos.put(rol, integrantes);
-	        }
-
-	        repertorioImportado.add(new Cancion(titulo, rolesXCupos));
-	    }
-
-	    // ------- Asignar a la instancia actual -------
-	    this.roles = rolesImportados;
-	    this.lineUp = lineUpImportado;
-	    this.repertorio = repertorioImportado;
+		JsonObject jsonArch;
+		try (FileReader fileReader = new FileReader(new File(rutaArch))) {
+			jsonArch = JsonParser.parseReader(fileReader).getAsJsonObject();
+		} catch (IOException e) {
+			throw new FileNotFoundException("No se pudo leer el archivo: " + e.getMessage());
+		}
+		Set<String> rolesImportados = new HashSet<>();
+		JsonArray rolesJSON = jsonArch.getAsJsonArray("roles");
+		for (JsonElement rol : rolesJSON)
+			rolesImportados.add(rol.getAsString());
+		JsonArray lineUpJSON = jsonArch.getAsJsonArray("lineUp");
+		Map<String, BandaHistorico> bancoBandas = new HashMap<>();
+		List<ArtistaBase> lineUpImportado = new ArrayList<>();
+		for (JsonElement e : lineUpJSON) {
+			JsonArray bandasJSON = e.getAsJsonObject().get("bandas").getAsJsonArray();
+			for (JsonElement b : bandasJSON) {
+				String nombreBanda = b.getAsString();
+				bancoBandas.putIfAbsent(nombreBanda, new BandaHistorico(nombreBanda));
+			}
+		}
+		for (JsonElement e : lineUpJSON) {
+			JsonObject artistaJSON = e.getAsJsonObject();
+			String nombre = artistaJSON.get("nombre").getAsString();
+			List<String> histRoles = new ArrayList<>();
+			for (JsonElement r : artistaJSON.get("roles").getAsJsonArray())
+				histRoles.add(r.getAsString());
+			List<BandaHistorico> histBandas = new ArrayList<>();
+			for (JsonElement b : artistaJSON.get("bandas").getAsJsonArray())
+				histBandas.add(bancoBandas.get(b.getAsString()));
+			JsonElement costoElem = artistaJSON.get("costo");
+			ArtistaBase artista;
+			if (costoElem != null && !costoElem.isJsonNull()) {
+				double costo = costoElem.getAsDouble();
+				JsonElement maxElem = artistaJSON.get("maxCanciones");
+				int max = (maxElem != null && !maxElem.isJsonNull()) ? maxElem.getAsInt() : 0;
+				artista = new ArtistaContratado(nombre, histRoles, histBandas, costo, max);
+			} else {
+				artista = new ArtistaBase(nombre, histRoles, histBandas);
+			}
+			lineUpImportado.add(artista);
+		}
+		List<Cancion> repertorioImportado = new ArrayList<>();
+		JsonArray repertorioJSON = jsonArch.getAsJsonArray("repertorio");
+		for (JsonElement elem : repertorioJSON) {
+			JsonObject cancionJSON = elem.getAsJsonObject();
+			String titulo = cancionJSON.get("titulo").getAsString();
+			List<IntegranteDeUnRol> integrantesDeRol = new ArrayList<>();
+			for (JsonElement rolElem : cancionJSON.get("rolesXArtista").getAsJsonArray()) {
+				JsonObject rolJSON = rolElem.getAsJsonObject();
+				String rol = rolJSON.get("rol").getAsString();
+				JsonArray integrantesJSON = rolJSON.get("integrantes").getAsJsonArray();
+				IntegranteDeUnRol integrantes = new IntegranteDeUnRol(rol, integrantesJSON.size());
+				for (JsonElement art : integrantesJSON) {
+					String nombreArt = art.getAsString();
+					if (!nombreArt.equals("vacante")) {
+						ArtistaBase artista = lineUpImportado.stream().filter(a -> a.getNombre().equals(nombreArt))
+								.findFirst().orElse(null);
+						if (artista != null)
+							integrantes.agregarIntegrante(artista);
+					}
+				}
+				integrantesDeRol.addLast(integrantes);
+			}
+			repertorioImportado.add(Cancion.crearCancionConIntegrantesAAsignar(titulo, integrantesDeRol));
+		}
+		this.roles = rolesImportados;
+		this.lineUp = lineUpImportado;
+		this.repertorio = repertorioImportado;
 	}
-
 
 	public List<String> getListadoDeIntegrantesDeCancion(int nombreDeCancion) {
 		return repertorio.get(nombreDeCancion).getListadoDeIntegrantes().stream()
@@ -499,26 +412,30 @@ public class Recital {
 		for (int i = 0; i < repertorio.size(); i++) {
 			titulos.add(repertorio.get(i).getTitulo());
 		}
-
 		return titulos;
+	}
+
+	public Map<String, Integer> getTitulosDeCancionesConRolesDisponibles() {
+		Map<String, Integer> canciones = new HashMap<>();
+		for (int i = 0; i < repertorio.size(); i++) {
+			if (repertorio.get(i).tieneRolesDisponibles())
+				canciones.put(repertorio.get(i).getTitulo(), i);
+		}
+		return canciones;
 	}
 
 	public List<String> getListaDeNombresDeArtistasQueEstanAsignadosAlMenosACancion() {
 		List<String> artistasAsignadosAUnaCancion = new ArrayList<>();
-		for (Cancion cancion : repertorio) {
-			List<ArtistaBase> integrantesDeCancion = cancion.getListadoDeIntegrantes();
-			for (int i = 0; i < integrantesDeCancion.size() && integrantesDeCancion.get(i) != null; i++) {
-				if (!artistasAsignadosAUnaCancion.contains(integrantesDeCancion.get(i).getNombre())) {
-					artistasAsignadosAUnaCancion.add(integrantesDeCancion.get(i).getNombre());
-				}
-			}
+		for (ArtistaBase artista : lineUp) {
+			if (artista.estaAsignadoAlmenosAUnaCancion())
+				artistasAsignadosAUnaCancion.addLast(artista.getNombre());
 		}
 		return artistasAsignadosAUnaCancion;
 	}
 
 	public List<String> getListaDeRolesDisponiblesParaEntrenarArtista(int indexDelLineUp) {
 		if (indexDelLineUp < 0 || indexDelLineUp >= lineUp.size())
-			return null;// Exception out of bonds
+			throw new IndexOutOfBoundsException("El índice del artista es inválido.");
 		List<String> rolesDelArtista = lineUp.get(indexDelLineUp).getRoles();
 		return roles.stream().filter(rol -> !rolesDelArtista.contains(rol)).toList();
 	}
@@ -530,7 +447,6 @@ public class Recital {
 			if (!artista.perteneceADiscografica() && !artista.estaAsignadoAlmenosAUnaCancion())
 				listado.put(artista.getNombre(), i);
 		}
-//		System.out.println(listado.size());s
 		return listado;
 	}
 
@@ -541,24 +457,24 @@ public class Recital {
 			if (!artista.perteneceADiscografica())
 				listado.put(artista.getNombre(), i);
 		}
-//		System.out.println(listado.size());s
 		return listado;
 	}
 
-//	private List<String> getListadoCancionesEnLasQueArtistaEstaAsignado(String nombreDeArtista) {
-//		Artista artista;
-//		boolean encontro = false;
-//		int i;
-//		for (i = 0; i < lineUp.size() && !encontro; i++)
-//			if (lineUp.get(i).getNombre().compareTo(nombreDeArtista) == 0)
-//				encontro = true;
-//		if (!encontro)// borrar la 2da condicion!!!!
-//			return null; // el artista con ese nombre no existe
-//		artista = lineUp.get(i);
-//		repertorio.stream().filter(cancion -> cancion.artistaEstaAsignado(artista)).forEach(cancion -> {
-//			cancion.quitarArtista(artista);
-//			artista.designar(cancion);
-//		});
-//		return null;
-//	}
+	public String getInformacionDeArtistasDeDiscografia() {
+		String str = "";
+		for (ArtistaBase artista : lineUp) {
+			if (artista.perteneceADiscografica()) {
+				str += artista.toString() + "\n";
+			}
+		}
+		return str;
+	}
+
+	public String getInformacionDeLineUp() {
+		String str = "";
+		for (ArtistaBase artista : lineUp) {
+			str += artista.toString() + "\n";
+		}
+		return str;
+	}
 }
