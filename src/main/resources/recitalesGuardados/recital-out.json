@@ -12,86 +12,144 @@
   ],
   "repertorio": [
     {
-      "titulo": "Perro Dinamita",
+      "titulo": "Somebody to Love",
       "rolesXArtista": [
+        {
+          "rol": "piano",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "voz principal",
+          "integrantes": [
+            "vacante"
+          ]
+        },
         {
           "rol": "bajo",
           "integrantes": [
-            "John Deacon",
-            "Adrián Barilari"
+            "vacante"
           ]
         },
         {
-          "rol": "armónica",
+          "rol": "guitarra eléctrica",
           "integrantes": [
-            "Ciro Martinez"
-          ]
-        },
-        {
-          "rol": "saxofón",
-          "integrantes": [
-            "Agustin Cruz"
+            "vacante"
           ]
         },
         {
           "rol": "batería",
           "integrantes": [
-            "Roger Taylor"
+            "vacante"
           ]
         }
       ],
-      "costo": 100375.0
+      "costo": 0.0
     },
     {
-      "titulo": "Pronta Entrega",
+      "titulo": "We Will Rock You",
       "rolesXArtista": [
         {
-          "rol": "bajo",
+          "rol": "voz principal",
           "integrantes": [
-            "John Deacon"
+            "vacante"
           ]
         },
         {
-          "rol": "saxofón",
+          "rol": "bajo",
           "integrantes": [
-            "Ciro Martinez",
-            "Adrián Barilari"
+            "vacante"
+          ]
+        },
+        {
+          "rol": "guitarra eléctrica",
+          "integrantes": [
+            "vacante"
           ]
         },
         {
           "rol": "batería",
           "integrantes": [
-            "Roger Taylor"
+            "vacante"
           ]
         }
       ],
-      "costo": 375.0
+      "costo": 0.0
+    },
+    {
+      "titulo": "These Are the Days of Our Lives",
+      "rolesXArtista": [
+        {
+          "rol": "voz principal",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "bajo",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "guitarra eléctrica",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "batería",
+          "integrantes": [
+            "vacante"
+          ]
+        }
+      ],
+      "costo": 0.0
+    },
+    {
+      "titulo": "Under Pressure",
+      "rolesXArtista": [
+        {
+          "rol": "voz principal",
+          "integrantes": [
+            "vacante",
+            "vacante"
+          ]
+        },
+        {
+          "rol": "bajo",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "guitarra eléctrica",
+          "integrantes": [
+            "vacante"
+          ]
+        },
+        {
+          "rol": "batería",
+          "integrantes": [
+            "vacante"
+          ]
+        }
+      ],
+      "costo": 0.0
     }
   ],
   "lineUp": [
     {
-      "nombre": "Adrián Barilari",
+      "nombre": "Annie Lennox",
       "roles": [
-        "bajo",
-        "saxofón"
+        "voz principal"
       ],
       "bandas": [
-        "Adrián Barilari",
-        "Rata Blanca"
+        "Eurythmics"
       ],
-      "costo": 75.0,
-      "maxCanciones": 10
-    },
-    {
-      "nombre": "Agustin Cruz",
-      "roles": [
-        "saxofón"
-      ],
-      "bandas": [
-        "Acru"
-      ],
-      "costo": 100000.0,
-      "maxCanciones": 1
+      "costo": 900.0,
+      "maxCanciones": 2
     },
     {
       "nombre": "Brian May",
@@ -104,17 +162,40 @@
       ]
     },
     {
-      "nombre": "Ciro Martinez",
+      "nombre": "David Bowie",
       "roles": [
-        "saxofón",
-        "armónica"
+        "voz principal"
       ],
       "bandas": [
-        "Ciro y los Persas",
-        "Los Piojos"
+        "Tin Machine",
+        "David Bowie"
       ],
-      "costo": 300.0,
-      "maxCanciones": 5
+      "costo": 1500.0,
+      "maxCanciones": 2
+    },
+    {
+      "nombre": "Elton John",
+      "roles": [
+        "voz principal",
+        "piano"
+      ],
+      "bandas": [
+        "Elton John Band"
+      ],
+      "costo": 1200.0,
+      "maxCanciones": 2
+    },
+    {
+      "nombre": "George Michael",
+      "roles": [
+        "voz principal"
+      ],
+      "bandas": [
+        "Wham!",
+        "George Michael"
+      ],
+      "costo": 1000.0,
+      "maxCanciones": 3
     },
     {
       "nombre": "John Deacon",
@@ -124,6 +205,17 @@
       "bandas": [
         "Queen"
       ]
+    },
+    {
+      "nombre": "Lisa Stansfield",
+      "roles": [
+        "voz principal"
+      ],
+      "bandas": [
+        "Lisa Stansfield"
+      ],
+      "costo": 800.0,
+      "maxCanciones": 2
     },
     {
       "nombre": "Roger Taylor",
