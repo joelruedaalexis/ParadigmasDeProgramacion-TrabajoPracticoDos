@@ -1,0 +1,20 @@
+[
+  {
+    "nombre": "Juan Perez",
+    "roles": ["guitarra", "voz principal"],
+    "historial": ["river plate"],
+    "maxCanciones": 5
+  },
+  {
+    "nombre": "Maria Lopez",
+    "costo": 1500,
+    "roles": [],
+    "maxCanciones": 3
+  },
+  {
+    "nombre": "Carlos Gomez",
+    "costo": 2000,
+    "roles": ["piano"],
+    "maxCanciones": 2
+  }
+]
