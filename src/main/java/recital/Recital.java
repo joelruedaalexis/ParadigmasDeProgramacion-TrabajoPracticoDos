@@ -262,6 +262,7 @@ public class Recital {
 
 //	prolog = 10
 	public int prolog() {
+		IntegracionProlog.setRecitalActual(this);
 		IntegracionProlog.generarBaseDeConocimiento();
 		return IntegracionProlog.consultarEntrenamientosMinimos();
 	}
@@ -477,4 +478,21 @@ public class Recital {
 		}
 		return str;
 	}
+	
+	public List<Cancion> getRepertorio() {
+	    return repertorio;
+	}
+
+	public List<ArtistaBase> getLineUp() {
+	    return lineUp;
+	}
+
+	public Set<String> getRoles() {
+	    return roles;
+	}
+	
+	public Recital getRecitalActual() {
+	    return this;
+	}
+	
 }

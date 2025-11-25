@@ -232,4 +232,10 @@ public class Cancion {
 		cancionJSON.addProperty("costo", costo);
 		return cancionJSON;
 	}
+	
+	public List<String> getRolesRequeridos() {
+	    return getRoles();
+	}
+
+	
 }

@@ -26,38 +26,55 @@ import org.jpl7.Query;
 import org.jpl7.Term;
 import org.jpl7.Variable;
 
+import recital.Recital;
+import cancion.Cancion;
+
 public class IntegracionProlog {
 
 	private static final String ARTISTAS_JSON_PATH = "assets/artistas.json";
-	private static final String RECITAL_JSON_PATH = "assets/recital.json";
 	private static final String DISCOGRAFICA_JSON_PATH = "assets/artistas-discografica.json";
-
 	private static final String OUTPUT_DIR = "target/prolog";
 	private static final String PL_FILE_NAME = "base-de-conocimiento-prolog.pl";
 
 	private static final List<String> lineas = new ArrayList<>();
+	
+	private static Recital recitalActual = null;
+
+	public static void setRecitalActual(Recital recital) {
+	    recitalActual = recital;
+	}
 
 	public static void generarBaseDeConocimiento() {
-		lineas.clear();
-		try {
-			File dir = new File(OUTPUT_DIR);
-			if (!dir.exists()) {
-				dir.mkdirs();
-			}
-			String outputPath = OUTPUT_DIR + File.separator + PL_FILE_NAME;
-			generarHechosDeArtistas();
-			generarHechosDeDiscografica();
-			generarHechosDeRecital();
-			agregarReglasEstaticas();
-			try (PrintWriter pw = new PrintWriter(new FileWriter(outputPath))) {
-				for (String l : lineas) {
-					pw.println(l);
-				}
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Error de I/O al generar la base Prolog.", e);
-		}
+	    lineas.clear();
+	    
+	    if (recitalActual == null) {
+	        throw new IllegalStateException("No hay ningún recital cargado. Use la opción 15 primero.");
+	    }
+
+	    try {
+	        File dir = new File(OUTPUT_DIR);
+	        if (!dir.exists()) {
+	            dir.mkdirs();
+	        }
+
+	        String outputPath = OUTPUT_DIR + File.separator + PL_FILE_NAME;
+
+	        generarHechosDeArtistas();
+	        generarHechosDeDiscografica();
+	        generarHechosDeRecital(recitalActual);
+	        agregarReglasEstaticas();
+
+	        try (PrintWriter pw = new PrintWriter(new FileWriter(outputPath))) {
+	            for (String l : lineas) {
+	                pw.println(l);
+	            }
+	        }
+
+	    } catch (IOException e) {
+	        throw new RuntimeException("Error de I/O al generar la base Prolog.", e);
+	    }
 	}
+
 
 	public static void generarHechosDeArtistas() throws IOException {
 		List<String> bloque = new ArrayList<>();
@@ -127,28 +144,24 @@ public class IntegracionProlog {
 		lineas.addAll(bloque);
 	}
 
-	public static void generarHechosDeRecital() throws IOException {
-		List<String> bloque = new ArrayList<>();
-		InputStream inputStream = IntegracionProlog.class.getClassLoader().getResourceAsStream(RECITAL_JSON_PATH);
-		if (inputStream == null)
-			throw new IOException("No se encontró " + RECITAL_JSON_PATH);
-		int id = 1;
-		try (InputStreamReader reader = new InputStreamReader(inputStream)) {
-			JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
-			for (JsonElement jsonElement : jsonArray) {
-				JsonObject cancion = jsonElement.getAsJsonObject();
-				if (cancion.has("rolesRequeridos") && cancion.get("rolesRequeridos").isJsonArray()) {
-					for (JsonElement r : cancion.getAsJsonArray("rolesRequeridos")) {
-						bloque.add(String.format("rol_instancia(i%d, %s).", id++, toPrologAtom(r.getAsString())));
-					}
-				}
-			}
-		}
+	public static void generarHechosDeRecital(Recital recital) {
+	    List<String> bloque = new ArrayList<>();
+	    int id = 1;
 
-		Collections.sort(bloque);
-		lineas.addAll(bloque);
-		lineas.add(String.format("total_instancias_rol(%d).", id - 1));
+	    for (Cancion c : recital.getRepertorio()) {
+	        if (c.getRolesRequeridos() != null) {
+	            for (String rol : c.getRolesRequeridos()) {
+	                bloque.add(String.format("rol_instancia(i%d, %s).", id++, toPrologAtom(rol)));
+	            }
+	        }
+	    }
+
+	    Collections.sort(bloque);
+	    lineas.addAll(bloque);
+
+	    lineas.add(String.format("total_instancias_rol(%d).", id - 1));
 	}
+
 
 	private static void agregarReglasEstaticas() {
 		lineas.add("coste_entrenamiento(A, R, 0) :- habilidad(A, R).");
