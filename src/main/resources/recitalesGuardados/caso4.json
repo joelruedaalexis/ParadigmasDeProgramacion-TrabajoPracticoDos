@@ -55,6 +55,15 @@
       "costo": 50.0,
       "maxCanciones": 10
     },
+	{
+		 "nombre": "Walter Giardino",
+		 "roles": [
+			"guitarra eléctrica"
+		 ],
+		 "bandas": [
+			"Rata Blanca"
+		 ]
+		},
     {
       "nombre": "Brian May",
       "roles": [

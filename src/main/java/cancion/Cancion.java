@@ -28,6 +28,9 @@ public class Cancion {
 	public static Cancion crearCancionConIntegrantesAAsignar(String titulo, List<IntegranteDeUnRol> integrantesXRol) {
 		Cancion cancion = new Cancion(titulo);
 		cancion.integrantesXRol = integrantesXRol;
+		for(IntegranteDeUnRol integranteDeUnRol: integrantesXRol) {
+			integranteDeUnRol.getListaDeIntegrantes().forEach(a -> a.asignar(cancion));
+		}
 		return cancion;
 	}
 
